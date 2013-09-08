@@ -1,0 +1,100 @@
+package Lexeme;
+/**
+ * @author Leon Verhelst
+ */
+
+public class Token {
+    
+   //Symbolic names of token types
+    
+    /*
+     * We may need to split this out into it's own file
+     */
+    public enum token_Type{
+        ID, //Identifier
+        NUM, //Numeral
+        BLIT, //Boolean literal
+        ENDFILE, //End of source text (this is added by the Scanner)
+        ERROR, //Erroneous token
+        AND, //and
+        BOOL, //bool
+        BRANCH, //branch
+        CASE, //case
+        CONTINUE, //continue
+        DEFAULT, //default
+        ELSE, //else
+        END, //end
+        IF, //if
+        INT, //int
+        LOOP, //loop
+        MOD, //mod
+        OR, //or
+        REF,  //ref
+        RETURN, //return
+        VOID, //void
+        PLUS, //+
+        MINUS, //-
+        MULT, //*
+        DIV, // /
+        ANDTHEN, // &&
+        ORELSE, // ||
+        LT, // <
+        LTEQ, // <=
+        GT, // >
+        GTEQ, // >=
+        EQ, // =
+        NEQ, // /=
+        ASSIGN, // :=
+        SEMI, // ;
+        COMMA, // ,
+        LPAREN, // (
+        RPAREN, // )
+        LSQR, // [
+        RSQR, // ]
+        LCRLY, //{
+        RCRLY //}
+   }
+    
+    //name is the classification of the lexeme
+    private token_Type name;
+    //A lexeme is the actual code that this token represents
+    private String lexeme;
+    
+    /**
+     * Constructor to create a token
+     * @param name Token type and defined by the above enumeration
+     * @param lexeme The lexeme code as found by the scanner
+     */
+    public Token(token_Type name, String lexeme){
+        this.name = name;
+        this.lexeme = lexeme;
+    }
+
+    /**
+     * @return the name
+     */
+    public token_Type getName() {
+        return name;
+    }
+
+    /**
+     * @param name the name to set
+     */
+    public void setName(token_Type name) {
+        this.name = name;
+    }
+
+    /**
+     * @return the lexeme
+     */
+    public String getLexeme() {
+        return lexeme;
+    }
+
+    /**
+     * @param lexeme the lexeme to set
+     */
+    public void setLexeme(String lexeme) {
+        this.lexeme = lexeme;
+    }
+}

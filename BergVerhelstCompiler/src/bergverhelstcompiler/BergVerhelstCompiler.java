@@ -11,7 +11,7 @@ public class BergVerhelstCompiler {
      */
     public static void main(String[] args) {
         // Print Motivational Message
-        System.out.println("Emery smells awful.");
+        System.out.println("Leon smells awful.");
     }
 }
 

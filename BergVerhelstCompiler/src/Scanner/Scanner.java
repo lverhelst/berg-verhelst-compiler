@@ -1,6 +1,9 @@
 package Scanner;
 import Lexeme.Token;
 import java.util.HashMap;
+import java.util.Map;
+import java.util.NavigableMap;
+import java.util.TreeMap;
 /**
  * @author Leon Verhelst
  */
@@ -23,7 +26,7 @@ public class Scanner {
      * It stores word tokens, which are lexemes that start with a letter (i.e. a|..|z|A|..|Z)
      * Keywords are to be added first, then the identifiers as we find them
      */
-    HashMap<String, Token> wordTable;
+    TreeMap<String, Token> wordTable;
     
     /**
      * Initializes Scanner with the contents of the input file
@@ -40,15 +43,28 @@ public class Scanner {
     public Token getToken(){
         /** Main Token Generation Logic here **/
         //Get next character from source line
+        System.out.println("*****");
+        String currentTokenString = "e";
         
-        System.out.println(wordTable.get((String)"/"));
+        //Get all the matching entries for currentToken* (Same as a SQL WHERE value LIKE '<token_value>*';)
+        char lastCharForTreeSearch = currentTokenString.charAt(currentTokenString.length() - 1);
+        String incrementedTokenString = currentTokenString.substring(0, currentTokenString.length() - 1) + (char)(lastCharForTreeSearch + 1);
+        
+        System.out.println("Searching TreeMap (WordTable) for keys from: " + currentTokenString + " to: " + incrementedTokenString);
+        System.out.println("Retrieved:");
+        for(Map.Entry<String, Token> t: wordTable.subMap(currentTokenString, true, incrementedTokenString, true).entrySet()){
+            System.out.println(t.getValue().toString());
+        }
+        System.out.println("*****");
         //Make descisions
-
+        
+        
         //Make token
-        System.out.println(wordTable.get("endfile").toString());
+        //Hardcoded to cause the scanner to stop getting tokens
         currentToken = wordTable.get("endfile");
         return currentToken;
     }
+    
     
     /**
      * Initializes the word table
@@ -56,7 +72,7 @@ public class Scanner {
     private void generateWordTable(){
         //Initial size of 1000 records
         //Default load ratio of 0.75 (75%)
-        wordTable = new HashMap(1000, (float)0.75);
+        wordTable = new TreeMap();
         /*
          * Unsure if we should add the following to the word table
             ID, //Identifier

@@ -59,6 +59,10 @@ public class Token {
     private token_Type name;
     //A lexeme is the actual code that this token represents
     private String lexeme;
+    //Attribute value is the value of the token
+    //For identifiers, this will be the name
+    //Attribute value can be null where appropriate, such as for the IF token
+    private String attribute_Value;
     
     /**
      * Constructor to create a token
@@ -96,5 +100,19 @@ public class Token {
      */
     public void setLexeme(String lexeme) {
         this.lexeme = lexeme;
+    }
+
+    /**
+     * @return the attribute_Value
+     */
+    public String getAttribute_Value() {
+        return attribute_Value;
+    }
+
+    /**
+     * @param attribute_Value the attribute_Value to set
+     */
+    public void setAttribute_Value(String attribute_Value) {
+        this.attribute_Value = attribute_Value;
     }
 }

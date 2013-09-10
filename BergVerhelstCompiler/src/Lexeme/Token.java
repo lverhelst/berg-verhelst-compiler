@@ -67,11 +67,11 @@ public class Token {
     /**
      * Constructor to create a token
      * @param name Token type and defined by the above enumeration
-     * @param lexeme The lexeme code as found by the scanner
+     * @param attributeValue The attribute code as found by the scanner
      */
-    public Token(token_Type name, String lexeme){
+    public Token(token_Type name, String attributeValue){
         this.name = name;
-        this.lexeme = lexeme;
+        this.attribute_Value = attributeValue;
     }
 
     /**
@@ -114,5 +114,10 @@ public class Token {
      */
     public void setAttribute_Value(String attribute_Value) {
         this.attribute_Value = attribute_Value;
+    }
+    
+    @Override
+    public String toString(){
+        return (this.lexeme == null ? "<No Lexeme>" : this.lexeme) + " -> (" + this.name + ", " + (this.attribute_Value == null ? "-" : this.attribute_Value);
     }
 }

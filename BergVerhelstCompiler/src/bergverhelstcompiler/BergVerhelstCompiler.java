@@ -32,9 +32,10 @@ public class BergVerhelstCompiler {
             while(!eof){
                 currentToken = scn.getToken();
                 //Print out current token
-                System.out.println(currentToken.getLexeme() + " -> (" + currentToken.getName() + ", " + currentToken.getAttribute_Value() == null ? "-" : currentToken.getAttribute_Value());
+                System.out.println(currentToken.toString());
                 if(currentToken.getName() == Token.token_Type.ENDFILE){
                     eof = true;
+                    System.out.println("EndFile Reached");
                 }
             }
         }

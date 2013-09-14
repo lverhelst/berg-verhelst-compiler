@@ -34,6 +34,7 @@ public class FileReader {
         byte[] fileContents = null;
         try{
             //Read entire file
+            //Warnings exist here when compiling with javac, no warning in IDE
             fileContents = IOUtils.readFully(inputStream, -1, true);
         }finally{
             inputStream.close();

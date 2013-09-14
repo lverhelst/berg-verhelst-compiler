@@ -1,8 +1,9 @@
 package Scanner;
+import FileIO.FileReader;
 import Lexeme.Token;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.NavigableMap;
 import java.util.TreeMap;
 /**
  * @author Leon Verhelst
@@ -33,8 +34,10 @@ public class Scanner {
      * @param input Input file contents
      */
     public Scanner(String input){
-        if(wordTable == null)
+        if(!generateWordTableFromFile()){
+            System.out.println("Word File Did Not Generate, attempting layman coding generation technique");
             generateWordTable();
+        }  
         this.inputString = input;
         this.inputString = this.inputString + "ENDFILE";
         System.out.println("Scanner recieved string: " + this.inputString);
@@ -65,9 +68,32 @@ public class Scanner {
         return currentToken;
     }
     
+    /**
+     * Initializes the wordTable from "wordTable.txt"
+     */
+    private Boolean generateWordTableFromFile(){
+        //Initial size of 1000 records
+        //Default load ratio of 0.75 (75%)
+        wordTable = new TreeMap();
+        FileReader fr = new FileReader("src\\wordTable.txt");
+        String tableString;
+        try{
+            tableString = fr.readFileToString();
+            String[] lines = tableString.split("\r\n");
+            for(String line : lines){
+                String[] arr = line.split(" ");
+                Token tok = new Token(arr[0], Token.token_Type.valueOf(arr[1]), (arr.length == 3)? arr[2] : null);
+                wordTable.put(tok.getLexeme(), tok);
+            }
+        }catch(IOException e){
+            System.out.println(e.toString());
+            return false;
+        }
+        return true;
+    }
     
     /**
-     * Initializes the word table
+     * Initializes the word table via code 
      */
     private void generateWordTable(){
         //Initial size of 1000 records

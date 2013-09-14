@@ -73,6 +73,18 @@ public class Token {
         this.name = name;
         this.attribute_Value = attributeValue;
     }
+    
+    /**
+     * Triplet Constructor
+     * @param lexeme lexeme found
+     * @param type Token_Type
+     * @param attributeValue Value (can be null)
+     */
+    public Token(String lexeme, token_Type type, String attributeValue){
+        this.lexeme = lexeme;
+        this.name = type;
+        this.attribute_Value = attributeValue;
+    }
 
     /**
      * @return the name
@@ -118,6 +130,6 @@ public class Token {
     
     @Override
     public String toString(){
-        return (this.lexeme == null ? "<No Lexeme>" : this.lexeme) + " -> (" + this.name + ", " + (this.attribute_Value == null ? "-" : this.attribute_Value);
+        return (this.lexeme == null ? "<No Lexeme>" : this.lexeme) + " -> (" + this.name + ", " + (this.attribute_Value == null ? "-" : this.attribute_Value) + ")";
     }
 }

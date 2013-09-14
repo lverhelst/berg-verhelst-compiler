@@ -10,6 +10,12 @@
 <project name="BergVerhelstCompiler" default="default" basedir=".">
     <description>Builds, tests, and runs the project BergVerhelstCompiler.</description>
     <import file="nbproject/build-impl.xml"/>
+	<!-- <target name="run" depends="jar">
+	  <exec dir="${work.dir}" executable="java" input="${work.dir}/src/cs13Test.cs13">
+		<arg value="-jar"/>
+		<arg file="${dist.jar}"/>
+	  </exec>
+	</target> -->
     <!--
 
     There exist several targets which are by default empty and which can be 

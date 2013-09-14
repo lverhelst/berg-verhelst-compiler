@@ -1,0 +1,41 @@
+true BLIT 1
+false BLIT 0
+endfile ENDFILE endfile
+error ERROR 
+and AND 
+bool BOOL 
+branch BRANCH 
+case CASE 
+continue CONTINUE 
+default DEFAULT 
+else ELSE 
+end END 
+if IF 
+int INT 
+loop LOOP 
+mod MOD 
+or OR 
+ref REF 
+return RETURN 
+void VOID 
++ PLUS 
+- MINUS 
+* MULT 
+/ DIV 
+&& ANDTHEN 
+|| ORELSE 
+< LT 
+<= LTEQ 
+> GT 
+>= GTEQ 
+= EQ 
+/= NEQ 
+:= ASSIGN 
+; SEMI 
+, COMMA 
+( LPAREN 
+) RPAREN 
+[ LSQR 
+] RSQR 
+{ LCRLY 
+} RCRLY 

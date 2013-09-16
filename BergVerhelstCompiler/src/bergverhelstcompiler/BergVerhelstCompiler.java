@@ -25,6 +25,7 @@ public class BergVerhelstCompiler {
         }catch(IOException e){
             System.out.println(e.toString());
         }
+        
         if(fileContents != null){
             Scanner scn = new Scanner(fileContents);
             Boolean eof = false;

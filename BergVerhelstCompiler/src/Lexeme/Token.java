@@ -67,11 +67,23 @@ public class Token {
     /**
      * Constructor to create a token
      * @param name Token type and defined by the above enumeration
+     * @param lexeme The lexeme  as found by the scanner
      * @param attributeValue The attribute code as found by the scanner
      */
-    public Token(token_Type name, String attributeValue){
+    public Token(token_Type name, String lexeme, String attributeValue){
         this.name = name;
+        this.lexeme = lexeme;
         this.attribute_Value = attributeValue;
+    }
+    
+     /**
+     * Constructor to create a token
+     * @param name Token type and defined by the above enumeration
+     * @param lexeme The lexeme  as found by the scanner
+     */
+    public Token(token_Type name, String lexeme){
+        this.name = name;
+        this.lexeme = lexeme;
     }
 
     /**

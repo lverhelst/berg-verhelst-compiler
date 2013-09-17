@@ -84,8 +84,19 @@ public class Scanner {
         char nextChar = getNextChar();
         
         //scan until the end of the file is found or a newline
-        while(nextChar != '\n' && hasNextChar())
-            nextChar = getNextChar();
+        while(hasNextChar() && peekNextChar() != '\n') {
+            if(getNextChar() == 'E') {
+                 String id = "E";
+                    
+                //put characters until its not valid
+                while(hasNextChar() && isSimpleCharacter(peekNextChar())) 
+                    id += getNextChar();
+
+                //if ENDFILE is found return error
+                if(id.equals("ENDFILE"));
+                   //[Todo] throw expection
+            }            
+        }
     }
     
     /**
@@ -113,8 +124,9 @@ public class Scanner {
             if(isNumeric(charSymbol))
                 return getNum(charSymbol);
         }
-        
-        return new Token(Token.token_Type.ERROR, "error", "Error found at: " + lineNumber + " line\n" + "No valid tokens");
+                
+        //[Todo] change to throw expection No token can ever be found
+        return new Token(Token.token_Type.ERROR, "error", getError() + "No valid tokens");
     } 
     
     /**
@@ -131,12 +143,12 @@ public class Scanner {
         switch(charSymbol) {
             case '&':
                 if(charSymbol2 != '&')
-                    return new Token(Token.token_Type.ERROR, "error", "Error found at: " + lineNumber + " line\n" + charSymbol + charSymbol2 + " not a valid symbol");
+                    return new Token(Token.token_Type.ERROR, "error", getError() + charSymbol + charSymbol2 + " not a valid symbol");
                 else
                     return wordTable.get("&&");
             case '|':
                 if(charSymbol2 != '|')
-                    return new Token(Token.token_Type.ERROR, "error", "Error found at: " + lineNumber + " line\n" + charSymbol + charSymbol2 + " not a valid symbol");
+                    return new Token(Token.token_Type.ERROR, "error", getError() + charSymbol + charSymbol2 + " not a valid symbol");
                 else
                     return wordTable.get("||");
             case '<':
@@ -151,13 +163,16 @@ public class Scanner {
                     return wordTable.get(">=");
             case ':':
                 if(charSymbol2 != '=')
-                    return new Token(Token.token_Type.ERROR, "error", "Error found at: " + lineNumber + " line\n" + charSymbol + charSymbol2 + " not a valid symbol");
+                    return new Token(Token.token_Type.ERROR, "error", getError()+ charSymbol + charSymbol2 + " not a valid symbol");
                 else
                     return wordTable.get(":=");
             case '/': //start comment
                 if(charSymbol2 == '*') { 
-                    if(removeComment() == null)
-                        return getToken();
+                    Token comment = removeComment();
+                    if(comment == null)
+                        return getToken(); // no error continue scanning
+                    else 
+                        return comment; //return error message
                 } else 
                     return wordTable.get("/");
             case '-': //comment out line
@@ -168,7 +183,7 @@ public class Scanner {
                     return wordTable.get("-");
         }
         
-        return new Token(Token.token_Type.ERROR, "error", "Error found at: " + lineNumber + " line\n" + charSymbol + charSymbol2 + " not a valid symbol");
+        return new Token(Token.token_Type.ERROR, "error", getError() + charSymbol + charSymbol2 + " not a valid symbol");
     }
     
     /**
@@ -185,13 +200,17 @@ public class Scanner {
                 
         //check if the type is boolean or endfile
         if(id.equals("true") || id.equals("false"))
-            return new Token(Token.token_Type.BOOL, "bool", id);
+            return new Token(Token.token_Type.BLIT, "blit", id);
         else if (id.equals("ENDFILE"))
             return new Token(Token.token_Type.ENDFILE, "endfile"); 
         
+        //check if it is a key word
+        if(wordTable.containsKey(id))
+            return wordTable.get(id);
+        
         //check if id exists
         if(!symbolTable.containsKey(id))
-            symbolTable.put(id, currentID++);
+            symbolTable.put(id, currentID++);        
         
         return new Token(Token.token_Type.ID, "id", id);        
     }
@@ -208,7 +227,7 @@ public class Scanner {
         while(hasNextChar() && isCharacter(peekNextChar())) 
             id += getNextChar();
         
-        return new Token(Token.token_Type.INT, "int", id);        
+        return new Token(Token.token_Type.NUM, "num", id);        
     }
     
     /**
@@ -229,15 +248,15 @@ public class Scanner {
                             getNextChar();
                         }
                     } else //end of file reached with no tag                        
-                        return new Token(Token.token_Type.ERROR, "error", "Error found at: " + lineNumber + " line\n" + "File not properly ended");
+                        return new Token(Token.token_Type.ERROR, "error", getError() + "\nFile not properly ended");
                 case '*': //check for closing symbol
-                    if(++positionInString < inputString.length()) {
+                    if(hasNextChar()) {
                         if(peekNextChar() == '/') {
                             commentDepth--;
                             getNextChar();
                         }
                     } else //end of file reached with no tag
-                        return new Token(Token.token_Type.ERROR, "error", "Error found at: " + lineNumber + " line\n" + "File not properly ended");
+                        return new Token(Token.token_Type.ERROR, "error", getError() + " line\n" + "File not properly ended");
                     break;
                 case 'E': //check for end of file if e is found
                     String id = charSymbol + "";
@@ -248,7 +267,7 @@ public class Scanner {
                 
                     //if ENDFILE is found return error
                     if(id.equals("ENDFILE")) 
-                        return new Token(Token.token_Type.ERROR, "error", "Error found at: " + lineNumber + " line\n" + "ENDFILE found within comment section");
+                        return new Token(Token.token_Type.ERROR, "error", getError() + "ENDFILE found within comment section");
             }            
             
             //if all comments broken out of comment finished
@@ -257,11 +276,15 @@ public class Scanner {
             
             //if all comments broken out of but more remain error
             if(commentDepth < 0) //miss matched comments
-                return new Token(Token.token_Type.ERROR, "error", "Error found at: " + lineNumber + " line\n" + "Miss matched comments, more closing than openning comments");
+                return new Token(Token.token_Type.ERROR, "error", getError() + "Miss matched comments, more closing than openning comments");
         }
         
         return null;
-    }   
+    }  
+    
+    public String getError() {
+        return "Error found at: " + lineNumber + " line\n";
+    }
     
     /**
      * Used to add tokens to the word table

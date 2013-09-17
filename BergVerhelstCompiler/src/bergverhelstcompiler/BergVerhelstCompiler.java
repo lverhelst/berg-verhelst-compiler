@@ -37,7 +37,7 @@ public class BergVerhelstCompiler {
                 if(currentToken.getName() == Token.token_Type.ENDFILE){
                     eof = true;
                     System.out.println("EndFile Reached");
-                }
+                }                
             }
         }
     }

@@ -38,13 +38,13 @@ public class Scanner {
      */
     public Scanner(String input){
         symbolTable = new HashMap();
-        
+        this.generateWordTableFromFile();
         if(wordTable == null)
             generateWordTable();
         
-        }  
+          
         this.inputString = input;
-        this.inputString = this.inputString + "ENDFILE";
+        this.inputString = this.inputString + "\r\nENDFILE";
         System.out.println("Scanner recieved string: " + this.inputString);
         positionInString = 0;
         commentDepth = 0;
@@ -131,7 +131,7 @@ public class Scanner {
         }
                 
         //[Todo] change to throw expection No token can ever be found
-        return new Token(Token.token_Type.ERROR, "error", getError() + "No valid tokens");
+        return new Token(Token.token_Type.ERROR, "error", getError() + " No valid tokens");
     } 
     
     /**
@@ -202,12 +202,14 @@ public class Scanner {
         //consume characters until invalid or end of file
         while(hasNextChar() && isCharacter(peekNextChar())) 
             id += getNextChar();
-                
         //check if the type is boolean or endfile
-        if(id.equals("true") || id.equals("false"))
-            return new Token(Token.token_Type.BLIT, "blit", id);
-        else if (id.equals("ENDFILE"))
-            return new Token(Token.token_Type.ENDFILE, "endfile"); 
+        switch (id) {
+            case "true":
+            case "false":
+                return new Token(Token.token_Type.BLIT, "blit", id);
+            case "ENDFILE":
+                return new Token(Token.token_Type.ENDFILE, "endfile");
+        }
         
         //check if it is a key word
         if(wordTable.containsKey(id))
@@ -244,7 +246,6 @@ public class Scanner {
         
         while(hasNextChar()) {
             char charSymbol = getNextChar();
-            
             switch(charSymbol) {
                 case '/': //check for opening symbol
                     if(++positionInString < inputString.length()) {
@@ -273,7 +274,7 @@ public class Scanner {
                     //if ENDFILE is found return error
                     if(id.equals("ENDFILE")) 
                         return new Token(Token.token_Type.ERROR, "error", getError() + "ENDFILE found within comment section");
-            }            
+            }                      
             
             //if all comments broken out of comment finished
             if(commentDepth == 0)

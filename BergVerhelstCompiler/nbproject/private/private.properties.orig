@@ -1,0 +1,11 @@
+application.args=-f src/cs13Test.cs13
+compile.on.save=true
+<<<<<<< HEAD
+do.depend=false
+do.jar=true
+javac.debug=true
+javadoc.preview=true
+user.properties.file=C:\\Users\\Orion\\.netbeans\\7.1.2\\build.properties
+=======
+user.properties.file=C:\\Users\\Emery\\AppData\\Roaming\\NetBeans\\7.4beta\\build.properties
+>>>>>>> 004f60992a15c6c7753da48534353e7d8631db38

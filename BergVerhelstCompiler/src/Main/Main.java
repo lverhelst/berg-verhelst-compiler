@@ -29,7 +29,7 @@ public class Main {
             System.out.println(e.toString());
         }*/
         /**
-         * This method grads the second of the provided args
+         * This method grabs the second of the provided args
          * With the current directory being ..\BergVerhelstCompiler
          * We eventually want a java -classpath src Main.Main -cs13 src\cs13Test.cs13
          * to be how the user specifies a file

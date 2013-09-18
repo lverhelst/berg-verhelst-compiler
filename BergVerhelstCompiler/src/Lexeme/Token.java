@@ -64,6 +64,16 @@ public class Token {
     //Attribute value can be null where appropriate, such as for the IF token
     private String attribute_Value;
     
+    
+    /**
+     * Two part constructor
+     * @param name Token Type
+     * @param lexeme Lexeme
+     */
+    public Token(token_Type name, String lexeme){
+        this.name = name;
+        this.lexeme = lexeme;
+    }
     /**
      * Constructor to create a token
      * @param name Token type and defined by the above enumeration

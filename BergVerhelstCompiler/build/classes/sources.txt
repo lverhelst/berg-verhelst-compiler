@@ -1,0 +1,4 @@
+C:\Users\Orion\berg-verhelst-compiler\BergVerhelstCompiler\src\FileIO\FileReader.java
+C:\Users\Orion\berg-verhelst-compiler\BergVerhelstCompiler\src\Lexeme\Token.java
+C:\Users\Orion\berg-verhelst-compiler\BergVerhelstCompiler\src\Main\Main.java
+C:\Users\Orion\berg-verhelst-compiler\BergVerhelstCompiler\src\Scanner\Scanner.java

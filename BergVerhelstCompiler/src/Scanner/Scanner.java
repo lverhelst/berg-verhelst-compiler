@@ -6,15 +6,14 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.NavigableMap;
 import java.util.TreeMap;
+import Main.AdministrativeConsole;
 /**
  * @authors Leon Verhelst and Emery Berg
  */
 public class Scanner {
-    private String inputString;
     private int commentDepth;
-    private int positionInString;
-    private int lineNumber;
     private int currentID;
+    private AdministrativeConsole badMVCDesignConsole;
     
     /*
      * The symbol table stores identifier lexemes (spellings) and assigned them numerical indices
@@ -32,70 +31,31 @@ public class Scanner {
      */
     private TreeMap<String, Token> wordTable;
     
-    /**
-     * Initializes Scanner with the contents of the input file
-     * @param input Input file contents
-     */
-    public Scanner(String input){
+    public Scanner(AdministrativeConsole adv){
         symbolTable = new HashMap();
         this.generateWordTableFromFile();
         if(wordTable == null)
             generateWordTable();
-        
-          
-        this.inputString = input;
-        this.inputString = this.inputString + "\r\nENDFILE";
-        System.out.println("Scanner recieved string: " + this.inputString);
-        positionInString = 0;
         commentDepth = 0;
-        lineNumber = 0;
         currentID = 0;
-    }   
-    
-    /**
-     * Used to get the next character in the input string
-     * @return the next character in the input string
-     */
-    public char getNextChar() {
-        char nextChar = inputString.charAt(positionInString++);
+        this.badMVCDesignConsole = adv;
         
-        //check if newline character and increment counter if it is
-        if(nextChar == '\n')
-            lineNumber++;
-        
-        return nextChar;
     }
-    
-    /**
-     * Used to peek at the next character without moving the cursor
-     * @return the next character in the input string
-     */
-    public char peekNextChar() {
-        return inputString.charAt(positionInString);
-    }
-    
-    /**
-     * Used to check if there is another character in the Input String 
-     * @return true if there is another character
-     */
-    public boolean hasNextChar() {
-        return (positionInString) < inputString.length();
-    }
-    
+
     /**
      * Used to skip lines during input, used for single line comments
      */
     public void skipLine() {
-        char nextChar = getNextChar();
+        char nextChar = badMVCDesignConsole.getNextChar();
         
         //scan until the end of the file is found or a newline
-        while(hasNextChar() && peekNextChar() != '\n') {
-            if(getNextChar() == 'E') {
+        while(badMVCDesignConsole.hasNextChar() && badMVCDesignConsole.peekNextChar() != '\n') {
+            if(badMVCDesignConsole.getNextChar() == 'E') {
                  String id = "E";
                     
                 //put characters until its not valid
-                while(hasNextChar() && isSimpleCharacter(peekNextChar())) 
-                    id += getNextChar();
+                while(badMVCDesignConsole.hasNextChar() && isSimpleCharacter(badMVCDesignConsole.peekNextChar())) 
+                    id += badMVCDesignConsole.getNextChar();
 
                 //if ENDFILE is found return error
                 if(id.equals("ENDFILE"));
@@ -110,8 +70,8 @@ public class Scanner {
      */
     public Token getToken(){        
         //scan input for tokens (looks used to ignore illegal chars and white space
-        while(hasNextChar()) {
-            char charSymbol = getNextChar();           
+        while(badMVCDesignConsole.hasNextChar()) {
+            char charSymbol = badMVCDesignConsole.getNextChar();           
           
             //check if the symbol is a simple character
             if(isSimpleSymbol(charSymbol)) 
@@ -131,7 +91,7 @@ public class Scanner {
         }
                 
         //[Todo] change to throw expection No token can ever be found
-        return new Token(Token.token_Type.ERROR, "error", getError() + " No valid tokens");
+        return new Token(Token.token_Type.ERROR, "error", " No valid tokens");
     } 
     
     /**
@@ -142,18 +102,18 @@ public class Scanner {
      */
     public Token getSymbol(char charSymbol) {
         // & | < > / :
-        char charSymbol2 = getNextChar();
+        char charSymbol2 = badMVCDesignConsole.getNextChar();
         
         //check if symbol is valid
         switch(charSymbol) {
             case '&':
                 if(charSymbol2 != '&')
-                    return new Token(Token.token_Type.ERROR, "error", getError() + charSymbol + charSymbol2 + " not a valid symbol");
+                    return new Token(Token.token_Type.ERROR, "error", charSymbol + charSymbol2 + " not a valid symbol");
                 else
                     return wordTable.get("&&");
             case '|':
                 if(charSymbol2 != '|')
-                    return new Token(Token.token_Type.ERROR, "error", getError() + charSymbol + charSymbol2 + " not a valid symbol");
+                    return new Token(Token.token_Type.ERROR, "error", charSymbol + charSymbol2 + " not a valid symbol");
                 else
                     return wordTable.get("||");
             case '<':
@@ -168,7 +128,7 @@ public class Scanner {
                     return wordTable.get(">=");
             case ':':
                 if(charSymbol2 != '=')
-                    return new Token(Token.token_Type.ERROR, "error", getError()+ charSymbol + charSymbol2 + " not a valid symbol");
+                    return new Token(Token.token_Type.ERROR, "error", charSymbol + charSymbol2 + " not a valid symbol");
                 else
                     return wordTable.get(":=");
             case '/': //start comment
@@ -188,7 +148,7 @@ public class Scanner {
                     return wordTable.get("-");
         }
         
-        return new Token(Token.token_Type.ERROR, "error", getError() + charSymbol + charSymbol2 + " not a valid symbol");
+        return new Token(Token.token_Type.ERROR, "error", charSymbol + charSymbol2 + " not a valid symbol");
     }
     
     /**
@@ -200,8 +160,8 @@ public class Scanner {
         String id = charSymbol + "";
        
         //consume characters until invalid or end of file
-        while(hasNextChar() && isCharacter(peekNextChar())) 
-            id += getNextChar();
+        while(badMVCDesignConsole.hasNextChar() && isCharacter(badMVCDesignConsole.peekNextChar())) 
+            id += badMVCDesignConsole.getNextChar();
         //check if the type is boolean or endfile
         switch (id) {
             case "true":
@@ -231,8 +191,8 @@ public class Scanner {
         String id = charSymbol + "";
        
         //consume characters until invalid or end of file
-        while(hasNextChar() && isCharacter(peekNextChar())) 
-            id += getNextChar();
+        while(badMVCDesignConsole.hasNextChar() && isCharacter(badMVCDesignConsole.peekNextChar())) 
+            id += badMVCDesignConsole.getNextChar();
         
         return new Token(Token.token_Type.NUM, "num", id);        
     }
@@ -244,36 +204,31 @@ public class Scanner {
     public Token removeComment() {
         commentDepth++;
         
-        while(hasNextChar()) {
-            char charSymbol = getNextChar();
+        while(badMVCDesignConsole.hasNextChar()) {
+            char charSymbol = badMVCDesignConsole.getNextChar();
             switch(charSymbol) {
                 case '/': //check for opening symbol
-                    if(++positionInString < inputString.length()) {
-                        if(peekNextChar() == '*') {
+                        if(badMVCDesignConsole.peekNextChar() == '*') {
                             commentDepth++;
-                            getNextChar();
+                            badMVCDesignConsole.getNextChar();
                         }
-                    } else //end of file reached with no tag                        
-                        return new Token(Token.token_Type.ERROR, "error", getError() + "\nFile not properly ended");
                 case '*': //check for closing symbol
-                    if(hasNextChar()) {
-                        if(peekNextChar() == '/') {
+                    if(badMVCDesignConsole.hasNextChar()) {
+                        if(badMVCDesignConsole.peekNextChar() == '/') {
                             commentDepth--;
-                            getNextChar();
+                            badMVCDesignConsole.getNextChar();
                         }
                     } else //end of file reached with no tag
-                        return new Token(Token.token_Type.ERROR, "error", getError() + " line\n" + "File not properly ended");
+                        return new Token(Token.token_Type.ERROR, "error", " line\n" + "File not properly ended");
                     break;
                 case 'E': //check for end of file if e is found
                     String id = charSymbol + "";
-                    
                     //put characters until its not valid
-                    while(hasNextChar() && isSimpleCharacter(peekNextChar())) 
-                        id += getNextChar();
-                
+                    while(badMVCDesignConsole.hasNextChar() && isSimpleCharacter(badMVCDesignConsole.peekNextChar())) 
+                        id += badMVCDesignConsole.getNextChar();
                     //if ENDFILE is found return error
                     if(id.equals("ENDFILE")) 
-                        return new Token(Token.token_Type.ERROR, "error", getError() + "ENDFILE found within comment section");
+                        return new Token(Token.token_Type.ERROR, "error", "ENDFILE found within comment section");
             }                      
             
             //if all comments broken out of comment finished
@@ -282,16 +237,12 @@ public class Scanner {
             
             //if all comments broken out of but more remain error
             if(commentDepth < 0) //miss matched comments
-                return new Token(Token.token_Type.ERROR, "error", getError() + "Miss matched comments, more closing than openning comments");
+                return new Token(Token.token_Type.ERROR, "error", "Miss matched comments, more closing than openning comments");
         }
         
         return null;
     }  
-    
-    public String getError() {
-        return "Error found at: " + lineNumber + " line\n";
-    }
-    
+
     /**
      * Used to add tokens to the word table
      * @param token the token to add

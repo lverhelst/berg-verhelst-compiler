@@ -3,17 +3,16 @@ import FileIO.FileReader;
 import Lexeme.Token;
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.Map;
-import java.util.NavigableMap;
 import java.util.TreeMap;
 import Main.AdministrativeConsole;
+
 /**
  * @authors Leon Verhelst and Emery Berg
  */
 public class Scanner {
-    private int commentDepth;
-    private int currentID;
     private AdministrativeConsole badMVCDesignConsole;
+    private int currentID;
+    private final char ENDFILE = '\u001a';
     
     /*
      * The symbol table stores identifier lexemes (spellings) and assigned them numerical indices
@@ -31,67 +30,55 @@ public class Scanner {
      */
     private TreeMap<String, Token> wordTable;
     
+    /**
+     * Creates the scanner object used to retrieve tokens for the compile
+     * @param adv the administrativeConsole to get input from
+     */
     public Scanner(AdministrativeConsole adv){
-        symbolTable = new HashMap();
+        this.badMVCDesignConsole = adv;
         this.generateWordTableFromFile();
+        
+        //if file fails load defaults
         if(wordTable == null)
             generateWordTable();
-        commentDepth = 0;
-        currentID = 0;
-        this.badMVCDesignConsole = adv;
-        
-    }
-
-    /**
-     * Used to skip lines during input, used for single line comments
-     */
-    public void skipLine() {
-        char nextChar = badMVCDesignConsole.getNextChar();
-        
-        //scan until the end of the file is found or a newline
-        while(badMVCDesignConsole.hasNextChar() && badMVCDesignConsole.peekNextChar() != '\n') {
-            if(badMVCDesignConsole.getNextChar() == 'E') {
-                 String id = "E";
-                    
-                //put characters until its not valid
-                while(badMVCDesignConsole.hasNextChar() && isSimpleCharacter(badMVCDesignConsole.peekNextChar())) 
-                    id += badMVCDesignConsole.getNextChar();
-
-                //if ENDFILE is found return error
-                if(id.equals("ENDFILE"));
-                   //[Todo] throw expection
-            }            
-        }
+                
+        symbolTable = new HashMap();                
+        currentID = 0;        
     }
     
     /**
      * Used to find the next valid token
      * @return the next valid token
      */
-    public Token getToken(){        
-        //scan input for tokens (looks used to ignore illegal chars and white space
-        while(badMVCDesignConsole.hasNextChar()) {
-            char charSymbol = badMVCDesignConsole.getNextChar();           
-          
-            //check if the symbol is a simple character
-            if(isSimpleSymbol(charSymbol)) 
-                return wordTable.get(charSymbol + "");
+    public Token getToken(){ 
+        char charSymbol = badMVCDesignConsole.getNextChar();  
+        
+        //filter out the white spaces
+        while(isWhiteSpace(charSymbol))
+            charSymbol = badMVCDesignConsole.getNextChar(); 
+        
+        //if the character is the end of file return EOF token
+        if(charSymbol == ENDFILE)
+            return wordTable.get("endfile");
 
-            //check if the char is a symbol
-            if(isSymbol(charSymbol))
-                return getSymbol(charSymbol);
+        //check if the symbol is a simple character
+        if(isSimpleSymbol(charSymbol)) 
+            return wordTable.get(charSymbol + "");
 
-            //Check if character is valid for ID
-            if(isSimpleCharacter(charSymbol)) 
-                return getID(charSymbol);
-            
-            //check if character is valid for a number
-            if(isNumeric(charSymbol))
-                return getNum(charSymbol);
-        }
+        //check if the char is a symbol
+        if(isSymbol(charSymbol))
+            return getSymbol(charSymbol);
+
+        //Check if character is valid for ID
+        if(isSimpleCharacter(charSymbol)) 
+            return getID(charSymbol);
+
+        //check if character is valid for a number
+        if(isNumeric(charSymbol))
+            return getNum(charSymbol);        
                 
         //[Todo] change to throw expection No token can ever be found
-        return new Token(Token.token_Type.ERROR, "error", " No valid tokens");
+        return new Token(Token.token_Type.ERROR, "error", "Character " + charSymbol + " [" +(int)charSymbol + "] is not a valid character");
     } 
     
     /**
@@ -142,8 +129,11 @@ public class Scanner {
                     return wordTable.get("/");
             case '-': //comment out line
                 if(charSymbol2 == '-') {
-                    skipLine();
-                    return getToken();
+                    Token comment = removeComment();
+                    if(comment == null)
+                        return getToken(); // no error continue scanning
+                    else 
+                        return comment; //return error message
                 } else 
                     return wordTable.get("-");
         }
@@ -196,13 +186,29 @@ public class Scanner {
         
         return new Token(Token.token_Type.NUM, "num", id);        
     }
+
+    /**
+     * Used to skip lines during input, used for single line comments
+     * @return null if the line was skipped, ENDFILE token if EOF was found
+     */
+    public Token skipLine() {
+        char nextChar = badMVCDesignConsole.getNextChar();
+        
+        //scan until the end of the file is found or a newline
+        while(badMVCDesignConsole.hasNextChar() && badMVCDesignConsole.peekNextChar() != '\n') {
+            if(badMVCDesignConsole.getNextChar() == ENDFILE) 
+                 return wordTable.get("endfile");
+        }
+        
+        return null;
+    }
     
     /**
      * Used to remove comments from the source
      * @return null if comment is removed, error if end of file or an error is found
      */
-    public Token removeComment() {
-        commentDepth++;
+    public Token removeComment() {        
+        int commentDepth = 1; //starts at one level
         
         while(badMVCDesignConsole.hasNextChar()) {
             char charSymbol = badMVCDesignConsole.getNextChar();
@@ -221,14 +227,8 @@ public class Scanner {
                     } else //end of file reached with no tag
                         return new Token(Token.token_Type.ERROR, "error", " line\n" + "File not properly ended");
                     break;
-                case 'E': //check for end of file if e is found
-                    String id = charSymbol + "";
-                    //put characters until its not valid
-                    while(badMVCDesignConsole.hasNextChar() && isSimpleCharacter(badMVCDesignConsole.peekNextChar())) 
-                        id += badMVCDesignConsole.getNextChar();
-                    //if ENDFILE is found return error
-                    if(id.equals("ENDFILE")) 
-                        return new Token(Token.token_Type.ERROR, "error", "ENDFILE found within comment section");
+                case ENDFILE: //check for end of file if e is found                    
+                    return wordTable.get("endfile");
             }                      
             
             //if all comments broken out of comment finished
@@ -393,5 +393,14 @@ public class Scanner {
      */
     public boolean isNumeric(char charSymbol) {
         return charSymbol > 47 && charSymbol < 58;
+    }
+    
+    /**
+     * Used to filter out white spaces by returning true if char is white space
+     * @param charSymbol the symbol to check
+     * @return true if white space char
+     */
+    public boolean isWhiteSpace(char charSymbol) {
+        return charSymbol == 10 || charSymbol == 13 || charSymbol == 32;
     }
 }

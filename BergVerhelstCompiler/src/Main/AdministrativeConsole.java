@@ -37,7 +37,7 @@ public class AdministrativeConsole {
            FileReader reader = new FileReader(fileName);
            try{
                 //Load the file into our string buffer
-                fileAsString = reader.readFileToString() + "\r\nENDFILE";
+                fileAsString = reader.readFileToString() + "\r\n\u001a";
                 
                 //Scan the file
                 this.ScanFile();

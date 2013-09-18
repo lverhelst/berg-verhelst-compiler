@@ -13,6 +13,7 @@ public class AdministrativeConsole {
         
    String fileAsString;
    int linenumber;
+   int charPosInLine;
    int characterposition;
 
    public AdministrativeConsole(String fileName, String[] args){
@@ -60,11 +61,16 @@ public class AdministrativeConsole {
     */
    private void ScanFile(){
        Scanner.Scanner scn = new Scanner.Scanner(this);
+       if(arguments.get("trace").booleanValue()){
+           System.out.println(fileAsString);
+       }
        Token currentToken;
+       //Continue scanning until endfile is reached
        while((currentToken = scn.getToken()).getName() != Token.token_Type.ENDFILE){
+           //Handle display of current token (if necessary)
            if(currentToken.getName() != Token.token_Type.ERROR ){
                if(arguments.get("trace").booleanValue()){
-                    System.out.println("Line: " + linenumber + " ChatAt: " + characterposition + " retrieves: " + currentToken);
+                    System.out.println("Line: " + linenumber + " ChatAt: " + (charPosInLine - currentToken.getLexeme().length()) + " retrieves: " + currentToken);
                }
            }else{
               this.handleErrorToken(currentToken);
@@ -77,7 +83,7 @@ public class AdministrativeConsole {
     * @param erronousToken 
     */
    private void handleErrorToken(Token erroneousToken){
-       System.out.println("ERROR DETECTED >> Line: " + linenumber + " ChatAt: " + characterposition + " retrieves: " + erroneousToken);
+       System.out.println("ERROR DETECTED >> Line: " + linenumber + " ChatAt: " + charPosInLine + " retrieves: " + erroneousToken);
    }
    /**
     * Returns the next available character
@@ -85,8 +91,11 @@ public class AdministrativeConsole {
     */
    public char getNextChar(){
        char returnChar = fileAsString.charAt(characterposition++);
-       if(returnChar == '\n')
+       charPosInLine++;
+       if(returnChar == '\n'){
            linenumber++;
+           charPosInLine = 0;
+       }
        return returnChar;
    }
   

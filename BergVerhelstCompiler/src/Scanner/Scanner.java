@@ -72,25 +72,20 @@ public class Scanner {
         //scan input for tokens (looks used to ignore illegal chars and white space
         while(badMVCDesignConsole.hasNextChar()) {
             char charSymbol = badMVCDesignConsole.getNextChar();           
-          
             //check if the symbol is a simple character
             if(isSimpleSymbol(charSymbol)) 
                 return wordTable.get(charSymbol + "");
-
             //check if the char is a symbol
             if(isSymbol(charSymbol))
                 return getSymbol(charSymbol);
-
             //Check if character is valid for ID
             if(isSimpleCharacter(charSymbol)) 
                 return getID(charSymbol);
-            
             //check if character is valid for a number
             if(isNumeric(charSymbol))
                 return getNum(charSymbol);
         }
-                
-        //[Todo] change to throw expection No token can ever be found
+        //[Todo] change to throw exception No token can ever be found
         return new Token(Token.token_Type.ERROR, "error", " No valid tokens");
     } 
     
@@ -108,12 +103,12 @@ public class Scanner {
         switch(charSymbol) {
             case '&':
                 if(charSymbol2 != '&')
-                    return new Token(Token.token_Type.ERROR, "error", charSymbol + charSymbol2 + " not a valid symbol");
+                    return new Token(Token.token_Type.ERROR, "error", (char)charSymbol + "" +  (char)charSymbol2 + " not a valid symbol");
                 else
                     return wordTable.get("&&");
             case '|':
                 if(charSymbol2 != '|')
-                    return new Token(Token.token_Type.ERROR, "error", charSymbol + charSymbol2 + " not a valid symbol");
+                    return new Token(Token.token_Type.ERROR, "error", (char)charSymbol + "" + (char)charSymbol2 + " not a valid symbol");
                 else
                     return wordTable.get("||");
             case '<':
@@ -356,11 +351,12 @@ public class Scanner {
         //40 - 45          ( ) * + ,
         //59, 61           ; = 
         //91, 93           [ ]
-        //123, 125         { }        
+        //123, 125         { }     
+        //38               &
         return (charSymbol > 39   && charSymbol < 45)  ||
                 charSymbol == 59  || charSymbol == 61  ||
                 charSymbol == 123 || charSymbol == 125 ||
-                charSymbol == 38  || charSymbol == 91  || 
+                /*charSymbol == 38  ||*/ charSymbol == 91  || 
                 charSymbol == 93;
     }
     

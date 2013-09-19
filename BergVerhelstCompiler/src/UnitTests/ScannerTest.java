@@ -1,10 +1,8 @@
 package UnitTests;
 
-import FileIO.FileReader;
 import Lexeme.Token;
 import Main.AdministrativeConsole;
 import Scanner.Scanner;
-import java.io.IOException;
 
 /**
  * Used to test the methods available in the scanner class
@@ -16,7 +14,7 @@ public class ScannerTest {
     
     /**
      * Creates the unit tester for the scanner
-     * @param adv the administrativeconsole to use
+     * @param adv the administrative console to use
      */
     public ScannerTest(AdministrativeConsole adv) {
         this.adminCon = adv;

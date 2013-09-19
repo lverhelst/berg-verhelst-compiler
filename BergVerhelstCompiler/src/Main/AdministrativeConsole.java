@@ -9,7 +9,7 @@ import java.io.IOException;
 import java.util.HashMap;
 /**
  *
- * @author Leon Verhelst
+ * @author Leon Verhelst and Emery Berg
  */
 public class AdministrativeConsole {
    
@@ -145,7 +145,9 @@ public class AdministrativeConsole {
        }
    }
    
-   
+   /**
+    * Resets all parameters
+    */
    private void resetParameters(){
        arguments = new HashMap();
        fileAsString = "";
@@ -283,10 +285,8 @@ public class AdministrativeConsole {
      * Runs all the unit tests
      */
     private void runUnitTests(){
-        UnitTester ut = new UnitTester();
+        UnitTester ut = new UnitTester(this);
         ut.runAllUnitTests();
-        ScannerTest scan = new ScannerTest(this);
-        scan.runAllUnitTests();
     }       
    
    /**

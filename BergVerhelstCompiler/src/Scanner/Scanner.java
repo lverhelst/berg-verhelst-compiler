@@ -74,8 +74,10 @@ public class Scanner{
         if(isNumeric(currentChar))
             return getNum(currentChar);        
                 
-        //[Todo] change to throw expection No token can ever be found
-        return new Token(Token.token_Type.ERROR, "error", "Character " + currentChar + " [" +(int)currentChar + "] is not a valid character");
+        //returns an error as an illegal character was found
+        return new Token(Token.token_Type.ERROR, "error", "Character "
+                + "" + currentChar + " [" +(int)currentChar + "] is a" 
+                + getCharType(currentChar));
     } 
     
     /**
@@ -144,7 +146,7 @@ public class Scanner{
                     return wordTable.get("-");
         }
         
-        return new Token(Token.token_Type.ERROR, "error", currentChar + "" + nextChar + " not a valid symbol");
+        return new Token(Token.token_Type.ERROR, "error", currentChar + "" + nextChar + " does not form a valid symbol");
     }
     
     /**
@@ -192,8 +194,8 @@ public class Scanner{
         //check if the next character is valid, if not return token as an error
         if(isCharacter(adv.peekNextChar()))        
             return new Token(Token.token_Type.ERROR, "error", id 
-                    + " can only be followed by whitespace or a symbol, not by "
-                    + adv.peekNextChar());
+                    + " can only be followed by whitespace or a symbol, not by a"
+                    + getCharType(adv.peekNextChar()) + " (" + adv.peekNextChar() + ")");
         
         return new Token(Token.token_Type.NUM, "num", id);        
     }
@@ -426,38 +428,49 @@ public class Scanner{
     }
     
     /**
+     * Used to find out what type of char a character is 
+     * @param currentChar the char to check
+     * @return a String representing the type which the char is
+     */
+    public String getCharType(char currentChar) {
+        //check if char is character type 
+        if(isSimpleCharacter(currentChar))
+            return "simple character";
+        else if(isCharacter(currentChar))
+            return "character";
+        
+        //check if char is numeric
+        if(isNumeric(currentChar))
+            return "numeric";
+        
+        //check if char is a symbol
+        if(isSimpleSymbol(currentChar))
+            return "simple symbol ";
+        else if(isSymbol(currentChar))
+            return "symbol ";
+            
+        //check if char is white space or an invisible char
+        if(isWhiteSpace(currentChar))
+            return "white space character";
+        else if(isInvisible(currentChar))
+            return "invisible character";
+         
+        //if no return has occured the character is invalid
+        return "invalid";
+    }
+    
+    /**
      * Used to print all characters in their groupings
      * @return 
      */
     public String printClassification() {
         String charSet = "";
         
+        //scans through the ASCII set and returns the chars classified
         for(int i = 0; i < 256; i++) {
             char currentChar = (char)i;
-            charSet += currentChar + " (" + i + ") ";
-            
-            if(isCharacter(currentChar))
-                charSet += "(Character) ";
-            
-            if(isInvisible(currentChar))
-                charSet += "(Invisible) ";
-                        
-            if(isNumeric(currentChar))
-                charSet += "(Numeric) ";
-            
-            if(isSimpleCharacter(currentChar))
-                charSet += "(Simple Character) ";
-            
-            if(isSimpleSymbol(currentChar))
-                charSet += "(Simple Symbol) ";
-            
-            if(isSymbol(currentChar))
-                charSet += "(Symbol) ";
-            
-            if(isWhiteSpace(currentChar))
-                charSet += "(White Space) ";
-            
-            charSet += "\n";
+            charSet += currentChar + " (" + i + ") " 
+                    + getCharType(currentChar) + "\n";
         }  
         
         return charSet;

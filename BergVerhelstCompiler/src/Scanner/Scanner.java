@@ -395,6 +395,7 @@ public class Scanner{
     
     /**
      * Used to check if the currentChar is a numeric
+     * These are 0 - 9
      * @param currentChar the currentChar to check
      * @return boolean value true if valid
      */
@@ -404,10 +405,23 @@ public class Scanner{
     
     /**
      * Used to filter out white spaces by returning true if char is white space
+     * These are horizontal tab(11), line feed (13), vertical tab(13), 
+     * form feed(14), carriage return(15), space(32)
      * @param currentChar the symbol to check
      * @return true if white space char
      */
     public boolean isWhiteSpace(char currentChar) {
-        return currentChar == 10 || currentChar == 13 || currentChar == 32;
+        return currentChar == 10 || currentChar == 11 ||
+               currentChar == 13 || currentChar == 14 ||
+               currentChar == 15 || currentChar == 32;
+    }
+    
+    /**
+     * Used to identify characters which are not visible (including whitespace)
+     * @@param currentChar the symbol to check
+     * @return true if invisible char
+     */
+    public boolean isInvisible(char currentChar) {
+         return currentChar <= 32;
     }
 }

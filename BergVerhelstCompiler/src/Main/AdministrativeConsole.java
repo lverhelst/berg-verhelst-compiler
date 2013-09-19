@@ -1,7 +1,9 @@
 package Main;
 import FileIO.FileReader;
 import Lexeme.Token;
+import java.io.File;
 import java.io.IOException;
+import java.util.Collections;
 import java.util.HashMap;
 /**
  *
@@ -129,7 +131,8 @@ public class AdministrativeConsole {
                     runFileProcess();
                     break;
                 case "3":
-                    System.out.println("Running Unit Tests (No Unit Tests Exist Currently)");
+                    //System.out.println("Running Unit Tests (No Unit Tests Exist Currently)");
+                    runCompileTest();
                     break;
                 case "4":
                     displayHelp();
@@ -164,6 +167,23 @@ public class AdministrativeConsole {
        }
        System.out.println("Administrative Console - Completed Scan");
    }
+   
+   /**
+    * Used to run all test files stored in the test folder and compare to expected output
+    */
+   public void runCompileTest() {
+       File folder = new File("test/");
+       File[] fileList = folder.listFiles();
+       String output = "";
+              
+       for(File file : fileList) {
+           
+           String[] traceargs = {"-tr","token", "-f", file.getPath()};
+            setParameters(traceargs);
+            runFileProcess();
+       }         
+   }   
+   
    /**
     * Print out result of erroneous token
     * @param erronousToken 

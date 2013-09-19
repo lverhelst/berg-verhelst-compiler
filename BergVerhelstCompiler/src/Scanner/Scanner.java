@@ -1,15 +1,15 @@
 package Scanner;
 import FileIO.FileReader;
 import Lexeme.Token;
+import Main.AdministrativeConsole;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.TreeMap;
-import Main.AdministrativeConsole;
 
 /**
  * @authors Leon Verhelst and Emery Berg
  */
-public class Scanner {
+public class Scanner{
     private AdministrativeConsole badMVCDesignConsole;
     private int currentID;
     private final char ENDFILE = '\u001a';
@@ -68,6 +68,12 @@ public class Scanner {
         //check if the char is a symbol
         if(isSymbol(charSymbol))
             return getSymbol(charSymbol);
+        
+        //Check if character is valid for ID
+	if(isSimpleCharacter(charSymbol))
+	    return getID(charSymbol);
+        if(isNumeric(charSymbol))
+	    return getNum(charSymbol);
 
         //[Todo] change to throw exception No token can ever be found
         return new Token(Token.token_Type.ERROR, "error", "Character " + charSymbol + " [" +(int)charSymbol + "] is not a valid character");

@@ -1,6 +1,8 @@
 package Main;
 import FileIO.FileReader;
 import Lexeme.Token;
+import Parser.Parser;
+import UnitTests.UnitTester;
 import java.io.IOException;
 import java.util.HashMap;
 /**
@@ -14,7 +16,10 @@ public class AdministrativeConsole {
    private enum valid_arguments{
        f ("-f", true),
        tr ("-tr", true),
-       ui ("-ui", false);
+       ui ("-ui", false),
+       help ("-help", false),
+       test ("-test", false),
+       load ("-load", true);
        protected String argString;
        protected Boolean requiresValue;
        valid_arguments(String argument, Boolean requiresValue){
@@ -28,19 +33,39 @@ public class AdministrativeConsole {
    int linenumber;
    int charPosInLine;
    int characterposition;
-
+   /**
+    * Create Administrative console with the provided parameters
+    * @param args Arguments/Parameters
+    */
    public AdministrativeConsole(String[] args){
        setParameters(args);
-       if(arguments.containsKey("ui")){
-           runUI();
+       //Display help if it exists
+       if(arguments.containsKey("help")){
+           displayHelp();
+       }
+       
+       if(arguments.containsKey("test")){
+           runUnitTests();
        }else{
-           runFileProcess();
+        //If the UI option is specified it takes precendence over all others
+        //Display UI, otherwise run the compiler with the other provided arguments
+        if(arguments.containsKey("ui")){
+            runUI();
+        }else{
+            runFileProcess();
+        }
        }
    }
-   
+   /**
+    * Read and Compile the file
+    */
    private void runFileProcess(){
        String fileName = arguments.get("f");
-       //Verify valid file name
+       if(fileName == null)
+           fileName = arguments.get("load");
+       
+       
+      //Verify valid file name
        if(!fileName.endsWith("cs13")){
            System.out.println("Administrative Console - Invalid File Name: " + fileName);
        }else{
@@ -50,13 +75,19 @@ public class AdministrativeConsole {
                 fileAsString = "\r\n" + reader.readFileToString() + "\u001a";
                 fileByLines = fileAsString.split("\r\n");
                 //Scan the file
-                scanFile();
+                //Only run the file process if f is specified,
+                //otherwise we will be satisfied with merely loading the file (for Unit Test reasons)
+                if(arguments.containsKey("f"))
+                    parseFile();
            }catch(IOException e){
                System.out.println("Administrative Console: " + e.toString());
            }
        }
    }
-   
+   /**
+    * Takes the arguments from as provided and sets the arguments hashmap
+    * @param args Arguments as a array of strings
+    */
    private void setParameters(String[] args)
    {   
        resetParameters();
@@ -81,6 +112,7 @@ public class AdministrativeConsole {
                            System.out.println("Administrative Console - Argument has no value: " + args[i]);
                        }
                    }else{
+                       //Argument does not need value, add to argument map
                        arguments.put(args[i], "");
                    }
                    
@@ -101,16 +133,19 @@ public class AdministrativeConsole {
        characterposition = 0;
    }
    
-   
-   private void runUI(){
-               
+   /**
+    * Runs the compiler as a looped-cmd program
+    */
+   private void runUI(){     
         java.util.Scanner kbd = new java.util.Scanner(System.in);
         System.out.println("Enter number Corresponding to the wanted command\r\n1) Scan File \r\n2) Show Trace \r\n3) Unit Tests \r\n4) Help \r\n5) Exit");
         String line;
         System.out.print(">");
+        //Get input until user quits
         while(!(line = kbd.nextLine()).equals("5")){
             switch(line){
                 case "1":
+                    //Case 1: Scan file, no parameters
                     resetParameters();
                     System.out.print("Enter File Name:");
                     line = kbd.nextLine();   
@@ -120,6 +155,7 @@ public class AdministrativeConsole {
                     runFileProcess();
                     break;
                 case "2":
+                    //Case 2: Scan file with trace token parameter
                     resetParameters();
                     System.out.print("Enter File Name:");
                     line = kbd.nextLine();
@@ -129,9 +165,17 @@ public class AdministrativeConsole {
                     runFileProcess();
                     break;
                 case "3":
-                    System.out.println("Running Unit Tests (No Unit Tests Exist Currently)");
+                    //Case 3: Run unit tests
+                    resetParameters();
+                    //parameters
+                    String[] unitargs = {"-test"}; 
+                    setParameters(unitargs);
+                    System.out.println("Running Unit Tests");
+                    runUnitTests();
+                    System.out.println("Unit Tests Completed");
                     break;
                 case "4":
+                    //Case 3: Display Help
                     displayHelp();
                     break;
             }
@@ -141,34 +185,25 @@ public class AdministrativeConsole {
    }
    
    /**
-    * Scan the current file
+    * Parse input File
     */
-   private void scanFile(){
-       Scanner.Scanner scn = new Scanner.Scanner(this);
+   private void parseFile(){
+       //Check trace
        if(arguments.containsKey("tr") && arguments.get("tr").equals("token")){
            for(int i = 1; i < fileByLines.length; i++){
                System.out.println(String.format("%3d", i) + "| " + fileByLines[i]);
            }
        }
-       Token currentToken;
-       //Continue scanning until endfile is reached
-       while((currentToken = scn.getToken()).getName() != Token.token_Type.ENDFILE){
-           //Handle display of current token (if necessary)
-           if(currentToken.getName() != Token.token_Type.ERROR ){
-               if(arguments.containsKey("tr") && arguments.get("tr").equals("token")){
-                    System.out.println("Line: " + linenumber + " ChatAt: " + (charPosInLine - currentToken.getLexeme().length()) + " retrieves: " + currentToken);
-               }
-           }else{
-              this.handleErrorToken(currentToken);
-           }
-       }
+       //Parse
+       Parser prs = new Parser(this);
+       prs.parse(arguments.containsKey("tr") && arguments.get("tr").equals("token"));
        System.out.println("Administrative Console - Completed Scan");
    }
    /**
     * Print out result of erroneous token
     * @param erronousToken 
     */
-   private void handleErrorToken(Token erroneousToken){
+   public void handleErrorToken(Token erroneousToken){
        System.out.println("ERROR DETECTED >> Line: " + linenumber + " ChatAt: " + charPosInLine + " retrieves: " + erroneousToken);
    }
    /**
@@ -176,15 +211,17 @@ public class AdministrativeConsole {
     * @return Next Character in the String
     */
    public char getNextChar(){
+       //Get next character
        char returnChar = fileAsString.charAt(characterposition++);
-
        charPosInLine++;
+       //Check if we progress to next line
        if(returnChar == '\n'){
            linenumber++;
-            if(arguments.containsKey("tr") && arguments.get("tr").equals("token")){
+           charPosInLine = 0;
+           //Check if we need to print out the current line
+           if(arguments.containsKey("tr") && arguments.get("tr").equals("token")){
                 System.out.println(linenumber + ": " + fileByLines[linenumber]);
             }
-           charPosInLine = 0;
        }
        return returnChar;
    }
@@ -204,10 +241,24 @@ public class AdministrativeConsole {
     public boolean hasNextChar() {
         return (characterposition) < fileAsString.length();
     }
-    
-    
-    public void displayHelp(){
+    /**
+     * Print trace information for a detected token
+     * @param t The token to print the information for
+     */
+    public void printTraceInformation(Token t){
+        System.out.println("Line: " + linenumber + " Position: " + (charPosInLine - t.getLexeme().length()) + " retrieves: " + t);
+    }
+    /**
+     * Print Help Information
+     */
+    private void displayHelp(){
        System.out.println("BERG-VERHELST-COMPILER c*13 Language \r\n **** \r\n Command List \r\n -f <FileName.cs13> (Load File into Compiler)" 
-               + "\r\n -tr token (Show tokens from the scanner \r\n -ui (Run compiler using command interface");     
+               + "\r\n -tr token (Trace tokens from the scanner) \r\n -ui (Run compiler using command interface) \r\n -help (Display help)");     
    }
+    
+    private void runUnitTests(){
+        UnitTester ut = new UnitTester();
+        ut.runAllUnitTests();
+    }
+        
 }

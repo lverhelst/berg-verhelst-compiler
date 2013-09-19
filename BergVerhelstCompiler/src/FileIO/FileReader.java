@@ -12,15 +12,13 @@ import sun.misc.IOUtils;
  */
 public class FileReader {
     private String fileName;
-    public static final String VALID_EXTENSION = "cs13";
     /**
      * Constructor specifying filename
+     * File name extension is checked at the administrative console
      * @param fileName 
      */
     public FileReader(String fileName){
         this.fileName = fileName;
-        //TODO: Perform extension check? throw invalid file error?
-        
     }
     /**
      * Reads the entire contents of a the file specified in the constructor into a String

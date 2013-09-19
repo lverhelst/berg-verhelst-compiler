@@ -1,9 +1,11 @@
 package Main;
 import FileIO.FileReader;
 import Lexeme.Token;
+import java.io.File;
 import Parser.Parser;
 import UnitTests.UnitTester;
 import java.io.IOException;
+import java.util.Collections;
 import java.util.HashMap;
 /**
  *
@@ -199,6 +201,23 @@ public class AdministrativeConsole {
        prs.parse(arguments.containsKey("tr") && arguments.get("tr").equals("token"));
        System.out.println("Administrative Console - Completed Scan");
    }
+   
+   /**
+    * Used to run all test files stored in the test folder and compare to expected output
+    */
+   public void runCompileTest() {
+       File folder = new File("test/");
+       File[] fileList = folder.listFiles();
+       String output = "";
+              
+       for(File file : fileList) {
+           
+           String[] traceargs = {"-tr","token", "-f", file.getPath()};
+            setParameters(traceargs);
+            runFileProcess();
+       }         
+   }   
+   
    /**
     * Print out result of erroneous token
     * @param erronousToken 

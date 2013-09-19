@@ -10,7 +10,7 @@ import java.util.TreeMap;
  * @authors Leon Verhelst and Emery Berg
  */
 public class Scanner{
-    private AdministrativeConsole badMVCDesignConsole;
+    private AdministrativeConsole adv;
     private final char ENDFILE = '\u001a';
     private int currentID;
     
@@ -35,7 +35,7 @@ public class Scanner{
      * @param adv the administrativeConsole to get input from
      */
     public Scanner(AdministrativeConsole adv){
-        this.badMVCDesignConsole = adv;
+        this.adv = adv;
         this.generateWordTableFromFile();
         
         //if file fails load defaults
@@ -51,13 +51,13 @@ public class Scanner{
      * @return the next valid token
      */
     public Token getToken(){ 
-        char currentChar = badMVCDesignConsole.getNextChar();
+        char currentChar = adv.getNextChar();
          //if the character is the end of file return EOF token
         if(currentChar == ENDFILE)
             return wordTable.get("endfile");
         //filter out the white spaces
         while(isWhiteSpace(currentChar))
-            currentChar = badMVCDesignConsole.getNextChar(); 
+            currentChar = adv.getNextChar(); 
         //check if the symbol is a simple character
         if(isSimpleSymbol(currentChar)) 
             return wordTable.get(currentChar + "");
@@ -84,8 +84,8 @@ public class Scanner{
      * @param currentChar the char which was found starting the symbol call
      * @return the token which was found. error token if symbol is not valid
      */
-    public Token getSymbol(char currentChar) {
-        char nextChar = badMVCDesignConsole.peekNextChar();
+    private Token getSymbol(char currentChar) {
+        char nextChar = adv.peekNextChar();
                 
         //check if symbol is valid
         switch(currentChar) {
@@ -100,14 +100,14 @@ public class Scanner{
                     break;
                 
                 //if valid consume char and return token
-                badMVCDesignConsole.getNextChar();
+                adv.getNextChar();
                 return wordTable.get(currentChar + "" + nextChar);
             case '<':
                 if(nextChar != '=') 
                     return wordTable.get("<");
                 else {
                     //if valid consume char and return token
-                    badMVCDesignConsole.getNextChar();
+                    adv.getNextChar();
                     return wordTable.get("<=");
                 }
             case '>':
@@ -115,26 +115,26 @@ public class Scanner{
                     return wordTable.get(">");
                 else {
                     //if valid consume char and return token
-                    badMVCDesignConsole.getNextChar();
+                    adv.getNextChar();
                     return wordTable.get(">=");
                 }
             case '/': //start comment
                 if(nextChar == '*') { 
-                    badMVCDesignConsole.getNextChar();
+                    adv.getNextChar();
                     
                     if(removeComment())
                         return getToken(); // no eof continue scanning
                     else 
                         return wordTable.get("endfile"); //return eof message
                 } else if (nextChar == '=') {
-                    badMVCDesignConsole.getNextChar();
+                    adv.getNextChar();
                     return wordTable.get("/=");
                 }
                 else                            
                     return wordTable.get("/");
             case '-': //comment out line
                 if(nextChar == '-') {
-                    badMVCDesignConsole.getNextChar();
+                    adv.getNextChar();
                     
                     if(skipLine())
                         return getToken(); // no eof continue scanning
@@ -152,12 +152,12 @@ public class Scanner{
      * @param currentChar the starting character
      * @return the id token
      */
-    public Token getID(char currentChar) {
+    private Token getID(char currentChar) {
         String id = currentChar + "";
        
         //consume characters until invalid or end of file
-        while(badMVCDesignConsole.hasNextChar() && isCharacter(badMVCDesignConsole.peekNextChar())) 
-            id += badMVCDesignConsole.getNextChar();
+        while(adv.hasNextChar() && isCharacter(adv.peekNextChar())) 
+            id += adv.getNextChar();
         
         //check if the type is boolean or endfile
         switch (id) {
@@ -182,18 +182,18 @@ public class Scanner{
      * @param currrentChar the starting character
      * @return the id token
      */
-    public Token getNum(char currrentChar) {
+    private Token getNum(char currrentChar) {
         String id = currrentChar + "";
        
         //consume numbers until invalid or end of file
-        while(badMVCDesignConsole.hasNextChar() && isNumeric(badMVCDesignConsole.peekNextChar())) 
-            id += badMVCDesignConsole.getNextChar();
+        while(adv.hasNextChar() && isNumeric(adv.peekNextChar())) 
+            id += adv.getNextChar();
         
         //check if the next character is valid, if not return token as an error
-        if(isCharacter(badMVCDesignConsole.peekNextChar()))        
+        if(isCharacter(adv.peekNextChar()))        
             return new Token(Token.token_Type.ERROR, "error", id 
                     + " can only be followed by whitespace or a symbol, not by "
-                    + badMVCDesignConsole.peekNextChar());
+                    + adv.peekNextChar());
         
         return new Token(Token.token_Type.NUM, "num", id);        
     }
@@ -202,12 +202,12 @@ public class Scanner{
      * Used to skip lines during input, used for single line comments
      * @return true if the line was skipped, false if EOF was found
      */
-    public boolean skipLine() {
-        char nextChar = badMVCDesignConsole.getNextChar();
+    private boolean skipLine() {
+        char nextChar = adv.getNextChar();
         
         //scan until the end of the file is found or a newline
-        while(badMVCDesignConsole.hasNextChar() && badMVCDesignConsole.peekNextChar() != '\n') {
-            if(badMVCDesignConsole.getNextChar() == ENDFILE) 
+        while(adv.hasNextChar() && adv.peekNextChar() != '\n') {
+            if(adv.getNextChar() == ENDFILE) 
                  return false;
         }
         
@@ -218,22 +218,22 @@ public class Scanner{
      * Used to remove comments from the source
      * @return true if comment is removed, false if end of file is found
      */
-    public boolean removeComment() {        
+    private boolean removeComment() {        
         int commentDepth = 1; //starts at one level
         
-        while(badMVCDesignConsole.hasNextChar()) {
-            char currentChar = badMVCDesignConsole.getNextChar();
+        while(adv.hasNextChar()) {
+            char currentChar = adv.getNextChar();
             
             switch(currentChar) {
                 case '/': //check for opening symbol
-                    if(badMVCDesignConsole.peekNextChar() == '*') {
-                        badMVCDesignConsole.getNextChar();
+                    if(adv.peekNextChar() == '*') {
+                        adv.getNextChar();
                         commentDepth++;
                     }
                     break;
                 case '*': //check for closing symbol
-                    if(badMVCDesignConsole.peekNextChar() == '/') {
-                        badMVCDesignConsole.getNextChar();
+                    if(adv.peekNextChar() == '/') {
+                        adv.getNextChar();
                         commentDepth--;
                     }
                     break;
@@ -423,5 +423,43 @@ public class Scanner{
      */
     public boolean isInvisible(char currentChar) {
          return currentChar <= 32;
+    }
+    
+    /**
+     * Used to print all characters in their groupings
+     * @return 
+     */
+    public String printClassification() {
+        String charSet = "";
+        
+        for(int i = 0; i < 256; i++) {
+            char currentChar = (char)i;
+            charSet += currentChar + " (" + i + ") ";
+            
+            if(isCharacter(currentChar))
+                charSet += "(Character) ";
+            
+            if(isInvisible(currentChar))
+                charSet += "(Invisible) ";
+                        
+            if(isNumeric(currentChar))
+                charSet += "(Numeric) ";
+            
+            if(isSimpleCharacter(currentChar))
+                charSet += "(Simple Character) ";
+            
+            if(isSimpleSymbol(currentChar))
+                charSet += "(Simple Symbol) ";
+            
+            if(isSymbol(currentChar))
+                charSet += "(Symbol) ";
+            
+            if(isWhiteSpace(currentChar))
+                charSet += "(White Space) ";
+            
+            charSet += "\n";
+        }  
+        
+        return charSet;
     }
 }

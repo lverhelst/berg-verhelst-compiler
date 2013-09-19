@@ -3,9 +3,9 @@ import FileIO.FileReader;
 import Lexeme.Token;
 import java.io.File;
 import Parser.Parser;
+import UnitTests.ScannerTest;
 import UnitTests.UnitTester;
 import java.io.IOException;
-import java.util.Collections;
 import java.util.HashMap;
 /**
  *
@@ -74,7 +74,7 @@ public class AdministrativeConsole {
            FileReader reader = new FileReader(fileName);
            try{
                 //Load the file into our string buffer
-                fileAsString = "\r\n" + reader.readFileToString() + "\u001a";
+                fileAsString = "\r\n" + reader.readFileToString() + '\u001a';
                 fileByLines = fileAsString.split("\r\n");
                 //Scan the file
                 //Only run the file process if f is specified,
@@ -86,6 +86,26 @@ public class AdministrativeConsole {
            }
        }
    }
+   
+   /**
+    * Used to load files for testing in unit test
+    * @param fileName the name of the file to load
+    */
+   public void loadFile(String fileName) {
+       if(!fileName.endsWith("cs13")){
+           System.out.println("Administrative Console - Invalid File Name: " + fileName);
+       }else{
+           FileReader reader = new FileReader(fileName);
+           try{
+                //Load the file into our string buffer
+                fileAsString = "\r\n" + reader.readFileToString() + '\u001a';
+                fileByLines = fileAsString.split("\r\n");
+           }catch(IOException e){
+               System.out.println("Administrative Console: " + e.toString());
+           }
+       }
+   }
+   
    /**
     * Takes the arguments from as provided and sets the arguments hashmap
     * @param args Arguments as a array of strings
@@ -200,27 +220,11 @@ public class AdministrativeConsole {
        Parser prs = new Parser(this);
        prs.parse(arguments.containsKey("tr") && arguments.get("tr").equals("token"));
        System.out.println("Administrative Console - Completed Scan");
-   }
-   
-   /**
-    * Used to run all test files stored in the test folder and compare to expected output
-    */
-   public void runCompileTest() {
-       File folder = new File("test/");
-       File[] fileList = folder.listFiles();
-       String output = "";
-              
-       for(File file : fileList) {
-           
-           String[] traceargs = {"-tr","token", "-f", file.getPath()};
-            setParameters(traceargs);
-            runFileProcess();
-       }         
-   }   
+   }  
    
    /**
     * Print out result of erroneous token
-    * @param erronousToken 
+    * @param erroneousToken 
     */
    public void handleErrorToken(Token erroneousToken){
        System.out.println("ERROR DETECTED >> Line: " + linenumber + " ChatAt: " + charPosInLine + " retrieves: " + erroneousToken);
@@ -275,9 +279,28 @@ public class AdministrativeConsole {
                + "\r\n -tr token (Trace tokens from the scanner) \r\n -ui (Run compiler using command interface) \r\n -help (Display help) \r\n -test (Run unit tests)");     
    }
     
+    /**
+     * Runs all the unit tests
+     */
     private void runUnitTests(){
         UnitTester ut = new UnitTester();
         ut.runAllUnitTests();
-    }
-        
+        ScannerTest scan = new ScannerTest(this);
+        scan.runAllUnitTests();
+    }       
+   
+   /**
+    * Used to run all test files stored in the test folder and compare to expected output
+    */
+   public void runCompileTest() {
+       File folder = new File("test/");
+       File[] fileList = folder.listFiles();
+       String output = "";
+              
+       for(File file : fileList) {
+            String[] traceargs = {"-tr","token", "-f", file.getPath()};
+            setParameters(traceargs);
+            runFileProcess();
+       }         
+   }  
 }

@@ -1,7 +1,7 @@
 true BLIT 1
 false BLIT 0
-endfile ENDFILE endfile
 error ERROR 
+endfile ENDFILE
 and AND 
 not NOT
 bool BOOL 

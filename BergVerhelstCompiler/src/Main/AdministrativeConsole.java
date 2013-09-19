@@ -272,7 +272,7 @@ public class AdministrativeConsole {
      */
     private void displayHelp(){
        System.out.println("BERG-VERHELST-COMPILER c*13 Language \r\n **** \r\n Command List \r\n -f <FileName.cs13> (Load File into Compiler)" 
-               + "\r\n -tr token (Trace tokens from the scanner) \r\n -ui (Run compiler using command interface) \r\n -help (Display help)");     
+               + "\r\n -tr token (Trace tokens from the scanner) \r\n -ui (Run compiler using command interface) \r\n -help (Display help) \r\n -test (Run unit tests)");     
    }
     
     private void runUnitTests(){

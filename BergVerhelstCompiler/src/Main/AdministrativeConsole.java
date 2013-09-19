@@ -94,6 +94,11 @@ public class AdministrativeConsole {
    
    private void resetParameters(){
        arguments = new HashMap();
+       fileAsString = "";
+       fileByLines = null;
+       linenumber = 0;
+       charPosInLine = 0;
+       characterposition = 0;
    }
    
    
@@ -172,6 +177,7 @@ public class AdministrativeConsole {
     */
    public char getNextChar(){
        char returnChar = fileAsString.charAt(characterposition++);
+
        charPosInLine++;
        if(returnChar == '\n'){
            linenumber++;
@@ -182,7 +188,6 @@ public class AdministrativeConsole {
        }
        return returnChar;
    }
-  
     
     /**
      * Used to peek at the next character without moving the cursor

@@ -51,16 +51,13 @@ public class Scanner{
      * @return the next valid token
      */
     public Token getToken(){ 
-        char currentChar = badMVCDesignConsole.getNextChar();  
-        
+        char currentChar = badMVCDesignConsole.getNextChar();
+         //if the character is the end of file return EOF token
+        if(currentChar == ENDFILE)
+            return wordTable.get("endfile");
         //filter out the white spaces
         while(isWhiteSpace(currentChar))
             currentChar = badMVCDesignConsole.getNextChar(); 
-        
-        //if the character is the end of file return EOF token
-        if(currentChar == ENDFILE)
-            return wordTable.get("endfile");
-
         //check if the symbol is a simple character
         if(isSimpleSymbol(currentChar)) 
             return wordTable.get(currentChar + "");

@@ -17,6 +17,7 @@ public class Token {
         ENDFILE, //End of source text (this is added by the Scanner)
         ERROR, //Erroneous token
         AND, //and
+        NOT,
         BOOL, //bool
         BRANCH, //branch
         CASE, //case

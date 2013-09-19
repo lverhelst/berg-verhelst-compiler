@@ -3,6 +3,7 @@ false BLIT 0
 endfile ENDFILE endfile
 error ERROR 
 and AND 
+not NOT
 bool BOOL 
 branch BRANCH 
 case CASE 

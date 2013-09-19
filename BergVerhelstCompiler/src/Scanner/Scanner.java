@@ -11,8 +11,8 @@ import java.util.TreeMap;
  */
 public class Scanner{
     private AdministrativeConsole badMVCDesignConsole;
-    private int currentID;
     private final char ENDFILE = '\u001a';
+    private int currentID;
     
     /*
      * The symbol table stores identifier lexemes (spellings) and assigned them numerical indices
@@ -51,112 +51,122 @@ public class Scanner{
      * @return the next valid token
      */
     public Token getToken(){ 
-        char charSymbol = badMVCDesignConsole.getNextChar();  
+        char currentChar = badMVCDesignConsole.getNextChar();  
         
         //filter out the white spaces
-        while(isWhiteSpace(charSymbol))
-            charSymbol = badMVCDesignConsole.getNextChar(); 
+        while(isWhiteSpace(currentChar))
+            currentChar = badMVCDesignConsole.getNextChar(); 
         
         //if the character is the end of file return EOF token
-        if(charSymbol == ENDFILE)
+        if(currentChar == ENDFILE)
             return wordTable.get("endfile");
 
         //check if the symbol is a simple character
-        if(isSimpleSymbol(charSymbol)) 
-            return wordTable.get(charSymbol + "");
+        if(isSimpleSymbol(currentChar)) 
+            return wordTable.get(currentChar + "");
 
         //check if the char is a symbol
-        if(isSymbol(charSymbol))
-            return getSymbol(charSymbol);
+        if(isSymbol(currentChar))
+            return getSymbol(currentChar);
         
         //Check if character is valid for ID
-	if(isSimpleCharacter(charSymbol))
-	    return getID(charSymbol);
-        if(isNumeric(charSymbol))
-	    return getNum(charSymbol);
+        if(isSimpleCharacter(currentChar)) 
+            return getID(currentChar);
 
-        //[Todo] change to throw exception No token can ever be found
-        return new Token(Token.token_Type.ERROR, "error", "Character " + charSymbol + " [" +(int)charSymbol + "] is not a valid character");
+        //check if character is valid for a number
+        if(isNumeric(currentChar))
+            return getNum(currentChar);        
+                
+        //[Todo] change to throw expection No token can ever be found
+        return new Token(Token.token_Type.ERROR, "error", "Character " + currentChar + " [" +(int)currentChar + "] is not a valid character");
     } 
     
     /**
      * Used when a symbol is detected, if symbol is invalid an error is returned
      * Method also calls the removeComment method if comment is detected
-     * @param charSymbol the char which was found starting the symbol call
+     * @param currentChar the char which was found starting the symbol call
      * @return the token which was found. error token if symbol is not valid
      */
-    public Token getSymbol(char charSymbol) {
-        // & | < > / :
-        char charSymbol2 = badMVCDesignConsole.getNextChar();
-        
+    public Token getSymbol(char currentChar) {
+        char nextChar = badMVCDesignConsole.peekNextChar();
+                
         //check if symbol is valid
-        switch(charSymbol) {
+        switch(currentChar) {
             case '&':
-                if(charSymbol2 != '&')
-                    return new Token(Token.token_Type.ERROR, "error", (char)charSymbol + "" +  (char)charSymbol2 + " not a valid symbol");
-                else
-                    return wordTable.get("&&");
+                if(nextChar != '&') //only valid char
+                    break;
             case '|':
-                if(charSymbol2 != '|')
-                    return new Token(Token.token_Type.ERROR, "error", (char)charSymbol + "" + (char)charSymbol2 + " not a valid symbol");
-                else
-                    return wordTable.get("||");
-            case '<':
-                if(charSymbol2 != '=') 
-                    return wordTable.get("<");
-                else
-                    return wordTable.get("<=");
-            case '>':
-                if(charSymbol2 != '=')                    
-                    return wordTable.get(">");
-                else
-                    return wordTable.get(">=");
+                if(nextChar != '|') //only valid char
+                    break; 
             case ':':
-                if(charSymbol2 != '=')
-                    return new Token(Token.token_Type.ERROR, "error", charSymbol + charSymbol2 + " not a valid symbol");
-                else
-                    return wordTable.get(":=");
+                if(nextChar != '=') //only valid char
+                    break;
+                
+                //if valid consume char and return token
+                badMVCDesignConsole.getNextChar();
+                return wordTable.get(currentChar + "" + nextChar);
+            case '<':
+                if(nextChar != '=') 
+                    return wordTable.get("<");
+                else {
+                    //if valid consume char and return token
+                    badMVCDesignConsole.getNextChar();
+                    return wordTable.get("<=");
+                }
+            case '>':
+                if(nextChar != '=')                    
+                    return wordTable.get(">");
+                else {
+                    //if valid consume char and return token
+                    badMVCDesignConsole.getNextChar();
+                    return wordTable.get(">=");
+                }
             case '/': //start comment
-                if(charSymbol2 == '*') { 
-                    Token comment = removeComment();
-                    if(comment == null)
-                        return getToken(); // no error continue scanning
+                if(nextChar == '*') { 
+                    badMVCDesignConsole.getNextChar();
+                    
+                    if(removeComment())
+                        return getToken(); // no eof continue scanning
                     else 
-                        return comment; //return error message
-                } else 
+                        return wordTable.get("endfile"); //return eof message
+                } else if (nextChar == '=') {
+                    badMVCDesignConsole.getNextChar();
+                    return wordTable.get("/=");
+                }
+                else                            
                     return wordTable.get("/");
             case '-': //comment out line
-                if(charSymbol2 == '-') {
-                    Token comment = removeComment();
-                    if(comment == null)
-                        return getToken(); // no error continue scanning
+                if(nextChar == '-') {
+                    badMVCDesignConsole.getNextChar();
+                    
+                    if(skipLine())
+                        return getToken(); // no eof continue scanning
                     else 
-                        return comment; //return error message
+                        return wordTable.get("endfile"); //return eof message
                 } else 
                     return wordTable.get("-");
         }
         
-        return new Token(Token.token_Type.ERROR, "error", charSymbol + charSymbol2 + " not a valid symbol");
+        return new Token(Token.token_Type.ERROR, "error", currentChar + "" + nextChar + " not a valid symbol");
     }
     
     /**
      * Used to get a token for an id value
-     * @param charSymbol the starting character
+     * @param currentChar the starting character
      * @return the id token
      */
-    public Token getID(char charSymbol) {
-        String id = charSymbol + "";
+    public Token getID(char currentChar) {
+        String id = currentChar + "";
        
         //consume characters until invalid or end of file
         while(badMVCDesignConsole.hasNextChar() && isCharacter(badMVCDesignConsole.peekNextChar())) 
             id += badMVCDesignConsole.getNextChar();
+        
         //check if the type is boolean or endfile
         switch (id) {
             case "true":
             case "false":
                 return new Token(Token.token_Type.BLIT, "blit", id);
-            case "ENDFILE":
-                return new Token(Token.token_Type.ENDFILE, "endfile");
         }
         
         //check if it is a key word
@@ -172,73 +182,74 @@ public class Scanner{
     
     /**
      * Used to get a int token for an Numeric value
-     * @param charSymbol the starting character
+     * @param currrentChar the starting character
      * @return the id token
      */
-    public Token getNum(char charSymbol) {
-        String id = charSymbol + "";
+    public Token getNum(char currrentChar) {
+        String id = currrentChar + "";
        
-        //consume characters until invalid or end of file
-        while(badMVCDesignConsole.hasNextChar() && isCharacter(badMVCDesignConsole.peekNextChar())) 
+        //consume numbers until invalid or end of file
+        while(badMVCDesignConsole.hasNextChar() && isNumeric(badMVCDesignConsole.peekNextChar())) 
             id += badMVCDesignConsole.getNextChar();
+        
+        //check if the next character is valid, if not return token as an error
+        if(isCharacter(badMVCDesignConsole.peekNextChar()))        
+            return new Token(Token.token_Type.ERROR, "error", id 
+                    + " can only be followed by whitespace or a symbol, not by "
+                    + badMVCDesignConsole.peekNextChar());
         
         return new Token(Token.token_Type.NUM, "num", id);        
     }
 
     /**
      * Used to skip lines during input, used for single line comments
-     * @return null if the line was skipped, ENDFILE token if EOF was found
+     * @return true if the line was skipped, false if EOF was found
      */
-    public Token skipLine() {
+    public boolean skipLine() {
         char nextChar = badMVCDesignConsole.getNextChar();
         
         //scan until the end of the file is found or a newline
         while(badMVCDesignConsole.hasNextChar() && badMVCDesignConsole.peekNextChar() != '\n') {
             if(badMVCDesignConsole.getNextChar() == ENDFILE) 
-                 return wordTable.get("endfile");
+                 return false;
         }
         
-        return null;
+        return true;
     }
     
     /**
      * Used to remove comments from the source
-     * @return null if comment is removed, error if end of file or an error is found
+     * @return true if comment is removed, false if end of file is found
      */
-    public Token removeComment() {        
+    public boolean removeComment() {        
         int commentDepth = 1; //starts at one level
         
         while(badMVCDesignConsole.hasNextChar()) {
-            char charSymbol = badMVCDesignConsole.getNextChar();
-            switch(charSymbol) {
+            char currentChar = badMVCDesignConsole.getNextChar();
+            
+            switch(currentChar) {
                 case '/': //check for opening symbol
-                        if(badMVCDesignConsole.peekNextChar() == '*') {
-                            commentDepth++;
-                            badMVCDesignConsole.getNextChar();
-                        }
+                    if(badMVCDesignConsole.peekNextChar() == '*') {
+                        badMVCDesignConsole.getNextChar();
+                        commentDepth++;
+                    }
+                    break;
                 case '*': //check for closing symbol
-                    if(badMVCDesignConsole.hasNextChar()) {
-                        if(badMVCDesignConsole.peekNextChar() == '/') {
-                            commentDepth--;
-                            badMVCDesignConsole.getNextChar();
-                        }
-                    } else //end of file reached with no tag
-                        return new Token(Token.token_Type.ERROR, "error", " line\n" + "File not properly ended");
+                    if(badMVCDesignConsole.peekNextChar() == '/') {
+                        badMVCDesignConsole.getNextChar();
+                        commentDepth--;
+                    }
                     break;
                 case ENDFILE: //check for end of file if e is found                    
-                    return wordTable.get("endfile");
+                    return false;
             }                      
             
             //if all comments broken out of comment finished
             if(commentDepth == 0)
                 break;
-            
-            //if all comments broken out of but more remain error
-            if(commentDepth < 0) //miss matched comments
-                return new Token(Token.token_Type.ERROR, "error", "Miss matched comments, more closing than openning comments");
         }
         
-        return null;
+        return true;
     }  
 
     /**
@@ -248,6 +259,7 @@ public class Scanner{
     public void addWordToken(Token token) {
         wordTable.put(token.getLexeme(), token);
     }
+    
     /**
      * Initializes the wordTable from "wordTable.txt"
      */
@@ -263,7 +275,7 @@ public class Scanner{
             for(String line : lines){
                 String[] arr = line.split(" ");
                 Token tok = new Token(arr[0], Token.token_Type.valueOf(arr[1]), (arr.length == 3)? arr[2] : null);
-                wordTable.put(tok.getLexeme(), tok);
+                addWordToken(tok);
             }
         }catch(IOException e){
             System.out.println(e.toString());
@@ -330,76 +342,75 @@ public class Scanner{
     /**
      * Used to check if the value is valid for symbols 
      * & ( ) * + , - / : ; < = > [ ] { | /
-     * @param charSymbol the character to check against valid symbols
+     * @param currentChar the character to check against valid symbols
      * @return true if the symbol is valid
      */
-    public boolean isSymbol(char charSymbol) {
+    public boolean isSymbol(char currentChar) {
         //38, 40 - 45, 47  & ( ) * + , - /
         //58-62            : ; < = >
         //91, 93           [ ]
         //123-125          { | }        
-        return (charSymbol > 39  && charSymbol < 46)  ||
-               (charSymbol > 57  && charSymbol < 63)  ||
-               (charSymbol > 122 && charSymbol < 126) ||
-                charSymbol == 38 || charSymbol == 47 || 
-                charSymbol == 91 || charSymbol == 93;
+        return (currentChar > 39  && currentChar < 46)  ||
+               (currentChar > 57  && currentChar < 63)  ||
+               (currentChar > 122 && currentChar < 126) ||
+                currentChar == 38 || currentChar == 47 || 
+                currentChar == 91 || currentChar == 93;
     }
     
     /**
      * Used to check if the value is a simple symbol ( ) * + , - ; = [] {}
-     * @param charSymbol the character to check against valid symbols
+     * @param currentChar the character to check against valid symbols
      * @return true if the symbol is valid
      */
-    public boolean isSimpleSymbol(char charSymbol) {
+    public boolean isSimpleSymbol(char currentChar) {
         //40 - 45          ( ) * + ,
         //59, 61           ; = 
         //91, 93           [ ]
         //123, 125         { }     
         //38               &
-        return (charSymbol > 39   && charSymbol < 45)  ||
-                charSymbol == 59  || charSymbol == 61  ||
-                charSymbol == 123 || charSymbol == 125 ||
-                /*charSymbol == 38  ||*/ charSymbol == 91  || 
-                charSymbol == 93;
+        return (currentChar > 39   && currentChar < 45)  ||
+                currentChar == 59  || currentChar == 61  ||
+                currentChar == 123 || currentChar == 125 ||
+                currentChar == 91  || currentChar == 93;
     }
     
     /**
-     * Used to check if the charSymbol is a valid character a-z. A-Z, 0-9 $ _
-     * @param charSymbol the charSymbol to check
+     * Used to check if the currentChar is a valid character a-z. A-Z, 0-9 $ _
+     * @param currentChar the currentChar to check
      * @return boolean value true if valid
      */
-    public boolean isCharacter(char charSymbol) {
-        return (isNumeric(charSymbol) || 
-                isSimpleCharacter(charSymbol)  || 
-                 charSymbol == '$' || 
-                 charSymbol == '_');
+    public boolean isCharacter(char currentChar) {
+        return (isNumeric(currentChar) || 
+                isSimpleCharacter(currentChar)  || 
+                 currentChar == '$' || 
+                 currentChar == '_');
     }
     
     /**
-     * Used to check if the charSymbol is a simple character a-z. A-Z
-     * @param charSymbol the charSymbol to check
+     * Used to check if the currentChar is a simple character a-z. A-Z
+     * @param currentChar the currentChar to check
      * @return boolean value true if valid
      */
-    public boolean isSimpleCharacter(char charSymbol) {
-        return ((charSymbol > 96 && charSymbol < 123) || 
-                (charSymbol > 64 && charSymbol < 91));
+    public boolean isSimpleCharacter(char currentChar) {
+        return ((currentChar > 96 && currentChar < 123) || 
+                (currentChar > 64 && currentChar < 91));
     }
     
     /**
-     * Used to check if the charSymbol is a numeric
-     * @param charSymbol the charSymbol to check
+     * Used to check if the currentChar is a numeric
+     * @param currentChar the currentChar to check
      * @return boolean value true if valid
      */
-    public boolean isNumeric(char charSymbol) {
-        return charSymbol > 47 && charSymbol < 58;
+    public boolean isNumeric(char currentChar) {
+        return currentChar > 47 && currentChar < 58;
     }
     
     /**
      * Used to filter out white spaces by returning true if char is white space
-     * @param charSymbol the symbol to check
+     * @param currentChar the symbol to check
      * @return true if white space char
      */
-    public boolean isWhiteSpace(char charSymbol) {
-        return charSymbol == 10 || charSymbol == 13 || charSymbol == 32;
+    public boolean isWhiteSpace(char currentChar) {
+        return currentChar == 10 || currentChar == 13 || currentChar == 32;
     }
 }

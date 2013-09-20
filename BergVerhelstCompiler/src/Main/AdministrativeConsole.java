@@ -1,5 +1,6 @@
 package Main;
 import FileIO.FileReader;
+import FileIO.Writer;
 import Lexeme.Token;
 import java.io.File;
 import Parser.Parser;
@@ -21,7 +22,8 @@ public class AdministrativeConsole {
        ui ("-ui", false),
        help ("-help", false),
        test ("-test", false),
-       load ("-load", true);
+       load ("-load", true),
+       out ("-out", true);
        protected String argString;
        protected Boolean requiresValue;
        valid_arguments(String argument, Boolean requiresValue){
@@ -29,9 +31,11 @@ public class AdministrativeConsole {
            this.requiresValue = requiresValue;
        }
    }
+   Writer writer;
    
    String fileAsString;
    String[] fileByLines;
+   String traceString;
    int linenumber;
    int charPosInLine;
    int characterposition;
@@ -54,8 +58,8 @@ public class AdministrativeConsole {
         if(arguments.containsKey("ui")){
             runUI();
         }else{
-			if(arguments.containsKey("f") || arguments.containsKey("load"))
-				runFileProcess();
+            if(arguments.containsKey("f") || arguments.containsKey("load"))
+		runFileProcess();
         }
        }
    }
@@ -76,7 +80,7 @@ public class AdministrativeConsole {
            try{
                 //Load the file into our string buffer
                 fileAsString = "\r\n" + reader.readFileToString() + '\u001a';
-                fileByLines = fileAsString.split("\r\n");
+                fileByLines = fileAsString.split("\n");
                 //Scan the file
                 //Only run the file process if f is specified,
                 //otherwise we will be satisfied with merely loading the file (for Unit Test reasons)
@@ -99,8 +103,8 @@ public class AdministrativeConsole {
            FileReader reader = new FileReader(fileName);
            try{
                 //Load the file into our string buffer
-                fileAsString = "\r\n" + reader.readFileToString() + '\u001a';
-                fileByLines = fileAsString.split("\r\n");
+                fileAsString = "\n" + reader.readFileToString() + '\u001a';
+                fileByLines = fileAsString.split("\n");
            }catch(IOException e){
                System.out.println("Administrative Console: " + e.toString());
            }
@@ -152,6 +156,7 @@ public class AdministrativeConsole {
    private void resetParameters(){
        arguments = new HashMap();
        fileAsString = "";
+       traceString = "";
        fileByLines = null;
        linenumber = 0;
        charPosInLine = 0;
@@ -192,10 +197,24 @@ public class AdministrativeConsole {
                     resetParameters();
                     System.out.print("Enter File Name:");
                     line = kbd.nextLine();
-                    //parameters
-                    String[] traceargs = {"-tr","token", "-f", line};
-                    setParameters(traceargs);
-                    runFileProcess();
+                    System.out.print("Save Trace to file? (y/n)");
+                    String saveTrace = kbd.nextLine();
+                    
+                    if(saveTrace.equals("y") || saveTrace.equals("Y")){
+                        System.out.print("Enter output file name:");
+                        //parameters
+                        String[] traceargs = {"-tr","token", "-f", line, "-out", kbd.nextLine()};
+                        setParameters(traceargs);
+                        runFileProcess();
+                    
+                    }else{
+                        //parameters
+                        String[] traceargs = {"-tr","token", "-f", line};
+                        setParameters(traceargs);
+                        runFileProcess();
+                    }
+                    
+                    
                     break;
                 case 3:
                     //Case 3: Run unit tests
@@ -227,14 +246,30 @@ public class AdministrativeConsole {
     */
    private void parseFile(){
        //Check trace
-       if(arguments.containsKey("tr") && arguments.get("tr").equals("token")){
+       String line;
+       try{
+            if(arguments.containsKey("out"))
+                writer = new Writer(arguments.get("out"));
+       }catch(IOException e){
+           writer = null;
+           arguments.remove("out");
+           System.out.println("Could not write to output file: " + e.toString());
+       }
+       if((arguments.containsKey("tr") && arguments.get("tr").equals("token")) || arguments.containsKey("out")){
            for(int i = 1; i < fileByLines.length; i++){
-               System.out.println(String.format("%3d", i) + "| " + fileByLines[i]);
+               line = String.format("%3d", i) + "| " + fileByLines[i] + "\r\n";
+               System.out.print(line);
+               if(arguments.containsKey("out"))
+                   writer.writeLine(line);
            }
        }
        //Parse
        Parser prs = new Parser(this);
        prs.parse(arguments.containsKey("tr") && arguments.get("tr").equals("token"));
+       if(writer != null){
+           System.out.println("Trace Exists in: " + arguments.get("out"));
+           writer.close();
+       }
        System.out.println("Administrative Console - Completed Scan");
    }  
    
@@ -243,24 +278,30 @@ public class AdministrativeConsole {
     * @param erroneousToken 
     */
    public void handleErrorToken(Token erroneousToken){
-       System.out.println("ERROR DETECTED >> Line: " + linenumber + " ChatAt: " + charPosInLine + " retrieves: " + erroneousToken);
+       System.out.println(erroneousToken);
+       if(arguments.containsKey("out"))
+           writer.writeLine(erroneousToken.toString() + "\r\n");
    }
    /**
     * Returns the next available character
     * @return Next Character in the String
     */
    public char getNextChar(){
+       String line;
        //Get next character
        char returnChar = fileAsString.charAt(characterposition++);
        charPosInLine++;
        //Check if we progress to next line
-       if(returnChar == '\n' || returnChar == '\r'){
+       if(returnChar == '\n'){
            linenumber++;
            charPosInLine = 0;
            //Check if we need to print out the current line
            if(arguments.containsKey("tr") && arguments.get("tr").equals("token")){
-                System.out.println(linenumber + ": " + fileByLines[linenumber]);
-            }
+                line = "Line " + linenumber + ": " + fileByLines[linenumber] + "\r\n" + String.format("%10s%7s%7s%s%7s%s%7s","Lexeme","","","Token Name","","Attribute Value","");
+                System.out.println(line);
+                if(arguments.containsKey("out"))
+                   writer.writeLine(line + "\r\n");
+           }
        }
        return returnChar;
    }
@@ -285,14 +326,16 @@ public class AdministrativeConsole {
      * @param t The token to print the information for
      */
     public void printTraceInformation(Token t){
-        System.out.println("Line: " + linenumber + " Position: " + (charPosInLine - t.getLexeme().length()) + " retrieves: " + t);
+        System.out.println(t);
+        if(arguments.containsKey("out"))
+           writer.writeLine(t.toString() + "\r\n");
     }
     /**
      * Print Help Information
      */
     private void displayHelp(){
-       System.out.println("BERG-VERHELST-COMPILER c*13 Language \r\n **** \r\n Command List \r\n -f <FileName.cs13> (Load File into Compiler)" 
-               + "\r\n -tr token (Trace tokens from the scanner) \r\n -ui (Run compiler using command interface) \r\n -help (Display help) \r\n -test (Run unit tests)");     
+       System.out.println("BERG-VERHELST-COMPILER c*13 Language \r\n **** \r\n Command List (for running as .jar)\r\n -f <FileName.cs13> (Load File into Compiler)" 
+               + "\r\n -tr token (Trace tokens from the scanner) \r\n -out <Filename> to save trace to a file\r\n -ui (Run compiler using command interface) \r\n -help (Display help) \r\n -test (Run unit tests)");     
    }
     
     /**

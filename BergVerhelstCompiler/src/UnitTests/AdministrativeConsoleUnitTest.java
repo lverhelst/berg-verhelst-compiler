@@ -19,7 +19,7 @@ public class AdministrativeConsoleUnitTest {
      * Also prints the tests
      */
     public ArrayList<UTResult> runAllUnitTests(){
-        String[] args = {"-load", "AdministrativeConsoleUnitTestFile.cs13"};
+        String[] args = {"-load", "unit/adminconsoletest.cs13"};
         testConsole = new AdministrativeConsole(args); 
         //Consume the prefixed \r\n
         testConsole.getNextChar();
@@ -38,7 +38,7 @@ public class AdministrativeConsoleUnitTest {
             }
         }
         for(UTResult b: results){
-            System.out.println(String.format("%24s Returns: %s" ,b.getDescription(), b.getResult()));        
+            System.out.println(String.format("%24s: %s" ,b.getDescription(), b.getResult()));        
         }
         return results;
     }

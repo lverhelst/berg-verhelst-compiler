@@ -75,7 +75,7 @@ public class Scanner{
             return getNum(currentChar);        
                 
         //returns an error as an illegal character was found
-        return new Token(Token.token_Type.ERROR, "error", "Character "
+        return new Token(Token.token_Type.ERROR, currentChar + "", "Character "
                 + "" + currentChar + " [" +(int)currentChar + "] is an "
                 + getCharType(currentChar));
     } 
@@ -146,7 +146,7 @@ public class Scanner{
                     return wordTable.get("-");
         }
         
-        return new Token(Token.token_Type.ERROR, "error", currentChar + "" + nextChar + " does not form a valid symbol");
+        return new Token(Token.token_Type.ERROR, currentChar + "", currentChar + "" + nextChar + " does not form a valid symbol");
     }
     
     /**
@@ -191,7 +191,7 @@ public class Scanner{
         
         //check if the next character is valid, if not return token as an error
         if(isCharacter(adv.peekNextChar()))        
-            return new Token(Token.token_Type.ERROR, "error", id 
+            return new Token(Token.token_Type.ERROR, id + adv.peekNextChar(), id 
                     + " can only be followed by whitespace or a symbol, not by a "
                     + getCharType(adv.peekNextChar()) + " (" + adv.peekNextChar() + ")");
         
@@ -271,7 +271,7 @@ public class Scanner{
             String[] lines = tableString.split("\r\n");
             for(String line : lines){
                 String[] arr = line.split(" ");
-                Token tok = new Token(arr[0], Token.token_Type.valueOf(arr[1]), (arr.length == 3)? arr[2] : null);
+                Token tok = new Token(Token.token_Type.valueOf(arr[1]), arr[0], (arr.length == 3)? arr[2] : null);
                 addWordToken(tok);
             }
         }catch(IOException e){
@@ -296,6 +296,7 @@ public class Scanner{
         addWordToken(new Token(Token.token_Type.ENDFILE, "endfile"));
         addWordToken(new Token(Token.token_Type.ERROR, "error"));
         addWordToken(new Token(Token.token_Type.AND, "and"));
+        addWordToken(new Token(Token.token_Type.NOT, "not"));
         addWordToken(new Token(Token.token_Type.BOOL, "bool"));
         addWordToken(new Token(Token.token_Type.BRANCH, "branch"));
         addWordToken(new Token(Token.token_Type.CASE, "case"));

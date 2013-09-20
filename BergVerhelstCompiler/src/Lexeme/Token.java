@@ -74,6 +74,10 @@ public class Token {
     public Token(token_Type name, String lexeme){
         this.name = name;
         this.lexeme = lexeme;
+         if(lexeme.equals("error")){
+            this.name = token_Type.ID;
+            this.attribute_Value = "error";
+         }
     }
     /**
      * Constructor to create a token
@@ -85,18 +89,10 @@ public class Token {
         this.name = name;
         this.lexeme = lexeme;
         this.attribute_Value = attributeValue;
-    }
-    
-    /**
-     * Triplet Constructor
-     * @param lexeme lexeme found
-     * @param type Token_Type
-     * @param attributeValue Value (can be null)
-     */
-    public Token(String lexeme, token_Type type, String attributeValue){
-        this.lexeme = lexeme;
-        this.name = type;
-        this.attribute_Value = attributeValue;
+        if(lexeme.equals("error")){
+            this.name = token_Type.ID;
+            this.attribute_Value = "error";
+         }
     }
 
     /**
@@ -140,9 +136,12 @@ public class Token {
     public void setAttribute_Value(String attribute_Value) {
         this.attribute_Value = attribute_Value;
     }
-    
+    /***
+     * @return Formatted Token String
+     */
     @Override
     public String toString(){
-        return (this.lexeme == null ? "<No Lexeme>" : this.lexeme) + " -> (" + this.name + ", " + (this.attribute_Value == null ? "-" : this.attribute_Value) + ")";
+        return String.format("%9s%3s",(this.lexeme == null ? "<No Lexeme>" : this.lexeme),"")+ String.format("%10s%10s","",this.name) + String.format("%10s%10s","",(this.attribute_Value == null ? "" : this.attribute_Value));
+        //return (this.lexeme == null ? "<No Lexeme>" : this.lexeme) + " -> (" + this.name + ", " + (this.attribute_Value == null ? "-" : this.attribute_Value) + ")";
     }
 }

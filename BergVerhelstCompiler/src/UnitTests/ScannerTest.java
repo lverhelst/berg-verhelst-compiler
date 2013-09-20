@@ -42,18 +42,8 @@ public class ScannerTest {
             }
         }
         for(UTResult b: results){
-            System.out.println(String.format("%24s Returns: %s" ,b.getDescription(), b.getResult()));
+            System.out.println(String.format("%24s: %s" ,b.getDescription(), b.getResult()));
         }
-		
-		/*System.out.println("getToken " + result(testgetToken()));
-        System.out.println("isCharacter " + result(testisCharacter()));
-        System.out.println("isInvisible " + result(testisInvisible()));
-        System.out.println("isNumeric " + result(testisNumeric()));
-        System.out.println("isSimpleCharacter " + result(testisSimpleCharacter()));
-        System.out.println("isSimpleSymbol " + result(testisSimpleSymbol()));
-        System.out.println("isSymbol " + result(testisSymbol()));
-        System.out.println("isWhiteSpace " + result(testisWhiteSpace()));*/
-//        System.out.println(this.printClassification());
     }
     
     /**

@@ -99,7 +99,7 @@ public class ScannerTest {
                 check &= false; //exit if test fails
             }
             
-            System.out.println(" Found " + token.getName() + " | expected " + expected[i++]);
+            System.out.println(" Found " + token.getLexeme() + " | expected " + expected[i++]);
                         
             token = scanner.getToken();
         }

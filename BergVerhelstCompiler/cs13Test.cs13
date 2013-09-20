@@ -1,0 +1,17 @@
+&%int main(){
+    int x = 0;
+    if(x > 0){
+        int y = 0;
+        x++;
+    }
+    return 0;
+/*/**/*/*/
+    int true false;
+    89012
+    /
+    /=
+    *=
+--test commenting out a line
+&%
+# /* !@#$%^&*()_IJHVCE*^(YUOJKNMPO&^*RI%^U */
+}

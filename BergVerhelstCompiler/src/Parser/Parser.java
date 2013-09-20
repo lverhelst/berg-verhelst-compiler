@@ -17,6 +17,10 @@ public class Parser {
         this.console = ac;
     }
     
+    /**
+     * Method stub for next phase, currently retrieves all tokens
+     * @param showTrace 
+     */
     public void parse(Boolean showTrace){
        Scanner.Scanner scn = new Scanner.Scanner(console);
        Token currentToken;

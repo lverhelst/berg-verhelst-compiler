@@ -1,11 +1,17 @@
-application.args=-f src/cs13Test.cs13
-compile.on.save=true
 <<<<<<< HEAD
+application.args=-f src\\cs13Test.cs13 -tr token -ui
+compile.on.save=true
 do.depend=false
 do.jar=true
 javac.debug=true
 javadoc.preview=true
 user.properties.file=C:\\Users\\Orion\\.netbeans\\7.1.2\\build.properties
 =======
-user.properties.file=C:\\Users\\Emery\\AppData\\Roaming\\NetBeans\\7.4beta\\build.properties
->>>>>>> 004f60992a15c6c7753da48534353e7d8631db38
+application.args=-ui
+compile.on.save=true
+do.depend=false
+do.jar=true
+javac.debug=true
+javadoc.preview=true
+user.properties.file=/home/eberg0/.netbeans/6.8/build.properties
+>>>>>>> 945b594e72d4b4e886fcbed83ca480fcf44d5038

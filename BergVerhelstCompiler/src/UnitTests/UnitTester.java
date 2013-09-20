@@ -1,17 +1,29 @@
 package UnitTests;
 
+import Main.AdministrativeConsole;
+
 /**
  *
- * @author Leon Verhelst
+ * @author Leon Verhelst and Emery
  */
 public class UnitTester {
+    private AdministrativeConsole adv;
     
-    public UnitTester(){
-    
+    /**
+     * Constructor for the unit testers
+     * @param adv the administrative console to use for file input
+     */
+    public UnitTester(AdministrativeConsole adv){
+        this.adv = adv;
     }
     
+    /**
+     * Runs all tests and returns their results and any errors which occur
+     */
     public void runAllUnitTests(){
         AdministrativeConsoleUnitTest acut = new AdministrativeConsoleUnitTest();
         acut.runAllUnitTests();
+        ScannerTest scan = new ScannerTest(adv);
+        scan.runAllUnitTests();
     }
 }

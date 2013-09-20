@@ -38,6 +38,5 @@ public class TokenTest {
     public boolean testToken(){
         Token t = new Token(Token.token_Type.BLIT, "true", "1");
         return t.getAttribute_Value().equals("1") && t.getName() == Token.token_Type.BLIT && t.getLexeme().equals("true");
-    }
-    
+    }    
 }

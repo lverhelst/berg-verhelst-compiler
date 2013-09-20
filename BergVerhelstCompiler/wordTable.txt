@@ -1,3 +1,5 @@
+true BLIT 1
+false BLIT 0
 endfile ENDFILE
 and AND 
 not NOT

@@ -21,7 +21,7 @@ public class Scanner{
      * This removes the need to do string comparisons, which is expensive and slow, and
      * allows for us to use integer comparisons
      */
-    private HashMap<String, Integer> symbolTable; 
+    private static HashMap<String, Integer> symbolTable = new HashMap(); 
     
     /*
      * The word table contains identifiers and keywords
@@ -41,8 +41,7 @@ public class Scanner{
         //if file fails load defaults
         if(wordTable == null)
             generateWordTable();
-                
-        symbolTable = new HashMap();                
+                            
         currentID = 0;        
     }
     
@@ -170,11 +169,22 @@ public class Scanner{
         if(wordTable.containsKey(id))
             return wordTable.get(id);
         
-        //check if id exists
-        if(!symbolTable.containsKey(id))
-            symbolTable.put(id, currentID++);        
+        int num = strID(id);    
         
-        return new Token(Token.token_Type.ID, "id", id);        
+        return new Token(Token.token_Type.ID, "id", num+"");        
+    }
+    
+    /**
+     * Used to retrieve the id
+     * @param id string name of the id
+     * @return the integer associated with the id
+     */
+    public int strID(String id) {
+        if(symbolTable.containsKey(id))
+            return symbolTable.get(id);
+        
+        symbolTable.put(id, currentID);
+        return currentID++;
     }
     
     /**

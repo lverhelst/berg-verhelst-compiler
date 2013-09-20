@@ -39,7 +39,7 @@ public class ScannerTest {
                     results.add(new UTResult(m.getName(),(Boolean)m.invoke(this)));
 		}
                 catch(Exception e){
-                    System.out.println(m.getName() + ": " + e.toString());
+                    System.out.println(m.getName() + ": " + e.getCause());
                 }
             }
         }
@@ -90,8 +90,13 @@ public class ScannerTest {
         int i = 0;        
         
         //check found tokens against expected results from file
-        while(token.getName() != Token.token_Type.ENDFILE) {             
-             if(!token.getLexeme().equals(expected[i])) {                
+        while(token.getName() != Token.token_Type.ENDFILE) {
+            if(token.getName() == Token.token_Type.ERROR) {
+                if(!expected[i].equals("ERROR")) {                                  
+                    System.out.println("[Failed] | Found " + token.getLexeme() + " | expected " + expected[i]);
+                    check &= false; //exit if test fails
+                }
+            } else if(!token.getLexeme().equals(expected[i])) {                
                 System.out.println("[Failed] | Found " + token.getLexeme() + " | expected " + expected[i]);
                 check &= false; //exit if test fails
             }
@@ -376,23 +381,27 @@ public class ScannerTest {
             System.out.println("No input in target file, cannot complete test ");
             return false;
         }
-
+        
         boolean check = true;
         int j = 0;
         String charSet = "";
         for(int i = 0; i < 256; i++) {            
-           if(scanner.isWhiteSpace((char)i)) {
-               //only check char if it is found to be a white space
-               if(i != expected[j].charAt(0)) {                   
-                   System.out.println(i + " does not match the expected white space " + expected[--j]);
+           if(scanner.isWhiteSpace((char)i)) {               
+               //only check char if it is found to be a white space (32 is skipped as it is removed by spilt)
+               if(i != 32 && i != expected[j].charAt(0)) {                   
+                   System.out.println((int)i + " does not match the expected white space " + (int)expected[j].charAt(0));
                    check &= false;
-               }
+               }               
                j++;
            }               
         }  
         
-        //not all white space characters checked
-        if(j != expected.length) {            
+        //checks to ensure space is valid (since it was skipped
+        if(!scanner.isInvisible(' '))
+            check &= false;
+        
+        //not all white space characters checked (+ 1 due to spliting on space
+        if(j != expected.length + 1) {            
             System.out.println("Not all white space characters matched " + j + "/" + expected.length);
             check &= false;
         }

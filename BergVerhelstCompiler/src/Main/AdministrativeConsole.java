@@ -165,17 +165,17 @@ public class AdministrativeConsole {
         java.util.Scanner kbd = new java.util.Scanner(System.in);
         System.out.println("Enter number Corresponding to the wanted command\r\n1) Scan File \r\n2) Show Trace \r\n3) Unit Tests \r\n4) Help \r\n5) Exit");
         String line;
-		int option;
-		boolean loop = true;
+        int option;
+        boolean loop = true;
         System.out.print(">");
         //Get input until user quits
         uiloop : while(loop){
-			try{
-				option = kbd.nextInt();	
-			}catch(InputMismatchException ime){
-				option = -1;
-			}
-			kbd.nextLine();
+            try{
+                    option = kbd.nextInt();	
+            }catch(InputMismatchException ime){
+                    option = -1;
+            }
+            kbd.nextLine();
             switch(option){
                 case 1:
                     //Case 1: Scan file, no parameters
@@ -211,12 +211,11 @@ public class AdministrativeConsole {
                     //Case 3: Display Help
                     displayHelp();
                     break;
-				case 5:
-					loop = false;
-					break uiloop;
-				default:
-					System.out.println("Invalid Option");
-					break;
+                case 5:
+                    break uiloop;
+                default:
+                    System.out.println("Invalid Option");
+                    break;
             }
             System.out.print(">");
         }
@@ -255,7 +254,7 @@ public class AdministrativeConsole {
        char returnChar = fileAsString.charAt(characterposition++);
        charPosInLine++;
        //Check if we progress to next line
-       if(returnChar == '\n'){
+       if(returnChar == '\n' || returnChar == '\r'){
            linenumber++;
            charPosInLine = 0;
            //Check if we need to print out the current line

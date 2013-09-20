@@ -264,7 +264,7 @@ public class Scanner{
         //Initial size of 1000 records
         //Default load ratio of 0.75 (75%)
         wordTable = new TreeMap();
-        FileReader fr = new FileReader("wordTable.txt");
+        FileReader fr = new FileReader("prereq/wordTable.txt");
         String tableString;
         try{
             tableString = fr.readFileToString();

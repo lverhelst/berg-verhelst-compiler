@@ -76,7 +76,7 @@ public class Scanner{
             return getNum(currentChar);        
         
         //if character is invalid consume until whitespace is found
-        String subString ="";        
+        String subString = currentChar +"";        
         while(!isWhiteSpace(adv.peekNextChar())) {
             subString += adv.getNextChar();
         }
@@ -91,7 +91,23 @@ public class Scanner{
      * Used to filter out invisible characters (white spaces are not skipped)
      * @return the next non invisible character (white space included)
      */
-    private char filterInvisible() {        
+    private char filterNext() {        
+        char currentChar = adv.getNextChar();
+        
+        //remove invisible characters
+        while(!isWhiteSpace(currentChar) && isInvisible(currentChar)) {
+            adv.getNextChar();
+            currentChar = adv.peekNextChar();            
+        }
+        
+        return currentChar;
+    }
+    
+    /**
+     * Peek method for filter out invisible characters (white spaces are not skipped)
+     * @return the peeked non invisible character (white space included)
+     */
+    private char filterPeek() {        
         char currentChar = adv.peekNextChar();
         
         //remove invisible characters
@@ -110,7 +126,7 @@ public class Scanner{
      * @return the token which was found. error token if symbol is not valid
      */
     private Token getSymbol(char currentChar) {
-        char nextChar = filterInvisible();
+        char nextChar = filterPeek();
                 
         //check if symbol is valid
         switch(currentChar) {
@@ -190,13 +206,13 @@ public class Scanner{
         String id = currentChar + "";
        
         //consume characters until invalid or end of file
-        while(adv.hasNextChar() && isCharacter(adv.peekNextChar())) {
-            id += adv.getNextChar();
+        while(adv.hasNextChar() && isCharacter(filterPeek())) {
+            id += filterNext();
         }
         
         //check if the type is boolean or endfile
         if(id.equals("true") || id.equals("false")) {
-			return new Token(Token.token_Type.BLIT, "blit", id);
+            return new Token(Token.token_Type.BLIT, "blit", id);
         }
         
         //check if it is a key word
@@ -223,21 +239,33 @@ public class Scanner{
     
     /**
      * Used to get a int token for an Numeric value
-     * @param currrentChar the starting character
+     * @param currentChar the starting character
      * @return the id token
      */
-    private Token getNum(char currrentChar) {
-        String id = currrentChar + "";
+    private Token getNum(char currentChar) {
+        String id = currentChar + "";
+        char nextChar;
        
-        //consume numbers until invalid or end of file
-        while(adv.hasNextChar() && isNumeric(adv.peekNextChar())) 
-            id += adv.getNextChar();
+        //consume characters until invalid or end of file
+        while(adv.hasNextChar() && isNumeric(filterPeek())) {
+            id += filterNext();
+        }
         
-        //check if the next character is valid, if not return token as an error
-        if(isCharacter(adv.peekNextChar()))        
-            return new Token(Token.token_Type.ERROR, id + adv.peekNextChar(), id 
-                    + " can only be followed by whitespace or a symbol, not by a "
-                    + getCharType(adv.peekNextChar()) + " (" + adv.peekNextChar() + ")");
+        nextChar = filterPeek();
+        //check if next char is valid for this type
+        if(isCharacter(nextChar)) {
+            //if character is invalid consume until whitespace is found
+            String subString = currentChar +"";  
+
+            //collect invalid identifier
+            while(isCharacter(filterPeek())) {
+                subString += filterNext();
+            }
+            
+            return new Token(Token.token_Type.ERROR, id + nextChar, id 
+                    + " can not be follwed by a character this produced an nvalid substring of " +
+                subString);
+        }            
         
         return new Token(Token.token_Type.NUM, "num", id);        
     }

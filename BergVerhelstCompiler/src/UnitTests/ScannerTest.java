@@ -90,8 +90,7 @@ public class ScannerTest {
         int i = 0;        
         
         //check found tokens against expected results from file
-        while(token.getName() != Token.token_Type.ENDFILE) { 
-            
+        while(token.getName() != Token.token_Type.ENDFILE) {             
              if(!token.getLexeme().equals(expected[i])) {                
                 System.out.println("[Failed] | Found " + token.getLexeme() + " | expected " + expected[i++]);
                 check &= false; //exit if test fails

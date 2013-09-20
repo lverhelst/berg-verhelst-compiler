@@ -54,9 +54,11 @@ public class Scanner{
          //if the character is the end of file return EOF token
         if(currentChar == ENDFILE)
             return wordTable.get("endfile");
+        
         //filter out the white spaces
-        while(isWhiteSpace(currentChar))
+        while(isInvisible(currentChar))
             currentChar = adv.getNextChar(); 
+        
         //check if the symbol is a simple character
         if(isSimpleSymbol(currentChar)) 
             return wordTable.get(currentChar + "");
@@ -80,22 +82,46 @@ public class Scanner{
     } 
     
     /**
+     * Used to filter out invisible characters (white spaces are not skipped)
+     * @return the next non invisible character (white space included)
+     */
+    private char filterInvisible() {        
+        char currentChar = adv.peekNextChar();
+        
+        //remove invisible characters
+        while(!isWhiteSpace(currentChar) && isInvisible(currentChar)) {
+            adv.getNextChar();
+            currentChar = adv.peekNextChar();            
+        }
+        
+        return currentChar;
+    }
+    
+    /**
      * Used when a symbol is detected, if symbol is invalid an error is returned
      * Method also calls the removeComment method if comment is detected
      * @param currentChar the char which was found starting the symbol call
      * @return the token which was found. error token if symbol is not valid
      */
     private Token getSymbol(char currentChar) {
-        char nextChar = adv.peekNextChar();
+        char nextChar = filterInvisible();
                 
         //check if symbol is valid
         switch(currentChar) {
             case '&':
                 if(nextChar != '&') //only valid char
                     break;
+                
+                //if valid consume char and return token
+                adv.getNextChar();
+                return wordTable.get(currentChar + "" + nextChar);
             case '|':
                 if(nextChar != '|') //only valid char
                     break; 
+                
+                //if valid consume char and return token
+                adv.getNextChar();
+                return wordTable.get(currentChar + "" + nextChar);
             case ':':
                 if(nextChar != '=') //only valid char
                     break;
@@ -145,6 +171,7 @@ public class Scanner{
                     return wordTable.get("-");
         }
         
+        adv.getNextChar();
         return new Token(Token.token_Type.ERROR, currentChar + "", currentChar + "" + nextChar + " does not form a valid symbol");
     }
     
@@ -157,8 +184,9 @@ public class Scanner{
         String id = currentChar + "";
        
         //consume characters until invalid or end of file
-        while(adv.hasNextChar() && isCharacter(adv.peekNextChar())) 
+        while(adv.hasNextChar() && isCharacter(adv.peekNextChar())) {
             id += adv.getNextChar();
+        }
         
         //check if the type is boolean or endfile
         if(id.equals("true") || id.equals("false")) {
@@ -171,7 +199,7 @@ public class Scanner{
         
         int num = strID(id);    
         
-        return new Token(Token.token_Type.ID, "id", num+"");        
+        return new Token(Token.token_Type.ID, id, num+"");        
     }
     
     /**

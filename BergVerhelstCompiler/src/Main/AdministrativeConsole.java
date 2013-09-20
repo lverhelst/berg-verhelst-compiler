@@ -199,7 +199,7 @@ public class AdministrativeConsole {
                     line = kbd.nextLine();
                     System.out.print("Save Trace to file? (y/n)");
                     String saveTrace = kbd.nextLine();
-                    
+                    //See if the user wants to save the trace to a file
                     if(saveTrace.equals("y") || saveTrace.equals("Y")){
                         System.out.print("Enter output file name:");
                         //parameters
@@ -213,8 +213,6 @@ public class AdministrativeConsole {
                         setParameters(traceargs);
                         runFileProcess();
                     }
-                    
-                    
                     break;
                 case 3:
                     //Case 3: Run unit tests
@@ -278,9 +276,9 @@ public class AdministrativeConsole {
     * @param erroneousToken 
     */
    public void handleErrorToken(Token erroneousToken){
-       System.out.println(erroneousToken);
+       System.out.println(erroneousToken + " (Line: " + linenumber + " Position: " + charPosInLine + ")");
        if(arguments.containsKey("out"))
-           writer.writeLine(erroneousToken.toString() + "\r\n");
+           writer.writeLine(erroneousToken.toString() + " (Line: " + linenumber + " Position: " + charPosInLine + ")\r\n");
    }
    /**
     * Returns the next available character

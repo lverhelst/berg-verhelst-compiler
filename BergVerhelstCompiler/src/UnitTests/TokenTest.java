@@ -12,7 +12,6 @@ public class TokenTest {
     public TokenTest(){
         
     }
-    
     /**
      * Runs all the unit tests for the scanner
      */
@@ -35,7 +34,7 @@ public class TokenTest {
         }
     }
     
-    public boolean testToken(){
+    public Boolean testToken(){
         Token t = new Token(Token.token_Type.BLIT, "true", "1");
         return t.getAttribute_Value().equals("1") && t.getName() == Token.token_Type.BLIT && t.getLexeme().equals("true");
     }

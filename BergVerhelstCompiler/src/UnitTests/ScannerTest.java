@@ -87,16 +87,13 @@ public class ScannerTest {
         
         Token token = scanner.getToken();
         int i = 0;
-        
         while(token.getName() != Token.token_Type.ENDFILE) {
             if(!token.getLexeme().equals(expected[i++])) {
                 System.out.println(token.getLexeme() + " does not match the expected token of " + expected[--i]);
                 return false; //exit if test fails
-            }
-                        
+            }        
             token = scanner.getToken();
         }
-        
         return true;
     }    
     
@@ -185,7 +182,6 @@ public class ScannerTest {
             System.out.println("Not all invisible characters matched " + j + "/" + expected.length);
             return false;
         }
-         
         return true;
     }
     

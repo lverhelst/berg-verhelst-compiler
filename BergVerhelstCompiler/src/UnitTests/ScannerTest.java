@@ -221,7 +221,7 @@ public class ScannerTest {
            if(scanner.isNumeric((char)i)) {
                //only check char if it is found to be a number
                if(i != expected[j].charAt(0)) {                   
-                   System.out.println((char)i + " does not match the expected number " + expected[--j]);
+                   System.out.println((char)i + " does not match the expected number " + expected[j]);
                    check &= false;
                }
                j++;
@@ -263,7 +263,7 @@ public class ScannerTest {
            if(scanner.isSimpleCharacter((char)i)) {
                //only check char if it is found to be a simple character
                if(i != expected[j].charAt(0)) {                   
-                   System.out.println((char)i + " does not match the expected simple character " + expected[--j]);
+                   System.out.println((char)i + " does not match the expected simple character " + expected[j]);
                    check &= false;
                }
                j++;
@@ -305,7 +305,7 @@ public class ScannerTest {
            if(scanner.isSimpleSymbol((char)i)) {
                //only check char if it is found to be a simple symbol
                if(i != expected[j].charAt(0)) {                   
-                   System.out.println((char)i + " does not match the expected simple symbol " + expected[--j]);
+                   System.out.println((char)i + " does not match the expected simple symbol " + expected[j]);
                    check &= false;
                }
                j++;
@@ -347,7 +347,7 @@ public class ScannerTest {
            if(scanner.isSymbol((char)i)) {
                //only check char if it is found to be a symbol
                if(i != expected[j].charAt(0)) {                   
-                   System.out.println((char)i + " does not match the expected symbol " + expected[--j]);
+                   System.out.println((char)i + " does not match the expected symbol " + expected[j]);
                    check &= false;
                }
                j++;
@@ -388,7 +388,7 @@ public class ScannerTest {
         for(int i = 0; i < 256; i++) {            
            if(scanner.isWhiteSpace((char)i)) {               
                //only check char if it is found to be a white space (32 is skipped as it is removed by spilt)
-               if(i != 32 && i != expected[j].charAt(0)) {                   
+               if(expected[j].equals(i + "")) {                   
                    System.out.println((int)i + " does not match the expected white space " + (int)expected[j].charAt(0));
                    check &= false;
                }               
@@ -396,12 +396,12 @@ public class ScannerTest {
            }               
         }  
         
-        //checks to ensure space is valid (since it was skipped
+        //checks to ensure space is valid (since it was skipped)
         if(!scanner.isInvisible(' '))
             check &= false;
         
-        //not all white space characters checked (+ 1 due to spliting on space
-        if(j != expected.length + 1) {            
+        //not all white space characters checked
+        if(j != expected.length) {            
             System.out.println("Not all white space characters matched " + j + "/" + expected.length);
             check &= false;
         }

@@ -168,17 +168,21 @@ public class ScannerTest {
         String charSet = "";
         for(int i = 0; i < 256; i++) {            
            if(scanner.isInvisible((char)i)) {
-               //only check char if it is found to be a invisible character
-               if(i != expected[j].charAt(0)) {                   
+               //only check char if it is found to be a invisible character (32 is skipped as it is removed by spilt)
+               if(i != 32 && i != expected[j].charAt(0)) {                   
                    System.out.println((int)i + " does not match the expected invisible character " + (int)expected[j].charAt(0));
                    check &= false;
-               }
+               }               
                j++;
            }               
         }  
         
-        //not all invisible chars checked
-        if(j != expected.length) {            
+        //checks to ensure space is valid (since it was skipped
+        if(!scanner.isInvisible(' '))
+            check &= false;
+        
+        //not all invisible chars checked (+ 1 due to spliting on space
+        if(j != expected.length + 1) {            
             System.out.println("Not all invisible characters matched " + j + "/" + expected.length);
             check &= false;
         }

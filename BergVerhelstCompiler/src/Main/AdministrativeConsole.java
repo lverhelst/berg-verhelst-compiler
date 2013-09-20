@@ -279,5 +279,4 @@ public class AdministrativeConsole {
         UnitTester ut = new UnitTester();
         ut.runAllUnitTests();
     }
-        
 }

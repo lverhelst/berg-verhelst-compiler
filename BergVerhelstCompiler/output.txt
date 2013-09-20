@@ -1,0 +1,46 @@
+  1| &%int main(){
+  2|     int x = 0;
+  3|     if(x > 0){
+  4|         int y = 0;
+  5|         x++;
+  6|     }
+  7|     return 0;
+  8| /*/**/*/*/
+  9|     int true false;
+ 10|     89012
+ 11|     /
+ 12|     /=
+ 13|     *=
+ 14| --test commenting out a line
+ 15| &%
+ 16| # /* !@#$%^&*()_IJHVCE*^(YUOJKNMPO&^*RI%^U */
+ 17| }
+ 18| id num blit error
+        &                  ERROR          &% does not form a valid symbol
+        %                  ERROR          Character % [37] is an invalid character
+        &                  ERROR          &% does not form a valid symbol
+        %                  ERROR          Character % [37] is an invalid character
+        #                  ERROR          Character # [35] is an invalid character
+  1| &%int main(){
+  2|     int x = 0;
+  3|     if(x > 0){
+  4|         int y = 0;
+  5|         x++;
+  6|     }
+  7|     return 0;
+  8| /*/**/*/*/
+  9|     int true false;
+ 10|     89012
+ 11|     /
+ 12|     /=
+ 13|     *=
+ 14| --test commenting out a line
+ 15| &%
+ 16| # /* !@#$%^&*()_IJHVCE*^(YUOJKNMPO&^*RI%^U */
+ 17| }
+ 18| id num blit error
+        &                  ERROR          &% does not form a valid symbol
+        %                  ERROR          Character % [37] is an invalid character
+        &                  ERROR          &% does not form a valid symbol
+        %                  ERROR          Character % [37] is an invalid character
+        #                  ERROR          Character # [35] is an invalid character

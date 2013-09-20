@@ -76,7 +76,7 @@ public class Scanner{
                 
         //returns an error as an illegal character was found
         return new Token(Token.token_Type.ERROR, "error", "Character "
-                + "" + currentChar + " [" +(int)currentChar + "] is a" 
+                + "" + currentChar + " [" +(int)currentChar + "] is an "
                 + getCharType(currentChar));
     } 
     
@@ -162,10 +162,8 @@ public class Scanner{
             id += adv.getNextChar();
         
         //check if the type is boolean or endfile
-        switch (id) {
-            case "true":
-            case "false":
-                return new Token(Token.token_Type.BLIT, "blit", id);
+        if(id.equals("true") || id.equals("false")) {
+			return new Token(Token.token_Type.BLIT, "blit", id);
         }
         
         //check if it is a key word
@@ -194,7 +192,7 @@ public class Scanner{
         //check if the next character is valid, if not return token as an error
         if(isCharacter(adv.peekNextChar()))        
             return new Token(Token.token_Type.ERROR, "error", id 
-                    + " can only be followed by whitespace or a symbol, not by a"
+                    + " can only be followed by whitespace or a symbol, not by a "
                     + getCharType(adv.peekNextChar()) + " (" + adv.peekNextChar() + ")");
         
         return new Token(Token.token_Type.NUM, "num", id);        
@@ -266,7 +264,7 @@ public class Scanner{
         //Initial size of 1000 records
         //Default load ratio of 0.75 (75%)
         wordTable = new TreeMap();
-        FileReader fr = new FileReader("src\\wordTable.txt");
+        FileReader fr = new FileReader("wordTable.txt");
         String tableString;
         try{
             tableString = fr.readFileToString();
@@ -456,7 +454,7 @@ public class Scanner{
             return "invisible character";
          
         //if no return has occured the character is invalid
-        return "invalid";
+        return "invalid character";
     }
     
     /**

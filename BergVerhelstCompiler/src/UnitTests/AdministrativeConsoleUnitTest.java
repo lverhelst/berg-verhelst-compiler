@@ -19,21 +19,20 @@ public class AdministrativeConsoleUnitTest {
      * Also prints the tests
      */
     public ArrayList<UTResult> runAllUnitTests(){
-        String[] args = {"-load", "src\\AdministrativeConsoleUnitTestFile.cs13"};
+        String[] args = {"-load", "AdministrativeConsoleUnitTestFile.cs13"};
         testConsole = new AdministrativeConsole(args); 
         //Consume the prefixed \r\n
-      
         testConsole.getNextChar();
         testConsole.getNextChar();
-        
-        
-        ArrayList<UTResult> results = new ArrayList<>();
+        System.out.println("--[Administrative Console Unit Test]--");
+        ArrayList<UTResult> results = new ArrayList<UTResult>();
         Method[] methods = AdministrativeConsoleUnitTest.class.getMethods();
         for(Method m: methods){
             if(m.getName().startsWith("test")){
                 try{
-                    results.add(new UTResult(m.getName(),(boolean)m.invoke(this)));}
-                catch(IllegalAccessException | IllegalArgumentException | InvocationTargetException e){
+                    results.add(new UTResult(m.getName(),(Boolean)m.invoke(this)));
+				}
+                catch(Exception e){
                     System.out.println(e.toString());
                 }
             }

@@ -3,6 +3,9 @@ package UnitTests;
 import Lexeme.Token;
 import Main.AdministrativeConsole;
 import Scanner.Scanner;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
 
 /**
  * Used to test the methods available in the scanner class
@@ -26,14 +29,30 @@ public class ScannerTest {
      */
     public void runAllUnitTests() {  
         System.out.println("--[Scanner Unit Test]--");      
-        System.out.println("getToken " + result(testgetToken()));
+        ArrayList<UTResult> results = new ArrayList<UTResult>();
+        Method[] methods = ScannerTest.class.getMethods();
+        for(Method m: methods){
+            if(m.getName().startsWith("test")){
+                try{
+                    results.add(new UTResult(m.getName(),(Boolean)m.invoke(this)));
+				}
+                catch(Exception e){
+                    System.out.println(e.toString());
+                }
+            }
+        }
+        for(UTResult b: results){
+            System.out.println(String.format("%24s Returns: %s" ,b.getDescription(), b.getResult()));
+        }
+		
+		/*System.out.println("getToken " + result(testgetToken()));
         System.out.println("isCharacter " + result(testisCharacter()));
         System.out.println("isInvisible " + result(testisInvisible()));
         System.out.println("isNumeric " + result(testisNumeric()));
         System.out.println("isSimpleCharacter " + result(testisSimpleCharacter()));
         System.out.println("isSimpleSymbol " + result(testisSimpleSymbol()));
         System.out.println("isSymbol " + result(testisSymbol()));
-        System.out.println("isWhiteSpace " + result(testisWhiteSpace()));
+        System.out.println("isWhiteSpace " + result(testisWhiteSpace()));*/
 //        System.out.println(this.printClassification());
     }
     

@@ -27,7 +27,7 @@ public class FileReader {
      * @throws IOException 
      */
     public String readFileToString() throws FileNotFoundException, IOException{
-        System.out.println("Searching for file in: " + System.getProperty("user.dir"));
+        //System.out.println("Searching for file in: " + System.getProperty("user.dir"));
         FileInputStream inputStream = new FileInputStream(fileName);
         byte[] fileContents = null;
         try{

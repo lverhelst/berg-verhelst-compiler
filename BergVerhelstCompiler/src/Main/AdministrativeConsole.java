@@ -3,9 +3,9 @@ import FileIO.FileReader;
 import Lexeme.Token;
 import java.io.File;
 import Parser.Parser;
-import UnitTests.ScannerTest;
 import UnitTests.UnitTester;
 import java.io.IOException;
+import java.util.InputMismatchException;
 import java.util.HashMap;
 /**
  *
@@ -54,7 +54,8 @@ public class AdministrativeConsole {
         if(arguments.containsKey("ui")){
             runUI();
         }else{
-            runFileProcess();
+			if(arguments.containsKey("f") || arguments.containsKey("load"))
+				runFileProcess();
         }
        }
    }
@@ -164,11 +165,19 @@ public class AdministrativeConsole {
         java.util.Scanner kbd = new java.util.Scanner(System.in);
         System.out.println("Enter number Corresponding to the wanted command\r\n1) Scan File \r\n2) Show Trace \r\n3) Unit Tests \r\n4) Help \r\n5) Exit");
         String line;
+		int option;
+		boolean loop = true;
         System.out.print(">");
         //Get input until user quits
-        while(!(line = kbd.nextLine()).equals("5")){
-            switch(line){
-                case "1":
+        uiloop : while(loop){
+			try{
+				option = kbd.nextInt();	
+			}catch(InputMismatchException ime){
+				option = -1;
+			}
+			kbd.nextLine();
+            switch(option){
+                case 1:
                     //Case 1: Scan file, no parameters
                     resetParameters();
                     System.out.print("Enter File Name:");
@@ -178,7 +187,7 @@ public class AdministrativeConsole {
                     setParameters(args);
                     runFileProcess();
                     break;
-                case "2":
+                case 2:
                     //Case 2: Scan file with trace token parameter
                     resetParameters();
                     System.out.print("Enter File Name:");
@@ -188,7 +197,7 @@ public class AdministrativeConsole {
                     setParameters(traceargs);
                     runFileProcess();
                     break;
-                case "3":
+                case 3:
                     //Case 3: Run unit tests
                     resetParameters();
                     //parameters
@@ -198,10 +207,16 @@ public class AdministrativeConsole {
                     runUnitTests();
                     System.out.println("Unit Tests Completed");
                     break;
-                case "4":
+                case 4:
                     //Case 3: Display Help
                     displayHelp();
                     break;
+				case 5:
+					loop = false;
+					break uiloop;
+				default:
+					System.out.println("Invalid Option");
+					break;
             }
             System.out.print(">");
         }

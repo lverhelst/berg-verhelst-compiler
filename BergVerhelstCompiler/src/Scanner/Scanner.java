@@ -91,18 +91,26 @@ public class Scanner{
         //check if symbol is valid
         switch(currentChar) {
             case '&':
-                if(nextChar != '&') //only valid char
-                    break;
-            case '|':
-                if(nextChar != '|') //only valid char
-                    break; 
-            case ':':
-                if(nextChar != '=') //only valid char
-                    break;
-                
+                if(nextChar == '&'){ //only valid char
                 //if valid consume char and return token
-                adv.getNextChar();
-                return wordTable.get(currentChar + "" + nextChar);
+                    adv.getNextChar();
+                    return wordTable.get(currentChar + "" + nextChar);
+                }
+                return new Token(Token.token_Type.ERROR, currentChar + "", currentChar + "" + nextChar + " does not form a valid symbol");
+            case '|':
+                if(nextChar == '|'){ //only valid char
+                //if valid consume char and return token
+                    adv.getNextChar();
+                    return wordTable.get(currentChar + "" + nextChar);
+                }
+                return new Token(Token.token_Type.ERROR, currentChar + "", currentChar + "" + nextChar + " does not form a valid symbol");
+            case ':':
+                if(nextChar == '='){ //only valid char
+                //if valid consume char and return token
+                    adv.getNextChar();
+                    return wordTable.get(currentChar + "" + nextChar);
+                }
+                return new Token(Token.token_Type.ERROR, currentChar + "", currentChar + "" + nextChar + " does not form a valid symbol");
             case '<':
                 if(nextChar != '=') 
                     return wordTable.get("<");
@@ -162,7 +170,7 @@ public class Scanner{
         
         //check if the type is boolean or endfile
         if(id.equals("true") || id.equals("false")) {
-			return new Token(Token.token_Type.BLIT, "blit", id);
+            return new Token(Token.token_Type.BLIT, "blit", id);
         }
         
         //check if it is a key word
@@ -171,7 +179,7 @@ public class Scanner{
         
         int num = strID(id);    
         
-        return new Token(Token.token_Type.ID, "id", num+"");        
+        return new Token(Token.token_Type.ID, id, num+"");        
     }
     
     /**
@@ -182,7 +190,6 @@ public class Scanner{
     public int strID(String id) {
         if(symbolTable.containsKey(id))
             return symbolTable.get(id);
-        
         symbolTable.put(id, currentID);
         return currentID++;
     }
@@ -205,7 +212,7 @@ public class Scanner{
                     + " can only be followed by whitespace or a symbol, not by a "
                     + getCharType(adv.peekNextChar()) + " (" + adv.peekNextChar() + ")");
         
-        return new Token(Token.token_Type.NUM, "num", id);        
+        return new Token(Token.token_Type.NUM, id, id);        
     }
 
     /**
@@ -291,9 +298,12 @@ public class Scanner{
         return true;
     }
     
+
     /**
      * Initializes the word table via code 
+     * @Deprecated This method has been deprecated with the advent of loading the word table from a file
      */
+     @Deprecated
     private void generateWordTable(){
         //Initial size of 1000 records
         //Default load ratio of 0.75 (75%)

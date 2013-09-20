@@ -6,7 +6,6 @@ package Lexeme;
 public class Token {
     
    //Symbolic names of token types
-    
     /*
      * We may need to split this out into it's own file
      */

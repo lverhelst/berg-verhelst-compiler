@@ -45,6 +45,11 @@ public class AdministrativeConsole {
     */
    public AdministrativeConsole(String[] args){
        setParameters(args);
+   }
+   /**
+    * Runs the compiler with set params
+    */
+   public void executeCompiler(){
        //Display help if it exists
        if(arguments.containsKey("help")){
            displayHelp();
@@ -63,6 +68,7 @@ public class AdministrativeConsole {
         }
        }
    }
+   
    /**
     * Read and Compile the file
     */
@@ -255,7 +261,7 @@ public class AdministrativeConsole {
        }
        if((arguments.containsKey("tr") && arguments.get("tr").equals("token")) || arguments.containsKey("out")){
            for(int i = 1; i < fileByLines.length; i++){
-               line = String.format("%3d", i) + "| " + fileByLines[i] + "\r\n";
+               line = String.format("%3d", i) + "| " + fileByLines[i] + "\n";
                System.out.print(line);
                if(arguments.containsKey("out"))
                    writer.writeLine(line);
@@ -295,7 +301,7 @@ public class AdministrativeConsole {
            charPosInLine = 0;
            //Check if we need to print out the current line
            if(arguments.containsKey("tr") && arguments.get("tr").equals("token")){
-                line = "Line " + linenumber + ": " + fileByLines[linenumber] + "\r\n" + String.format("%10s%7s%7s%s%7s%s%7s","Lexeme","","","Token Name","","Attribute Value","");
+                line = "Line " + linenumber + ": " + fileByLines[linenumber] + "\n" + String.format("%10s%7s%7s%s%7s%s%7s","Lexeme","","","Token Name","","Attribute Value","");
                 System.out.println(line);
                 if(arguments.containsKey("out"))
                    writer.writeLine(line + "\r\n");

@@ -2,10 +2,7 @@
 true false error and not bool branch case continue default else end if int loop mod or ref return void
 
 --test for the symbols (which are complete by themselves)
-( ) * + , - / ; < = > [ ] { }
-
---test for random illegal chars
-!@#%^\.?"'`~€‚ƒ„…†‡ˆ‰Š‹Œ‘’“”•–—˜™š›œŸ¡¢£¤¥¦§¨©ª«¬­®¯ °±²³´µ¶·¸¹º»¼½¾¿ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏĞÑÒÓÔÕÖ×ØÙÚÛÜİŞßàáâãäåæçèéêëìíïğñòóôõö÷øùúûüışÿ                            
+( ) * + , - / ; < = > [ ] { } >= <= /= := && ||
 
 --test for random cases ID
 abc1ac4gb_34d$32
@@ -27,12 +24,16 @@ andid+anotherid
         #%*$&^(#^(#)@)(&) */	
        */
 
-
 --tests for errors
 8redrum
 $something
 _something
-&|:
+&|:$_
+
+--test for random illegal chars
+!@#%^\.?"'`~€‚ƒ„…†‡ˆ‰Š‹Œ‘’“”•–—˜™š›œŸ¡¢£¤¥¦§¨©ª«¬­®¯ °±²³´µ¶·¸¹º»¼½¾¿ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏĞÑÒÓÔÕÖ×ØÙÚÛÜİŞßàáâãäåæçèéêëìíïğñòóôõö÷øùúûüışÿ                            
 
 --end of file within comment
 /*
+*/
+&&

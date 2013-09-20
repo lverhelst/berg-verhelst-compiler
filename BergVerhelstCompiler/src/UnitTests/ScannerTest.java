@@ -43,9 +43,8 @@ public class ScannerTest {
                 }
             }
         }
-        
         for(UTResult b: results){
-            System.out.println(String.format("%24s Returns: %s" ,b.getDescription(), b.getResult()));
+            System.out.println(String.format("%24s: %s" ,b.getDescription(), b.getResult()));
         }
     }
     
@@ -307,13 +306,11 @@ public class ScannerTest {
                }
            }               
         }  
-        
         //not all while space characters checked
         if(j != expected.length) {            
             System.out.println("Not all white space characters matched " + j + "/" + expected.length);
             return false;
         }
-        
         return true;
     }    
 }

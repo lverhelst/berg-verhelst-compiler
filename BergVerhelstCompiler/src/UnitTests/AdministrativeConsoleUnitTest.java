@@ -21,6 +21,7 @@ public class AdministrativeConsoleUnitTest {
     public ArrayList<UTResult> runAllUnitTests(){
         String[] args = {"-load", "unit/adminconsoletest.cs13"};
         testConsole = new AdministrativeConsole(args); 
+        testConsole.executeCompiler();
         //Consume the prefixed \r\n
         testConsole.getNextChar();
         testConsole.getNextChar();

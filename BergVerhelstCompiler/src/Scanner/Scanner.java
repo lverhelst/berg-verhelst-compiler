@@ -74,11 +74,17 @@ public class Scanner{
         //check if character is valid for a number
         if(isNumeric(currentChar))
             return getNum(currentChar);        
-                
-        //returns an error as an illegal character was found
-        return new Token(Token.token_Type.ERROR, currentChar + "", "Character "
-                + "" + currentChar + " [" +(int)currentChar + "] is an "
-                + getCharType(currentChar));
+        
+        //if character is invalid consume until whitespace is found
+        String subString ="";        
+        while(!isWhiteSpace(adv.peekNextChar())) {
+            subString += adv.getNextChar();
+        }
+        
+        //returns an error as an illegal string was found
+        return new Token(Token.token_Type.ERROR, subString, "Invalid Character " + 
+                subString.charAt(0) + " was found and produced an invalid substring of " +
+                subString);
     } 
     
     /**

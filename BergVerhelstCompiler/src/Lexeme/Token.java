@@ -25,6 +25,7 @@ public class Token {
         DEFAULT, //default
         ELSE, //else
         END, //end
+        EXIT, //exit
         IF, //if
         INT, //int
         LOOP, //loop

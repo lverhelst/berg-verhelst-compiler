@@ -50,14 +50,16 @@ public class Scanner{
      * @return the next valid token
      */
     public Token getToken(){ 
-        char currentChar = adv.getNextChar();
+        char currentChar = adv.getNextChar();        
+        
+        //filter out the white spaces
+        while(currentChar != ENDFILE && isInvisible(currentChar))
+            currentChar = adv.getNextChar();
+        
          //if the character is the end of file return EOF token
         if(currentChar == ENDFILE)
             return wordTable.get("endfile");
-        
-        //filter out the white spaces
-        while(isInvisible(currentChar))
-            currentChar = adv.getNextChar(); 
+         
         
         //check if the symbol is a simple character
         if(isSimpleSymbol(currentChar)) 
@@ -97,6 +99,10 @@ public class Scanner{
         //remove invisible characters
         while(!isWhiteSpace(currentChar) && isInvisible(currentChar)) {
             adv.getNextChar();
+            
+            if(currentChar == ENDFILE)
+                return currentChar;
+            
             currentChar = adv.peekNextChar();            
         }
         
@@ -111,8 +117,12 @@ public class Scanner{
         char currentChar = adv.peekNextChar();
         
         //remove invisible characters
-        while(!isWhiteSpace(currentChar) && isInvisible(currentChar)) {
-            adv.getNextChar();
+        while(!isWhiteSpace(currentChar) && isInvisible(currentChar) && currentChar != ENDFILE) {
+            adv.getNextChar();            
+            
+            if(currentChar == ENDFILE)
+                return currentChar;
+            
             currentChar = adv.peekNextChar();            
         }
         

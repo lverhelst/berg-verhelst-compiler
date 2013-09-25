@@ -21,7 +21,7 @@ public class Scanner{
      * This removes the need to do string comparisons, which is expensive and slow, and
      * allows for us to use integer comparisons
      */
-    private HashMap<String, Integer> symbolTable; 
+    private static HashMap<String, Integer> symbolTable = new HashMap(); 
     
     /*
      * The word table contains identifiers and keywords
@@ -41,8 +41,7 @@ public class Scanner{
         //if file fails load defaults
         if(wordTable == null)
             generateWordTable();
-                
-        symbolTable = new HashMap();                
+                            
         currentID = 0;        
     }
     
@@ -51,13 +50,17 @@ public class Scanner{
      * @return the next valid token
      */
     public Token getToken(){ 
-        char currentChar = adv.getNextChar();
+        char currentChar = adv.getNextChar();        
+        
+        //filter out the white spaces
+        while(currentChar != ENDFILE && isInvisible(currentChar))
+            currentChar = adv.getNextChar();
+        
          //if the character is the end of file return EOF token
         if(currentChar == ENDFILE)
             return wordTable.get("endfile");
-        //filter out the white spaces
-        while(isWhiteSpace(currentChar))
-            currentChar = adv.getNextChar(); 
+         
+        
         //check if the symbol is a simple character
         if(isSimpleSymbol(currentChar)) 
             return wordTable.get(currentChar + "");
@@ -73,12 +76,58 @@ public class Scanner{
         //check if character is valid for a number
         if(isNumeric(currentChar))
             return getNum(currentChar);        
-                
-        //returns an error as an illegal character was found
-        return new Token(Token.token_Type.ERROR, "error", "Character "
-                + "" + currentChar + " [" +(int)currentChar + "] is an "
-                + getCharType(currentChar));
+        
+        //if character is invalid consume until whitespace is found
+        String subString = currentChar +"";        
+        while(!isWhiteSpace(adv.peekNextChar())) {
+            subString += adv.getNextChar();
+        }
+        
+        //returns an error as an illegal string was found
+        return new Token(Token.token_Type.ERROR, subString, "Invalid Character " + 
+                subString.charAt(0) + " was found and produced an invalid substring of " +
+                subString);
     } 
+    
+    /**
+     * Used to filter out invisible characters (white spaces are not skipped)
+     * @return the next non invisible character (white space included)
+     */
+    private char filterNext() {        
+        char currentChar = adv.getNextChar();
+        
+        //remove invisible characters
+        while(!isWhiteSpace(currentChar) && isInvisible(currentChar)) {
+            adv.getNextChar();
+            
+            if(currentChar == ENDFILE)
+                return currentChar;
+            
+            currentChar = adv.peekNextChar();            
+        }
+        
+        return currentChar;
+    }
+    
+    /**
+     * Peek method for filter out invisible characters (white spaces are not skipped)
+     * @return the peeked non invisible character (white space included)
+     */
+    private char filterPeek() {        
+        char currentChar = adv.peekNextChar();
+        
+        //remove invisible characters
+        while(!isWhiteSpace(currentChar) && isInvisible(currentChar) && currentChar != ENDFILE) {
+            adv.getNextChar();            
+            
+            if(currentChar == ENDFILE)
+                return currentChar;
+            
+            currentChar = adv.peekNextChar();            
+        }
+        
+        return currentChar;
+    }
     
     /**
      * Used when a symbol is detected, if symbol is invalid an error is returned
@@ -87,16 +136,24 @@ public class Scanner{
      * @return the token which was found. error token if symbol is not valid
      */
     private Token getSymbol(char currentChar) {
-        char nextChar = adv.peekNextChar();
+        char nextChar = filterPeek();
                 
         //check if symbol is valid
         switch(currentChar) {
             case '&':
                 if(nextChar != '&') //only valid char
                     break;
+                
+                //if valid consume char and return token
+                adv.getNextChar();
+                return wordTable.get(currentChar + "" + nextChar);
             case '|':
                 if(nextChar != '|') //only valid char
                     break; 
+                
+                //if valid consume char and return token
+                adv.getNextChar();
+                return wordTable.get(currentChar + "" + nextChar);
             case ':':
                 if(nextChar != '=') //only valid char
                     break;
@@ -146,7 +203,8 @@ public class Scanner{
                     return wordTable.get("-");
         }
         
-        return new Token(Token.token_Type.ERROR, "error", currentChar + "" + nextChar + " does not form a valid symbol");
+        adv.getNextChar();
+        return new Token(Token.token_Type.ERROR, currentChar + "", currentChar + "" + nextChar + " does not form a valid symbol");
     }
     
     /**
@@ -158,42 +216,66 @@ public class Scanner{
         String id = currentChar + "";
        
         //consume characters until invalid or end of file
-        while(adv.hasNextChar() && isCharacter(adv.peekNextChar())) 
-            id += adv.getNextChar();
+        while(adv.hasNextChar() && isCharacter(filterPeek())) {
+            id += filterNext();
+        }
         
         //check if the type is boolean or endfile
         if(id.equals("true") || id.equals("false")) {
-			return new Token(Token.token_Type.BLIT, "blit", id);
+            return new Token(Token.token_Type.BLIT, "blit", id);
         }
         
         //check if it is a key word
         if(wordTable.containsKey(id))
             return wordTable.get(id);
         
-        //check if id exists
-        if(!symbolTable.containsKey(id))
-            symbolTable.put(id, currentID++);        
+        int num = strID(id);    
         
-        return new Token(Token.token_Type.ID, "id", id);        
+        return new Token(Token.token_Type.ID, id, num+"");        
+    }
+    
+    /**
+     * Used to retrieve the id
+     * @param id string name of the id
+     * @return the integer associated with the id
+     */
+    public int strID(String id) {
+        if(symbolTable.containsKey(id))
+            return symbolTable.get(id);
+        
+        symbolTable.put(id, currentID);
+        return currentID++;
     }
     
     /**
      * Used to get a int token for an Numeric value
-     * @param currrentChar the starting character
+     * @param currentChar the starting character
      * @return the id token
      */
-    private Token getNum(char currrentChar) {
-        String id = currrentChar + "";
+    private Token getNum(char currentChar) {
+        String id = currentChar + "";
+        char nextChar;
        
-        //consume numbers until invalid or end of file
-        while(adv.hasNextChar() && isNumeric(adv.peekNextChar())) 
-            id += adv.getNextChar();
+        //consume characters until invalid or end of file
+        while(adv.hasNextChar() && isNumeric(filterPeek())) {
+            id += filterNext();
+        }
         
-        //check if the next character is valid, if not return token as an error
-        if(isCharacter(adv.peekNextChar()))        
-            return new Token(Token.token_Type.ERROR, "error", id 
-                    + " can only be followed by whitespace or a symbol, not by a "
-                    + getCharType(adv.peekNextChar()) + " (" + adv.peekNextChar() + ")");
+        nextChar = filterPeek();
+        //check if next char is valid for this type
+        if(isCharacter(nextChar)) {
+            //if character is invalid consume until whitespace is found
+            String subString = currentChar +"";  
+
+            //collect invalid identifier
+            while(isCharacter(filterPeek())) {
+                subString += filterNext();
+            }
+            
+            return new Token(Token.token_Type.ERROR, id + nextChar, id 
+                    + " can not be follwed by a character this produced an nvalid substring of " +
+                subString);
+        }            
         
         return new Token(Token.token_Type.NUM, "num", id);        
     }
@@ -264,14 +346,14 @@ public class Scanner{
         //Initial size of 1000 records
         //Default load ratio of 0.75 (75%)
         wordTable = new TreeMap();
-        FileReader fr = new FileReader("wordTable.txt");
+        FileReader fr = new FileReader("prereq/wordTable.txt");
         String tableString;
         try{
             tableString = fr.readFileToString();
             String[] lines = tableString.split("\r\n");
             for(String line : lines){
                 String[] arr = line.split(" ");
-                Token tok = new Token(arr[0], Token.token_Type.valueOf(arr[1]), (arr.length == 3)? arr[2] : null);
+                Token tok = new Token(Token.token_Type.valueOf(arr[1]), arr[0], (arr.length == 3)? arr[2] : null);
                 addWordToken(tok);
             }
         }catch(IOException e){
@@ -296,6 +378,7 @@ public class Scanner{
         addWordToken(new Token(Token.token_Type.ENDFILE, "endfile"));
         addWordToken(new Token(Token.token_Type.ERROR, "error"));
         addWordToken(new Token(Token.token_Type.AND, "and"));
+        addWordToken(new Token(Token.token_Type.NOT, "not"));
         addWordToken(new Token(Token.token_Type.BOOL, "bool"));
         addWordToken(new Token(Token.token_Type.BRANCH, "branch"));
         addWordToken(new Token(Token.token_Type.CASE, "case"));

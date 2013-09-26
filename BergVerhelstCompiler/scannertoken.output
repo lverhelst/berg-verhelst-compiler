@@ -1,0 +1,175 @@
+  1| --test for the keywords to be used with ID
+  2| true false error and not bool branch case continue default else end if int loop mod or ref return void
+  3| 
+  4| --test for the symbols (which are complete by themselves)
+  5| ( ) * + , - / ; < = > [ ] { } >= <= /= := && ||
+  6| 
+  7| --test for random cases ID
+  8| abc1ac4gb_34d$32
+  9| ef$_31a
+ 10| 	a_$123$_
+ 11| asd$
+ 12| x
+ 13| x
+ 14| 	what
+ 15| x
+ 16| white space
+ 17| andid+anotherid
+ 18| 
+ 19| --comment test
+ 20| /*ajsdhfjkhsdkfhshweirhlwerhlkslfhds*/
+ 21| /*asidsdhlkalsd/*akjsdhfkjshdkf*/akljsdklsa*/
+ 22| /*
+ 23| /*
+ 24|         #%*$&^(#^(#)@)(&) */	
+ 25|        */
+ 26| 
+ 27| --tests for errors
+ 28| 8redrum
+ 29| $something
+ 30| _something
+ 31| &|:$_
+ 32| 
+ 33| --test for random illegal chars
+ 34| !@#%^\.?"'`~�������������������������������������������������������������������������������������������������������������������������������                            
+ 35| 
+ 36| --end of file within comment
+ 37| /*
+ 38| 
+Line 1: --test for the keywords to be used with ID
+    Lexeme              Token Name       Attribute Value       
+Line 2: true false error and not bool branch case continue default else end if int loop mod or ref return void
+    Lexeme              Token Name       Attribute Value       
+     blit                   BLIT                true
+     blit                   BLIT               false
+    error                     ID               error
+      and                    AND                    
+      not                    NOT                    
+     bool                   BOOL                    
+   branch                 BRANCH                    
+     case                   CASE                    
+ continue               CONTINUE                    
+  default                DEFAULT                    
+     else                   ELSE                    
+      end                    END                    
+       if                     IF                    
+      int                    INT                    
+     loop                   LOOP                    
+      mod                    MOD                    
+       or                     OR                    
+      ref                    REF                    
+   return                 RETURN                    
+     void                   VOID                    
+Line 3: 
+    Lexeme              Token Name       Attribute Value       
+Line 4: --test for the symbols (which are complete by themselves)
+    Lexeme              Token Name       Attribute Value       
+Line 5: ( ) * + , - / ; < = > [ ] { } >= <= /= := && ||
+    Lexeme              Token Name       Attribute Value       
+        (                 LPAREN                    
+        )                 RPAREN                    
+        *                   MULT                    
+        +                   PLUS                    
+        ,                  COMMA                    
+        -                  MINUS                    
+        /                    DIV                    
+        ;                   SEMI                    
+        <                     LT                    
+        =                     EQ                    
+        >                     GT                    
+        [                   LSQR                    
+        ]                   RSQR                    
+        {                  LCRLY                    
+        }                  RCRLY                    
+       >=                   GTEQ                    
+       <=                   LTEQ                    
+       /=                    NEQ                    
+       :=                 ASSIGN                    
+       &&                ANDTHEN                    
+       ||                 ORELSE                    
+Line 6: 
+    Lexeme              Token Name       Attribute Value       
+Line 7: --test for random cases ID
+    Lexeme              Token Name       Attribute Value       
+Line 8: abc1ac4gb_34d$32
+    Lexeme              Token Name       Attribute Value       
+abc1ac4gb_34d$32                     ID                   0
+Line 9: ef$_31a
+    Lexeme              Token Name       Attribute Value       
+  ef$_31a                     ID                   1
+Line 10: 	a_$123$_
+    Lexeme              Token Name       Attribute Value       
+ a_$123$_                     ID                   2
+Line 11: asd$
+    Lexeme              Token Name       Attribute Value       
+     asd$                     ID                   3
+Line 12: x
+    Lexeme              Token Name       Attribute Value       
+        x                     ID                   4
+Line 13: x
+    Lexeme              Token Name       Attribute Value       
+        x                     ID                   4
+Line 14: 	what
+    Lexeme              Token Name       Attribute Value       
+     what                     ID                   5
+Line 15: x
+    Lexeme              Token Name       Attribute Value       
+        x                     ID                   4
+Line 16: white space
+    Lexeme              Token Name       Attribute Value       
+    white                     ID                   6
+    space                     ID                   7
+Line 17: andid+anotherid
+    Lexeme              Token Name       Attribute Value       
+    andid                     ID                   8
+        +                   PLUS                    
+anotherid                     ID                   9
+Line 18: 
+    Lexeme              Token Name       Attribute Value       
+Line 19: --comment test
+    Lexeme              Token Name       Attribute Value       
+Line 20: /*ajsdhfjkhsdkfhshweirhlwerhlkslfhds*/
+    Lexeme              Token Name       Attribute Value       
+Line 21: /*asidsdhlkalsd/*akjsdhfkjshdkf*/akljsdklsa*/
+    Lexeme              Token Name       Attribute Value       
+Line 22: /*
+    Lexeme              Token Name       Attribute Value       
+Line 23: /*
+    Lexeme              Token Name       Attribute Value       
+Line 24:         #%*$&^(#^(#)@)(&) */	
+    Lexeme              Token Name       Attribute Value       
+Line 25:        */
+    Lexeme              Token Name       Attribute Value       
+Line 26: 
+    Lexeme              Token Name       Attribute Value       
+Line 27: --tests for errors
+    Lexeme              Token Name       Attribute Value       
+Line 28: 8redrum
+    Lexeme              Token Name       Attribute Value       
+       8r                  ERROR          8 can not be follwed by a character this produced an nvalid substring of 8redrum (Line: 28 Position: 7)
+Line 29: $something
+    Lexeme              Token Name       Attribute Value       
+$something                  ERROR          Invalid Character $ was found and produced an invalid substring of $something (Line: 29 Position: 10)
+Line 30: _something
+    Lexeme              Token Name       Attribute Value       
+_something                  ERROR          Invalid Character _ was found and produced an invalid substring of _something (Line: 30 Position: 10)
+Line 31: &|:$_
+    Lexeme              Token Name       Attribute Value       
+        &                  ERROR          &| does not form a valid symbol (Line: 31 Position: 2)
+        :                  ERROR          :$ does not form a valid symbol (Line: 31 Position: 4)
+        _                  ERROR          Invalid Character _ was found and produced an invalid substring of _ (Line: 31 Position: 5)
+Line 32: 
+    Lexeme              Token Name       Attribute Value       
+Line 33: --test for random illegal chars
+    Lexeme              Token Name       Attribute Value       
+Line 34: !@#%^\.?"'`~�������������������������������������������������������������������������������������������������������������������������������                            
+    Lexeme              Token Name       Attribute Value       
+!@#%^\.?"'`~�������������������������������������������������������������������������������������������������������������������������������                  ERROR          Invalid Character ! was found and produced an invalid substring of !@#%^\.?"'`~������������������������������������������������������������������������������������������������������������������������������� (Line: 34 Position: 140)
+Line 35: 
+    Lexeme              Token Name       Attribute Value       
+Line 36: --end of file within comment
+    Lexeme              Token Name       Attribute Value       
+Line 37: /*
+    Lexeme              Token Name       Attribute Value       
+Line 38: 
+    Lexeme              Token Name       Attribute Value       

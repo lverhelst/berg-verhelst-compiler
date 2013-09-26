@@ -24,16 +24,18 @@ public class Parser {
     public void parse(Boolean showTrace){
        Scanner.Scanner scn = new Scanner.Scanner(console);
        Token currentToken;
+       
        //Continue scanning until endfile is reached
-       while((currentToken = scn.getToken()).getName() != Token.token_Type.ENDFILE){
-           //Handle display of current token (if necessary)
+       do {
+           currentToken = scn.getToken();
+           
            if(currentToken.getName() != Token.token_Type.ERROR ){
                if(showTrace){
                     console.printTraceInformation(currentToken);
                }
            }else{
               console.handleErrorToken(currentToken);
-           }
-       }
+           }           
+       } while(currentToken.getName() != Token.token_Type.ENDFILE);
     }
 }

@@ -1,9 +1,10 @@
 package UnitTests;
 
+import FileIO.FileReader;
 import Lexeme.Token;
 import Main.AdministrativeConsole;
 import Scanner.Scanner;
-import java.lang.reflect.InvocationTargetException;
+import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 
@@ -31,38 +32,37 @@ public class ScannerTest {
         System.out.println("--[Scanner Unit Test]--");      
         ArrayList<UTResult> results = new ArrayList<UTResult>();
         Method[] methods = ScannerTest.class.getMethods();
+        
         for(Method m: methods){
             if(m.getName().startsWith("test")){
                 try{
                     results.add(new UTResult(m.getName(),(Boolean)m.invoke(this)));
-				}
+		}
                 catch(Exception e){
-                    System.out.println(e.toString());
+                    System.out.println(m.getName() + ": " + e.getCause());
                 }
             }
         }
+        
         for(UTResult b: results){
-            System.out.println(String.format("%24s Returns: %s" ,b.getDescription(), b.getResult()));
+            System.out.println(String.format("%24s: %s" ,b.getDescription(), b.getResult()));
         }
-		
-		/*System.out.println("getToken " + result(testgetToken()));
-        System.out.println("isCharacter " + result(testisCharacter()));
-        System.out.println("isInvisible " + result(testisInvisible()));
-        System.out.println("isNumeric " + result(testisNumeric()));
-        System.out.println("isSimpleCharacter " + result(testisSimpleCharacter()));
-        System.out.println("isSimpleSymbol " + result(testisSimpleSymbol()));
-        System.out.println("isSymbol " + result(testisSymbol()));
-        System.out.println("isWhiteSpace " + result(testisWhiteSpace()));*/
-//        System.out.println(this.printClassification());
     }
     
     /**
-     * Simple method used to clean up test result lines
-     * @param result the result of the test as a boolean
-     * @return successful if true, failed if false
+     * Used to get the contents of a file in string format (Used for test files)
+     * @param fileName the file to load
+     * @return the contents of the file if found, null if not
      */
-    public String result(boolean result) {
-        return result ? "successful" : "failed";
+    public String fileToString(String fileName) {
+        FileReader fr = new FileReader(fileName);
+        
+        try {
+            return fr.readFileToString();            
+        } catch (IOException e) {
+            System.out.println("Failed to read file " + e.toString());
+            return null;
+        }
     }
     
     /**
@@ -70,44 +70,42 @@ public class ScannerTest {
      * @return true if test succeeded
      */
     public boolean testgetToken() {
+        String contents = fileToString("unit/scannerToken.target");
+        String[] expected; 
+        
+        if(contents == null) {
+            System.out.println("file not found, cannot complete test ");
+            return false;
+        }
+        
+        expected = contents.split(" ");        
+        if(expected == null) {                
+            System.out.println("No input in target file, cannot complete test ");
+            return false;
+        }
+        
         adminCon.loadFile("unit/scannerToken.cs13");
-        String[] expected = {"blit","blit","error","and","not","bool","branch",
-            "case","continue","default","else","end","if","int","loop","mod",
-            "or","ref","return","void","(",")","*","+",",","-","/",";","<","=",
-            ">","[","]","{","}","error","error","error","error","error","error",
-            "error","error","error","error","error","error","error","error",
-            "error","error","error","error","error","error","error","error",
-            "error","error","error","error","error","error","error","error",
-            "error","error","error","error","error","error","error","error",
-            "error","error","error","error","error","error","error","error",
-            "error","error","error","error","error","error","error","error",
-            "error","error","error","error","error","error","error","error",
-            "error","error","error","error","error","error","error","error",
-            "error","error","error","error","error","error","error","error",
-            "error","error","error","error","error","error","error","error",
-            "error","error","error","error","error","error","error","error",
-            "error","error","error","error","error","error","error","error",
-            "error","error","error","error","error","error","error","error",
-            "error","error","error","error","error","error","error","error",
-            "error","error","error","error","error","error","error","error",
-            "error","error","error","error","error","error","error","error",
-            "error","error","error","error","error","error","id","id","error",
-            "id","id","id","id","error","id","id","id","id","id","+","id",
-            "error","id","error","id","error","id","error","error","error"};
-        
         Token token = scanner.getToken();
-        int i = 0;
+        boolean check = true;
+        int i = 0;        
         
+        //check found tokens against expected results from file
         while(token.getName() != Token.token_Type.ENDFILE) {
-            if(!token.getLexeme().equals(expected[i++])) {
-                System.out.println(token.getLexeme() + " does not match the expected token of " + expected[--i]);
-                return false; //exit if test fails
+            if(token.getName() == Token.token_Type.ERROR) {
+                if(!expected[i].equals("ERROR")) {                                  
+                    System.out.println("[Failed] | Found " + token.getLexeme() + " | expected " + expected[i]);
+                    check &= false; //exit if test fails
+                }
+            } else if(!token.getLexeme().equals(expected[i])) {                
+                System.out.println("[Failed] | Found " + token.getLexeme() + " | expected " + expected[i]);
+                check &= false; //exit if test fails
             }
-                        
+            
+            i++;
             token = scanner.getToken();
         }
         
-        return true;
+        return check;
     }    
     
     /**
@@ -115,21 +113,30 @@ public class ScannerTest {
      * @return true if test succeeded
      */
     public boolean testisCharacter() {
-        char[] expected = {'$','0','1','2','3','4','5','6','7','8','9','A','B',
-            'C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R',
-            'S','T','U','V','W','X','Y','Z','_','a','b','c','d','e','f','g',
-            'h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w',
-            'x','y','z'};
+        String contents = fileToString("unit/scannerCharacter.target");
+        String[] expected; 
+        
+        if(contents == null) {
+            System.out.println("file not found, cannot complete test ");
+            return false;
+        }
+        
+        expected = contents.split(" ");        
+        if(expected == null) {                
+            System.out.println("No input in target file, cannot complete test ");
+            return false;
+        }
 
         int j = 0;
         String charSet = "";
         for(int i = 0; i < 256; i++) {            
            if(scanner.isCharacter((char)i)) {
                //only check char if it is found to be a character
-               if((char)i != expected[j++]) {                   
-                   System.out.println((char)i + " does not match the expected character " + expected[--j]);
+               if((char)i != expected[j].charAt(0)) {                   
+                   System.out.println((char)i + " does not match the expected character " + expected[j]);
                    return false;
                }
+               j++;
            }               
         }  
         
@@ -147,28 +154,45 @@ public class ScannerTest {
      * @return true if test succeeded
      */
     public boolean testisInvisible() {
-        int[] expected = {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,
-            20,21,22,23,24,25,26,27,28,29,30,31,32};
+        String contents = fileToString("unit/scannerInvisible.target");
+        String[] expected; 
+        
+        if(contents == null) {
+            System.out.println("file not found, cannot complete test ");
+            return false;
+        }
+        
+        expected = contents.split(" ");        
+        if(expected == null) {                
+            System.out.println("No input in target file, cannot complete test ");
+            return false;
+        }
 
+        boolean check = true;
         int j = 0;
         String charSet = "";
         for(int i = 0; i < 256; i++) {            
            if(scanner.isInvisible((char)i)) {
-               //only check char if it is found to be a invisible character
-               if(i != expected[j++]) {                   
-                   System.out.println((char)i + " does not match the expected invisible character " + expected[--j]);
-                   return false;
-               }
+               //only check char if it is found to be a invisible character (32 is skipped as it is removed by spilt)
+               if(i != 32 && i != expected[j].charAt(0)) {                   
+                   System.out.println((int)i + " does not match the expected invisible character " + (int)expected[j].charAt(0));
+                   check &= false;
+               }               
+               j++;
            }               
         }  
         
-        //not all invisible chars checked
-        if(j != expected.length) {            
+        //checks to ensure space is valid (since it was skipped
+        if(!scanner.isInvisible(' '))
+            check &= false;
+        
+        //not all invisible chars checked (+ 1 due to spliting on space
+        if(j != expected.length + 1) {            
             System.out.println("Not all invisible characters matched " + j + "/" + expected.length);
-            return false;
+            check &= false;
         }
         
-        return true;
+        return check;
     }
     
     /**
@@ -176,27 +200,41 @@ public class ScannerTest {
      * @return true if test succeeded
      */
     public boolean testisNumeric() {
-        char[] expected = {'0','1','2','3','4','5','6','7','8','9'};
+        String contents = fileToString("unit/scannerNumeric.target");
+        String[] expected; 
+        
+        if(contents == null) {
+            System.out.println("file not found, cannot complete test ");
+            return false;
+        }
+        
+        expected = contents.split(" ");        
+        if(expected == null) {                
+            System.out.println("No input in target file, cannot complete test ");
+            return false;
+        }
 
+        boolean check = true;
         int j = 0;
         String charSet = "";
         for(int i = 0; i < 256; i++) {            
            if(scanner.isNumeric((char)i)) {
                //only check char if it is found to be a number
-               if(i != expected[j++]) {                   
-                   System.out.println((char)i + " does not match the expected number " + expected[--j]);
-                   return false;
+               if(i != expected[j].charAt(0)) {                   
+                   System.out.println((char)i + " does not match the expected number " + expected[j]);
+                   check &= false;
                }
+               j++;
            }               
         }  
         
         //not all numbers checked
         if(j != expected.length) {            
             System.out.println("Not all invisible characters matched " + j + "/" + expected.length);
-            return false;
+            check &= false;
         }
-         
-        return true;
+        
+        return check;
     }
     
     /**
@@ -204,30 +242,41 @@ public class ScannerTest {
      * @return true if test succeeded
      */
     public boolean testisSimpleCharacter() {
-       char[] expected = {'A','B','C','D','E','F','G','H','I','J','K','L','M',
-            'N','O','P','Q','R','S','T','U','V','W','X','Y','Z','a','b','c','d',
-            'e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u',
-            'v','w','x','y','z'};
+        String contents = fileToString("unit/scannerSimpleChar.target");
+        String[] expected; 
+        
+        if(contents == null) {
+            System.out.println("file not found, cannot complete test ");
+            return false;
+        }
+        
+        expected = contents.split(" ");        
+        if(expected == null) {                
+            System.out.println("No input in target file, cannot complete test ");
+            return false;
+        }
 
+        boolean check = true;
         int j = 0;
         String charSet = "";
         for(int i = 0; i < 256; i++) {            
            if(scanner.isSimpleCharacter((char)i)) {
                //only check char if it is found to be a simple character
-               if((char)i != expected[j++]) {                   
-                   System.out.println((char)i + " does not match the expected simple character " + expected[--j]);
-                   return false;
+               if(i != expected[j].charAt(0)) {                   
+                   System.out.println((char)i + " does not match the expected simple character " + expected[j]);
+                   check &= false;
                }
+               j++;
            }               
         }  
         
         //not all simple chars checked
         if(j != expected.length) {            
             System.out.println("Not all simple characters matched " + j + "/" + expected.length);
-            return false;
+            check &= false;
         }
         
-        return true;
+        return check;
     }
     
     /**
@@ -235,82 +284,128 @@ public class ScannerTest {
      * @return true if test succeeded
      */
     public boolean testisSimpleSymbol() {
-        char[] expected = {'(',')','*','+',',',';','=','[',']','{','}'};
+        String contents = fileToString("unit/scannerSimpleSymbol.target");
+        String[] expected; 
+        
+        if(contents == null) {
+            System.out.println("file not found, cannot complete test ");
+            return false;
+        }
+        
+        expected = contents.split(" ");        
+        if(expected == null) {                
+            System.out.println("No input in target file, cannot complete test ");
+            return false;
+        }
 
+        boolean check = true;
         int j = 0;
         String charSet = "";
         for(int i = 0; i < 256; i++) {            
            if(scanner.isSimpleSymbol((char)i)) {
                //only check char if it is found to be a simple symbol
-               if((char)i != expected[j++]) {                   
-                   System.out.println((char)i + " does not match the expected simple symbol " + expected[--j]);
-                   return false;
+               if(i != expected[j].charAt(0)) {                   
+                   System.out.println((char)i + " does not match the expected simple symbol " + expected[j]);
+                   check &= false;
                }
+               j++;
            }               
         }  
         
         //not all simple symbol checked
         if(j != expected.length) {            
             System.out.println("Not all simple symbol matched " + j + "/" + expected.length);
-            return false;
+            check &= false;
         }
         
-        return true;
+        return check; 
     }
     
     /**
      * Used to test the isSymbol function of the scanner
      * @return true if test succeeded
      */
-    public boolean testisSymbol() {
-        char[] expected = {'&','(',')','*','+',',','-','/',':',';','<','=','>','[',']','{','|','}'};
+    public boolean testisSymbol() {        
+        String contents = fileToString("unit/scannerSymbol.target");
+        String[] expected; 
+        
+        if(contents == null) {
+            System.out.println("file not found, cannot complete test ");
+            return false;
+        }
+        
+        expected = contents.split(" ");        
+        if(expected == null) {                
+            System.out.println("No input in target file, cannot complete test ");
+            return false;
+        }
 
+        boolean check = true;
         int j = 0;
         String charSet = "";
         for(int i = 0; i < 256; i++) {            
            if(scanner.isSymbol((char)i)) {
                //only check char if it is found to be a symbol
-               if((char)i != expected[j++]) {                   
-                   System.out.println((char)i + " does not match the expected symbol " + expected[--j]);
-                   return false;
+               if(i != expected[j].charAt(0)) {                   
+                   System.out.println((char)i + " does not match the expected symbol " + expected[j]);
+                   check &= false;
                }
+               j++;
            }               
         }  
         
         //not all symbol checked
         if(j != expected.length) {            
             System.out.println("Not all symbol matched " + j + "/" + expected.length);
-            return false;
+            check &= false;
         }
         
-        return true;
+        return check; 
     }
     
     /**
      * Used to test the isWhiteSpace function of the scanner
      * @return true if test succeeded
      */
-    public boolean testisWhiteSpace() {
-        int[] expected = {10,11,13,14,15,32};
-
-        int j = 0;
-        String charSet = "";
-        for(int i = 0; i < 256; i++) {            
-           if(scanner.isWhiteSpace((char)i)) {
-               //only check char if it is found to be a white space
-               if(i != expected[j++]) {                   
-                   System.out.println(i + " does not match the expected white space " + expected[--j]);
-                   return false;
-               }
-           }               
-        }  
+    public boolean testisWhiteSpace() {      
+        String contents = fileToString("unit/scannerWhite.target");
+        String[] expected; 
         
-        //not all while space characters checked
-        if(j != expected.length) {            
-            System.out.println("Not all white space characters matched " + j + "/" + expected.length);
+        if(contents == null) {
+            System.out.println("file not found, cannot complete test ");
             return false;
         }
         
-        return true;
+        expected = contents.split(" ");        
+        if(expected == null) {                
+            System.out.println("No input in target file, cannot complete test ");
+            return false;
+        }
+        
+        boolean check = true;
+        int j = 0;
+        String charSet = "";
+        for(int i = 0; i < 256; i++) {            
+           if(scanner.isWhiteSpace((char)i)) {               
+               //only check char if it is found to be a white space (32 is skipped as it is removed by spilt)
+               if(expected[j].equals(i + "")) {                   
+                   System.out.println((int)i + " does not match the expected white space " + (int)expected[j].charAt(0));
+                   check &= false;
+               }               
+               j++;
+           }               
+        }  
+        
+        //checks to ensure space is valid (since it was skipped)
+        if(!scanner.isInvisible(' '))
+            check &= false;
+        
+        //not all white space characters checked
+        if(j != expected.length) {            
+            System.out.println("Not all white space characters matched " + j + "/" + expected.length);
+            check &= false;
+        }
+        
+        return check; 
     }    
 }

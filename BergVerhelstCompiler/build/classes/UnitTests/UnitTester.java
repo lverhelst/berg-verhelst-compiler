@@ -25,5 +25,7 @@ public class UnitTester {
         acut.runAllUnitTests();
         ScannerTest scan = new ScannerTest(adv);
         scan.runAllUnitTests();
+        TokenTest tknt = new TokenTest();
+        tknt.runAllUnitTests();
     }
 }

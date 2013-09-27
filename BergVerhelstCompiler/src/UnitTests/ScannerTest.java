@@ -84,19 +84,29 @@ public class ScannerTest {
         }
         
         adminCon.loadFile("unit/scannerToken.cs13");
-        Token token = scanner.getToken();
+        Token token;
         boolean check = true;
         int i = 0;        
         
         //check found tokens against expected results from file
-        while(token.getName() != Token.token_Type.ENDFILE) {             
-             if(!token.getLexeme().equals(expected[i])) {                
+        do {
+            token = scanner.getToken();
+            if(token.getName() == Token.token_Type.ERROR) {
+                if(!expected[i].equals("ERROR")) {                                  
+                    System.out.println("[Failed] | Found " + token.getLexeme() + " | expected " + expected[i]);
+                    check &= false; //exit if test fails
+                }
+            } else if(!token.getLexeme().equals(expected[i])) {                
                 System.out.println("[Failed] | Found " + token.getLexeme() + " | expected " + expected[i]);
                 check &= false; //exit if test fails
             }
             
-            i++;
-            token = scanner.getToken();
+             i++;
+        } while(token.getName() != Token.token_Type.ENDFILE );
+        
+        if(token.getName() != Token.token_Type.ENDFILE) {
+            System.out.println("[Failed] | More tokens created then expected");
+            check &= false;
         }
         
         return check;
@@ -168,7 +178,7 @@ public class ScannerTest {
         for(int i = 0; i < 256; i++) {            
            if(scanner.isInvisible((char)i)) {
                //only check char if it is found to be a invisible character (32 is skipped as it is removed by spilt)
-               if(i != 32 && i != expected[j].charAt(0)) {                   
+               if(i != expected[j].charAt(0)) {                   
                    System.out.println((int)i + " does not match the expected invisible character " + (int)expected[j].charAt(0));
                    check &= false;
                }               
@@ -176,12 +186,8 @@ public class ScannerTest {
            }               
         }  
         
-        //checks to ensure space is valid (since it was skipped
-        if(!scanner.isInvisible(' '))
-            check &= false;
-        
         //not all invisible chars checked (+ 1 due to spliting on space
-        if(j != expected.length + 1) {            
+        if(j != expected.length) {            
             System.out.println("Not all invisible characters matched " + j + "/" + expected.length);
             check &= false;
         }
@@ -215,7 +221,7 @@ public class ScannerTest {
            if(scanner.isNumeric((char)i)) {
                //only check char if it is found to be a number
                if(i != expected[j].charAt(0)) {                   
-                   System.out.println((char)i + " does not match the expected number " + expected[--j]);
+                   System.out.println((char)i + " does not match the expected number " + expected[j]);
                    check &= false;
                }
                j++;
@@ -257,7 +263,7 @@ public class ScannerTest {
            if(scanner.isSimpleCharacter((char)i)) {
                //only check char if it is found to be a simple character
                if(i != expected[j].charAt(0)) {                   
-                   System.out.println((char)i + " does not match the expected simple character " + expected[--j]);
+                   System.out.println((char)i + " does not match the expected simple character " + expected[j]);
                    check &= false;
                }
                j++;
@@ -299,7 +305,7 @@ public class ScannerTest {
            if(scanner.isSimpleSymbol((char)i)) {
                //only check char if it is found to be a simple symbol
                if(i != expected[j].charAt(0)) {                   
-                   System.out.println((char)i + " does not match the expected simple symbol " + expected[--j]);
+                   System.out.println((char)i + " does not match the expected simple symbol " + expected[j]);
                    check &= false;
                }
                j++;
@@ -341,7 +347,7 @@ public class ScannerTest {
            if(scanner.isSymbol((char)i)) {
                //only check char if it is found to be a symbol
                if(i != expected[j].charAt(0)) {                   
-                   System.out.println((char)i + " does not match the expected symbol " + expected[--j]);
+                   System.out.println((char)i + " does not match the expected symbol " + expected[j]);
                    check &= false;
                }
                j++;
@@ -375,20 +381,24 @@ public class ScannerTest {
             System.out.println("No input in target file, cannot complete test ");
             return false;
         }
-
+        
         boolean check = true;
         int j = 0;
         String charSet = "";
         for(int i = 0; i < 256; i++) {            
-           if(scanner.isWhiteSpace((char)i)) {
-               //only check char if it is found to be a white space
-               if(i != expected[j].charAt(0)) {                   
-                   System.out.println(i + " does not match the expected white space " + expected[--j]);
+           if(scanner.isWhiteSpace((char)i)) {               
+               //only check char if it is found to be a white space (32 is skipped as it is removed by spilt)
+               if(expected[j].equals(i + "")) {                   
+                   System.out.println((int)i + " does not match the expected white space " + (int)expected[j].charAt(0));
                    check &= false;
-               }
+               }               
                j++;
            }               
         }  
+        //checks to ensure space is valid (since it was skipped)
+        if(!scanner.isWhiteSpace(' '))
+            check &= false;
+        
         //not all white space characters checked
         if(j != expected.length) {            
             System.out.println("Not all white space characters matched " + j + "/" + expected.length);

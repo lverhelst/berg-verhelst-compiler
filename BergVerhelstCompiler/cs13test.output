@@ -1,0 +1,96 @@
+  1| &%int main(){
+  2|     int x = 0;
+  3|     if(x > 0){
+  4|         int y = 0;
+  5|         x++;
+  6|     }
+  7|     return 0;
+  8| /*/**/*/*/
+  9|     int true false;
+ 10|     89012
+ 11|     /
+ 12|     /=
+ 13|     *=
+ 14| --test commenting out a line
+ 15| &%
+ 16| # /* !@#$%^&*()_IJHVCE*^(YUOJKNMPO&^*RI%^U */
+ 17| }
+Line 1: &%int main(){
+    Lexeme              Token Name       Attribute Value       
+        &                  ERROR          &% does not form a valid symbol (Line: 1 Position: 2)
+      int                    INT                    
+     main                     ID                   0
+        (                 LPAREN                    
+        )                 RPAREN                    
+        {                  LCRLY                    
+Line 2:     int x = 0;
+    Lexeme              Token Name       Attribute Value       
+      int                    INT                    
+        x                     ID                   4
+        =                     EQ                    
+      num                    NUM                   0
+        ;                   SEMI                    
+Line 3:     if(x > 0){
+    Lexeme              Token Name       Attribute Value       
+       if                     IF                    
+        (                 LPAREN                    
+        x                     ID                   4
+        >                     GT                    
+      num                    NUM                   0
+        )                 RPAREN                    
+        {                  LCRLY                    
+Line 4:         int y = 0;
+    Lexeme              Token Name       Attribute Value       
+      int                    INT                    
+        y                     ID                   1
+        =                     EQ                    
+      num                    NUM                   0
+        ;                   SEMI                    
+Line 5:         x++;
+    Lexeme              Token Name       Attribute Value       
+        x                     ID                   4
+        +                   PLUS                    
+        +                   PLUS                    
+        ;                   SEMI                    
+Line 6:     }
+    Lexeme              Token Name       Attribute Value       
+        }                  RCRLY                    
+Line 7:     return 0;
+    Lexeme              Token Name       Attribute Value       
+   return                 RETURN                    
+      num                    NUM                   0
+        ;                   SEMI                    
+Line 8: /*/**/*/*/
+    Lexeme              Token Name       Attribute Value       
+        *                   MULT                    
+        /                    DIV                    
+Line 9:     int true false;
+    Lexeme              Token Name       Attribute Value       
+      int                    INT                    
+     blit                   BLIT                true
+     blit                   BLIT               false
+        ;                   SEMI                    
+Line 10:     89012
+    Lexeme              Token Name       Attribute Value       
+      num                    NUM               89012
+Line 11:     /
+    Lexeme              Token Name       Attribute Value       
+        /                    DIV                    
+Line 12:     /=
+    Lexeme              Token Name       Attribute Value       
+       /=                    NEQ                    
+Line 13:     *=
+    Lexeme              Token Name       Attribute Value       
+        *                   MULT                    
+        =                     EQ                    
+Line 14: --test commenting out a line
+    Lexeme              Token Name       Attribute Value       
+Line 15: &%
+    Lexeme              Token Name       Attribute Value       
+        &                  ERROR          &% does not form a valid symbol (Line: 15 Position: 2)
+Line 16: # /* !@#$%^&*()_IJHVCE*^(YUOJKNMPO&^*RI%^U */
+    Lexeme              Token Name       Attribute Value       
+        #                  ERROR          Invalid Character # was found and produced an invalid substring of # (Line: 16 Position: 1)
+Line 17: }
+    Lexeme              Token Name       Attribute Value       
+        }                  RCRLY                    

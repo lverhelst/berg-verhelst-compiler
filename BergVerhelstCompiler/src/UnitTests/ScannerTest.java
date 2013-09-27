@@ -39,7 +39,7 @@ public class ScannerTest {
                     results.add(new UTResult(m.getName(),(Boolean)m.invoke(this)));
 		}
                 catch(Exception e){
-                    System.out.println(m.getName() + ": " + e.toString());
+                    System.out.println(m.getName() + ": " + e.getCause());
                 }
             }
         }

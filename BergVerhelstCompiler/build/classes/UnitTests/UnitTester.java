@@ -3,7 +3,7 @@ package UnitTests;
 import Main.AdministrativeConsole;
 
 /**
- *
+ * Used to test the Administrative Console Class
  * @author Leon Verhelst and Emery
  */
 public class UnitTester {

@@ -3,7 +3,7 @@ import Lexeme.Token;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 /**
- *
+ * Used to test the Token class
  * @author Leon Verhelst
  */
 public class TokenTest {
@@ -32,7 +32,10 @@ public class TokenTest {
             System.out.println(String.format("%24s: %s" ,b.getDescription(), b.getResult()));
         }
     }
-    
+    /**
+     * Make a token, see if that token is really what was made
+     * @return Check of what exists in the token
+     */
     public Boolean testToken(){
         Token t = new Token(Token.token_Type.BLIT, "true", "1");
         return t.getAttribute_Value().equals("1") && t.getName() == Token.token_Type.BLIT && t.getLexeme().equals("true");

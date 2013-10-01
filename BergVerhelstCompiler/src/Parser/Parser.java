@@ -5,8 +5,8 @@ import Main.AdministrativeConsole;
 
 
 /**
- *
  * @author Leon Verhelst
+ * Parser class for parsing the tokens from the Scanner
  */
 public class Parser {
     AdministrativeConsole console;

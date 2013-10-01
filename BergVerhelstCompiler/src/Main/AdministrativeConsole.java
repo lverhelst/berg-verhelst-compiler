@@ -44,7 +44,12 @@ public class AdministrativeConsole {
     * @param args Arguments/Parameters
     */
    public AdministrativeConsole(String[] args){
-       setParameters(args);
+       //Set parameters for admin console
+       setParameters(args);       
+   }
+   
+   
+   public void runAdminConsole(){
        //Display help if it exists
        if(arguments.containsKey("help")){
            displayHelp();
@@ -53,14 +58,14 @@ public class AdministrativeConsole {
        if(arguments.containsKey("test")){
            runUnitTests();
        }else{
-        //If the UI option is specified it takes precendence over all others
-        //Display UI, otherwise run the compiler with the other provided arguments
-        if(arguments.containsKey("ui")){
-            runUI();
-        }else{
-            if(arguments.containsKey("f") || arguments.containsKey("load"))
-		runFileProcess();
-        }
+            //If the UI option is specified it takes precendence over all others
+            //Display UI, otherwise run the compiler with the other provided arguments
+            if(arguments.containsKey("ui")){
+                runUI();
+            }else{
+                if(arguments.containsKey("f") || arguments.containsKey("load"))
+                    runFileProcess();
+            }
        }
    }
    /**
@@ -69,8 +74,7 @@ public class AdministrativeConsole {
    private void runFileProcess(){
        String fileName = arguments.get("f");
        if(fileName == null)
-           fileName = arguments.get("load");
-       
+           fileName = arguments.get("load");       
        
       //Verify valid file name
        if(!fileName.endsWith("cs13")){
@@ -295,7 +299,7 @@ public class AdministrativeConsole {
            charPosInLine = 0;
            //Check if we need to print out the current line
            if(arguments.containsKey("tr") && arguments.get("tr").equals("token")){
-                line = "Line " + linenumber + ": " + fileByLines[linenumber] + "\r\n" + String.format("%10s%7s%7s%s%7s%s%7s","Lexeme","","","Token Name","","Attribute Value","");
+                line = "Line " + linenumber + ": " + fileByLines[linenumber] + "\r\n" + String.format("%13s%7s%7s%s%7s%s%7s","Lexeme","","","Token Name","","Attribute Value","");
                 System.out.println(line);
                 if(arguments.containsKey("out"))
                    writer.writeLine(line + "\r\n");
@@ -324,7 +328,7 @@ public class AdministrativeConsole {
      * @param t The token to print the information for
      */
     public void printTraceInformation(Token t){
-        System.out.println(t);
+        System.out.println(linenumber + ":" + t.toString());
         if(arguments.containsKey("out"))
            writer.writeLine(t.toString() + "\r\n");
     }

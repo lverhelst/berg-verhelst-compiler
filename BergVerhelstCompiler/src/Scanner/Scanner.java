@@ -8,6 +8,7 @@ import java.util.TreeMap;
 
 /**
  * @authors Leon Verhelst and Emery Berg
+ * Creates tokens from an input of characters
  */
 public class Scanner{
     private AdministrativeConsole adv;
@@ -45,7 +46,6 @@ public class Scanner{
         symbolTable = new HashMap();
                             
         currentID = 0;    
-        System.out.println("Endfile = " + (int)ENDFILE);
     }
     
     /**
@@ -255,14 +255,7 @@ public class Scanner{
         //consume characters until invalid or end of file
         while(adv.hasNextChar() && isNumeric(filterPeek())) {
             id += filterNext();
-        }
-        
-        nextChar = filterPeek();
-        //check if next char is valid for this type
-        if(isCharacter(nextChar)) {            
-            return new Token(Token.token_Type.ERROR, id + nextChar, id 
-                    + " can not be follwed by a character");
-        }            
+        }      
         
         return new Token(Token.token_Type.NUM, "num", id);        
     }
@@ -475,15 +468,12 @@ public class Scanner{
     
     /**
      * Used to filter out white spaces by returning true if char is white space
-     * These are horizontal tab(11), line feed (13), vertical tab(13), 
-     * form feed(14), carriage return(15), space(32)
+     * These are horizontal tab(09), line feed (10),  space(32)
      * @param currentChar the symbol to check
      * @return true if white space char
      */
     public boolean isWhiteSpace(char currentChar) {
-        return currentChar == 10 || currentChar == 11 ||
-               currentChar == 13 || currentChar == 14 ||
-               currentChar == 15 || currentChar == 32;
+        return currentChar == 9 || currentChar == 10 || currentChar == 32;
     }
     
     /**

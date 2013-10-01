@@ -6,6 +6,9 @@ import java.util.ArrayList;
 /**
  *
  * @author Leon Verhelst
+ * Administrative Console to control the flow of the compiler
+ * Handles printing, user input and output, setting of parameters, 
+ * handles retrieving next characters
  */
 public class AdministrativeConsoleUnitTest {
     AdministrativeConsole testConsole;
@@ -21,6 +24,7 @@ public class AdministrativeConsoleUnitTest {
     public ArrayList<UTResult> runAllUnitTests(){
         String[] args = {"-load", "unit/adminconsoletest.cs13"};
         testConsole = new AdministrativeConsole(args); 
+        testConsole.runAdminConsole();
         //Consume the prefixed \r\n
         testConsole.getNextChar();
         testConsole.getNextChar();

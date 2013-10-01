@@ -8,10 +8,11 @@ import java.util.TreeMap;
 
 /**
  * @authors Leon Verhelst and Emery Berg
+ * Creates tokens from an input of characters
  */
 public class Scanner{
     private AdministrativeConsole adv;
-    private final char ENDFILE = '\u001a';
+    private final char ENDFILE = 26;
     private int currentID;
     
     /*
@@ -21,7 +22,7 @@ public class Scanner{
      * This removes the need to do string comparisons, which is expensive and slow, and
      * allows for us to use integer comparisons
      */
-    private static HashMap<String, Integer> symbolTable = new HashMap(); 
+    private HashMap<String, Integer> symbolTable; 
     
     /*
      * The word table contains identifiers and keywords
@@ -41,8 +42,10 @@ public class Scanner{
         //if file fails load defaults
         if(wordTable == null)
             generateWordTable();
+        
+        symbolTable = new HashMap();
                             
-        currentID = 0;        
+        currentID = 0;    
     }
     
     /**
@@ -53,13 +56,12 @@ public class Scanner{
         char currentChar = adv.getNextChar();        
         
         //filter out the white spaces
-        while(currentChar != ENDFILE && isInvisible(currentChar))
+        while(currentChar != ENDFILE && (isInvisible(currentChar) || isWhiteSpace(currentChar)))
             currentChar = adv.getNextChar();
         
          //if the character is the end of file return EOF token
         if(currentChar == ENDFILE)
-            return wordTable.get("endfile");
-         
+            return new Token(Token.token_Type.ENDFILE, ENDFILE + "", null);         
         
         //check if the symbol is a simple character
         if(isSimpleSymbol(currentChar)) 
@@ -76,17 +78,11 @@ public class Scanner{
         //check if character is valid for a number
         if(isNumeric(currentChar))
             return getNum(currentChar);        
-        
-        //if character is invalid consume until whitespace is found
-        String subString = currentChar +"";        
-        while(!isWhiteSpace(adv.peekNextChar())) {
-            subString += adv.getNextChar();
-        }
-        
+                
         //returns an error as an illegal string was found
-        return new Token(Token.token_Type.ERROR, subString, "Invalid Character " + 
-                subString.charAt(0) + " was found and produced an invalid substring of " +
-                subString);
+        return new Token(Token.token_Type.ERROR, currentChar + "", "Invalid Character " 
+                + (int)currentChar + " of type " + getCharType(currentChar) 
+                + " and resulted in an error token");
     } 
     
     /**
@@ -184,7 +180,7 @@ public class Scanner{
                     if(removeComment())
                         return getToken(); // no eof continue scanning
                     else 
-                        return wordTable.get("endfile"); //return eof message
+                        return new Token(Token.token_Type.ENDFILE, ENDFILE + "", null); 
                 } else if (nextChar == '=') {
                     adv.getNextChar();
                     return wordTable.get("/=");
@@ -198,12 +194,12 @@ public class Scanner{
                     if(skipLine())
                         return getToken(); // no eof continue scanning
                     else 
-                        return wordTable.get("endfile"); //return eof message
+                        return new Token(Token.token_Type.ENDFILE, ENDFILE + "", null); 
                 } else 
                     return wordTable.get("-");
         }
         
-        adv.getNextChar();
+//        adv.getNextChar();
         return new Token(Token.token_Type.ERROR, currentChar + "", currentChar + "" + nextChar + " does not form a valid symbol");
     }
     
@@ -259,23 +255,7 @@ public class Scanner{
         //consume characters until invalid or end of file
         while(adv.hasNextChar() && isNumeric(filterPeek())) {
             id += filterNext();
-        }
-        
-        nextChar = filterPeek();
-        //check if next char is valid for this type
-        if(isCharacter(nextChar)) {
-            //if character is invalid consume until whitespace is found
-            String subString = currentChar +"";  
-
-            //collect invalid identifier
-            while(isCharacter(filterPeek())) {
-                subString += filterNext();
-            }
-            
-            return new Token(Token.token_Type.ERROR, id + nextChar, id 
-                    + " can not be follwed by a character this produced an nvalid substring of " +
-                subString);
-        }            
+        }      
         
         return new Token(Token.token_Type.NUM, "num", id);        
     }
@@ -488,15 +468,12 @@ public class Scanner{
     
     /**
      * Used to filter out white spaces by returning true if char is white space
-     * These are horizontal tab(11), line feed (13), vertical tab(13), 
-     * form feed(14), carriage return(15), space(32)
+     * These are horizontal tab(09), line feed (10),  space(32)
      * @param currentChar the symbol to check
      * @return true if white space char
      */
     public boolean isWhiteSpace(char currentChar) {
-        return currentChar == 10 || currentChar == 11 ||
-               currentChar == 13 || currentChar == 14 ||
-               currentChar == 15 || currentChar == 32;
+        return currentChar == 9 || currentChar == 10 || currentChar == 32;
     }
     
     /**
@@ -505,7 +482,7 @@ public class Scanner{
      * @return true if invisible char
      */
     public boolean isInvisible(char currentChar) {
-         return currentChar <= 32;
+         return currentChar < 32 || currentChar == 127;
     }
     
     /**

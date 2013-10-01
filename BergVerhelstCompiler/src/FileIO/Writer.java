@@ -5,7 +5,7 @@ import java.io.PrintWriter;
 /**
  *
  * @author Leon I. Verhelst
- * 
+ * Writes to a file
  */
 public class Writer{
     private PrintWriter outf;

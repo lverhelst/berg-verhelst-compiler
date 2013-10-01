@@ -85,12 +85,13 @@ public class ScannerTest {
         }
         
         adminCon.loadFile("unit/scannerToken.cs13");
-        Token token = scanner.getToken();
+        Token token;
         boolean check = true;
         int i = 0;        
         
         //check found tokens against expected results from file
-        while(token.getName() != Token.token_Type.ENDFILE) {
+        do {
+            token = scanner.getToken();
             if(token.getName() == Token.token_Type.ERROR) {
                 if(!expected[i].equals("ERROR")) {                                  
                     System.out.println("[Failed] | Found " + token.getLexeme() + " | expected " + expected[i]);
@@ -101,8 +102,12 @@ public class ScannerTest {
                 check &= false; //exit if test fails
             }
             
-            i++;
-            token = scanner.getToken();
+             i++;
+        } while(token.getName() != Token.token_Type.ENDFILE );
+        
+        if(token.getName() != Token.token_Type.ENDFILE) {
+            System.out.println("[Failed] | More tokens created then expected");
+            check &= false;
         }
         
         return check;
@@ -174,7 +179,7 @@ public class ScannerTest {
         for(int i = 0; i < 256; i++) {            
            if(scanner.isInvisible((char)i)) {
                //only check char if it is found to be a invisible character (32 is skipped as it is removed by spilt)
-               if(i != 32 && i != expected[j].charAt(0)) {                   
+               if(i != expected[j].charAt(0)) {                   
                    System.out.println((int)i + " does not match the expected invisible character " + (int)expected[j].charAt(0));
                    check &= false;
                }               
@@ -182,12 +187,8 @@ public class ScannerTest {
            }               
         }  
         
-        //checks to ensure space is valid (since it was skipped
-        if(!scanner.isInvisible(' '))
-            check &= false;
-        
         //not all invisible chars checked (+ 1 due to spliting on space
-        if(j != expected.length + 1) {            
+        if(j != expected.length) {            
             System.out.println("Not all invisible characters matched " + j + "/" + expected.length);
             check &= false;
         }
@@ -397,7 +398,7 @@ public class ScannerTest {
         }  
         
         //checks to ensure space is valid (since it was skipped)
-        if(!scanner.isInvisible(' '))
+        if(!scanner.isWhiteSpace(' '))
             check &= false;
         
         //not all white space characters checked

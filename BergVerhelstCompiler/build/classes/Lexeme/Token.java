@@ -1,6 +1,8 @@
 package Lexeme;
 /**
  * @author Leon Verhelst
+ * Used to represent the categories of lexemes
+ * 
  */
 
 public class Token {

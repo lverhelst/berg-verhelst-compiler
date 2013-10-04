@@ -141,7 +141,7 @@ public class Token {
      */
     @Override
     public String toString(){
-        return String.format("%9s%3s",(this.lexeme == null ? "<No Lexeme>" : this.lexeme),"")+ String.format("%10s%10s","",this.name) + String.format("%10s%10s","",(this.attribute_Value == null ? "" : this.attribute_Value));
-        //return (this.lexeme == null ? "<No Lexeme>" : this.lexeme) + " -> (" + this.name + ", " + (this.attribute_Value == null ? "-" : this.attribute_Value) + ")";
+        //return String.format("%9s%3s",(this.lexeme == null ? "<No Lexeme>" : this.lexeme),"")+ String.format("%10s%10s","",this.name) + String.format("%10s%10s","",(this.attribute_Value == null ? "" : this.attribute_Value));
+        return "(" + this.name + ", " + (this.attribute_Value == null ? "-" : this.attribute_Value) + ")" + (this.lexeme == null ? "" : " => " + this.lexeme);
     }
 }

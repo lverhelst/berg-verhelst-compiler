@@ -45,7 +45,7 @@ public class Scanner{
         symbolTable = new HashMap();
                             
         currentID = 0;    
-        System.out.println("Endfile = " + (int)ENDFILE);
+        //System.out.println("Endfile = " + (int)ENDFILE);
     }
     
     /**

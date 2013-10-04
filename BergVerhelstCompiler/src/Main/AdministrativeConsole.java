@@ -39,6 +39,7 @@ public class AdministrativeConsole {
    int linenumber;
    int charPosInLine;
    int characterposition;
+   private boolean didPass;
    /**
     * Create Administrative console with the provided parameters
     * @param args Arguments/Parameters
@@ -76,8 +77,6 @@ public class AdministrativeConsole {
        String fileName = arguments.get("f");
        if(fileName == null)
            fileName = arguments.get("load");
-       
-       
       //Verify valid file name
        if(!fileName.endsWith("cs13")){
            System.out.println("Administrative Console - Invalid File Name: " + fileName);
@@ -161,6 +160,7 @@ public class AdministrativeConsole {
     */
    private void resetParameters(){
        arguments = new HashMap();
+       didPass = true;
        fileAsString = "";
        traceString = "";
        fileByLines = null;
@@ -259,17 +259,24 @@ public class AdministrativeConsole {
            arguments.remove("out");
            System.out.println("Could not write to output file: " + e.toString());
        }
-       if((arguments.containsKey("tr") && arguments.get("tr").equals("token")) || arguments.containsKey("out")){
+       //We are not supposed to print the file at the beginning of the parsing run
+       /*if((arguments.containsKey("tr") && arguments.get("tr").equals("token")) || arguments.containsKey("out")){
            for(int i = 1; i < fileByLines.length; i++){
                line = String.format("%3d", i) + "| " + fileByLines[i] + "\n";
                System.out.print(line);
                if(arguments.containsKey("out"))
                    writer.writeLine(line);
            }
-       }
+       }*/
        //Parse
        Parser prs = new Parser(this);
        prs.parse(arguments.containsKey("tr") && arguments.get("tr").equals("token"));
+       if(this.didPass){
+           System.out.println("PASS");
+       }else{
+           System.out.println("FAIL");
+       }
+       
        if(writer != null){
            System.out.println("Trace Exists in: " + arguments.get("out"));
            writer.close();
@@ -282,9 +289,10 @@ public class AdministrativeConsole {
     * @param erroneousToken 
     */
    public void handleErrorToken(Token erroneousToken){
-       System.out.println(erroneousToken + " (Line: " + linenumber + " Position: " + charPosInLine + ")");
+       didPass = false;
+       System.out.println("   " + linenumber + ": " + erroneousToken);
        if(arguments.containsKey("out"))
-           writer.writeLine(erroneousToken.toString() + " (Line: " + linenumber + " Position: " + charPosInLine + ")\r\n");
+           writer.writeLine("   " + linenumber + ": " + erroneousToken+ "\r\n");
    }
    /**
     * Returns the next available character
@@ -301,7 +309,7 @@ public class AdministrativeConsole {
            charPosInLine = 0;
            //Check if we need to print out the current line
            if(arguments.containsKey("tr") && arguments.get("tr").equals("token")){
-                line = "Line " + linenumber + ": " + fileByLines[linenumber] + "\n" + String.format("%10s%7s%7s%s%7s%s%7s","Lexeme","","","Token Name","","Attribute Value","");
+                line = "Line " + linenumber + ": " + fileByLines[linenumber];
                 System.out.println(line);
                 if(arguments.containsKey("out"))
                    writer.writeLine(line + "\r\n");
@@ -330,9 +338,9 @@ public class AdministrativeConsole {
      * @param t The token to print the information for
      */
     public void printTraceInformation(Token t){
-        System.out.println(t);
+        System.out.println("   " + linenumber + ": " + t);
         if(arguments.containsKey("out"))
-           writer.writeLine(t.toString() + "\r\n");
+           writer.writeLine("   " + linenumber + ": " + t.toString() + "\r\n");
     }
     /**
      * Print Help Information

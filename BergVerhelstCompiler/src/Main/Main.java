@@ -1,7 +1,6 @@
 package Main;
 
 /**
- *
  * @author Emery Berg, Leon Verhelst
  * Starts compiler
  */
@@ -11,8 +10,8 @@ public class Main {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        //Begin Compiler
+        //Start compiler
         console = new AdministrativeConsole(args);
-        console.runAdminConsole();
+        console.executeCompiler();
     }
 }

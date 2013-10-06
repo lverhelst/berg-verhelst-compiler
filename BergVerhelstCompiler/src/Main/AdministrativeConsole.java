@@ -248,6 +248,14 @@ public class AdministrativeConsole {
    }
    
    /**
+    * Used to print error messages in output and to file if parameter set
+    * @created by Emery
+    */
+   public void error(String errorMsg) {
+       
+   }
+   
+   /**
     * Parse input File
     */
    private void parseFile(){

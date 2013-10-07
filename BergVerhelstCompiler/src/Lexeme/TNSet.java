@@ -10,19 +10,16 @@ public class TNSet {
     private ArrayList<Token.token_Type> set;
     
     public TNSet() {
-        
+        set = new ArrayList<Token.token_Type>();
     }
     
-    public void add() {
-        
-    }
-    
-    public void get() {
-        
-    }
-    
-    public boolean disjoint() {
-        return false;
+    /**
+     * Wrapper function for adding to the set
+     * @param token the token to add
+     * @created by Emery
+     */
+    public void add(Token.token_Type token) {
+        set.add(token);
     }
     
     /**

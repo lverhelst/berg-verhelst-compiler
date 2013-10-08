@@ -7,10 +7,9 @@ import java.util.ArrayList;
  * @author Emery
  */
 public class TNSet {
-    private ArrayList<Token.token_Type> set;
-    
+    private ArrayList<TokenType> set;
     public TNSet() {
-        set = new ArrayList<Token.token_Type>();
+        set = new ArrayList<TokenType>();
     }
     
     /**
@@ -18,7 +17,7 @@ public class TNSet {
      * @param token the token to add
      * @created by Emery
      */
-    public void add(Token.token_Type token) {
+    public void add(TokenType token) {
         set.add(token);
     }
     
@@ -28,7 +27,7 @@ public class TNSet {
      * @return true if the set contains the token
      * @created by Emery
      */
-    public boolean contains(Token.token_Type token) {
+    public boolean contains(TokenType token) {
         return set.contains(token);
     }
     
@@ -38,16 +37,16 @@ public class TNSet {
      */
     public TNSet copy(){
         TNSet copiedTo = new TNSet();
-        for(Token.token_Type token : this.set){
+        for(TokenType token : this.set){
             copiedTo.set.add(token);
         }
         return copiedTo;
     }
     /**
      * Used to retrieve the set of tokens for this instance of TNSet
-     * @return The set of Token.token_types
+     * @return The set of TokenTypes
      */
-    public ArrayList<Token.token_Type> getSet(){
+    public ArrayList<TokenType> getSet(){
         return this.set;
     }
 }

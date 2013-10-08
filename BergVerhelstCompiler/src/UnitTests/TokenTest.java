@@ -2,6 +2,7 @@ package UnitTests;
 import Lexeme.Token;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import Lexeme.TokenType;
 /**
  * Used to test the Token class
  * @author Leon Verhelst
@@ -37,7 +38,7 @@ public class TokenTest {
      * @return Check of what exists in the token
      */
     public Boolean testToken(){
-        Token t = new Token(Token.token_Type.BLIT, "true", "1");
-        return t.getAttribute_Value().equals("1") && t.getName() == Token.token_Type.BLIT && t.getLexeme().equals("true");
+        Token t = new Token(TokenType.BLIT, "true", "1");
+        return t.getAttribute_Value().equals("1") && t.getName() == TokenType.BLIT && t.getLexeme().equals("true");
     }    
 }

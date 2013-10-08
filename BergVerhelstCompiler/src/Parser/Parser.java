@@ -15,7 +15,7 @@ public class Parser {
     private HashMap<String, TNSet> firstSet;
     private HashMap<String, TNSet> followSet;
     private Scanner.Scanner scn;
-    private Token.token_Type lookahead;
+    private TokenType lookahead;
     
     /**
      * Empty Constructor
@@ -39,14 +39,14 @@ public class Parser {
        //Continue scanning until endfile is reached
        /*do {
            currentToken = scn.getToken();
-           if(currentToken.getName() != Token.token_Type.ERROR ){
+           if(currentToken.getName() != TokenType.ERROR ){
                if(showTrace){
                     console.printTraceInformation(currentToken);
                }
            }else{
               console.handleErrorToken(currentToken);
            }           
-       } while(currentToken.getName() != Token.token_Type.ENDFILE);*/
+       } while(currentToken.getName() != TokenType.ENDFILE);*/
        currentToken = scn.getToken();
        lookahead = currentToken.getName();
        visit("program");
@@ -74,219 +74,219 @@ public class Parser {
         firstSet = new HashMap<String, TNSet>();
         
         TNSet program = new TNSet();
-        program.add(Token.token_Type.INT);
-        program.add(Token.token_Type.BOOL);
-        program.add(Token.token_Type.VOID);        
+        program.add(TokenType.INT);
+        program.add(TokenType.BOOL);
+        program.add(TokenType.VOID);        
         firstSet.put("program", program);
         
         TNSet declaration = new TNSet();
-        declaration.add(Token.token_Type.INT);
-        declaration.add(Token.token_Type.BOOL);
-        declaration.add(Token.token_Type.VOID);        
+        declaration.add(TokenType.INT);
+        declaration.add(TokenType.BOOL);
+        declaration.add(TokenType.VOID);        
         firstSet.put("declaration", program);
         
         TNSet nonvoidSpec = new TNSet();
-        nonvoidSpec.add(Token.token_Type.INT);
-        nonvoidSpec.add(Token.token_Type.BOOL);        
+        nonvoidSpec.add(TokenType.INT);
+        nonvoidSpec.add(TokenType.BOOL);        
         firstSet.put("nonvoid-specifier", nonvoidSpec);
         
         TNSet decTail = new TNSet();
-        decTail.add(Token.token_Type.LSQR);
-        decTail.add(Token.token_Type.SEMI);
-        decTail.add(Token.token_Type.COMMA);
-        decTail.add(Token.token_Type.LPAREN);        
+        decTail.add(TokenType.LSQR);
+        decTail.add(TokenType.SEMI);
+        decTail.add(TokenType.COMMA);
+        decTail.add(TokenType.LPAREN);        
         firstSet.put("dec-tail", decTail);
         
         TNSet vardecTail = new TNSet();
-        vardecTail.add(Token.token_Type.LSQR);
-        vardecTail.add(Token.token_Type.SEMI);
-        vardecTail.add(Token.token_Type.COMMA);      
+        vardecTail.add(TokenType.LSQR);
+        vardecTail.add(TokenType.SEMI);
+        vardecTail.add(TokenType.COMMA);      
         firstSet.put("var-dec-tail", vardecTail);
         
         TNSet varName = new TNSet();
-        varName.add(Token.token_Type.ID);       
+        varName.add(TokenType.ID);       
         firstSet.put("var-name", varName);
         
         TNSet fundecTail = new TNSet();
-        fundecTail.add(Token.token_Type.LPAREN);    
+        fundecTail.add(TokenType.LPAREN);    
         firstSet.put("fun-dec-tail", fundecTail);
         
         TNSet params = new TNSet();
-        params.add(Token.token_Type.REF);  
-        params.add(Token.token_Type.INT);
-        params.add(Token.token_Type.BOOL);
-        params.add(Token.token_Type.VOID);       
+        params.add(TokenType.REF);  
+        params.add(TokenType.INT);
+        params.add(TokenType.BOOL);
+        params.add(TokenType.VOID);       
         firstSet.put("params", params);
         
         TNSet param = new TNSet();
-        param.add(Token.token_Type.REF);  
-        param.add(Token.token_Type.INT);
-        param.add(Token.token_Type.BOOL);     
+        param.add(TokenType.REF);  
+        param.add(TokenType.INT);
+        param.add(TokenType.BOOL);     
         firstSet.put("param", param);
         
         TNSet statement = new TNSet();
-        statement.add(Token.token_Type.LCRLY);
-        statement.add(Token.token_Type.IF);
-        statement.add(Token.token_Type.LOOP);   
-        statement.add(Token.token_Type.EXIT);
-        statement.add(Token.token_Type.CONTINUE);
-        statement.add(Token.token_Type.RETURN);
-        statement.add(Token.token_Type.SEMI);
-        statement.add(Token.token_Type.ID);
-        statement.add(Token.token_Type.BRANCH);     
+        statement.add(TokenType.LCRLY);
+        statement.add(TokenType.IF);
+        statement.add(TokenType.LOOP);   
+        statement.add(TokenType.EXIT);
+        statement.add(TokenType.CONTINUE);
+        statement.add(TokenType.RETURN);
+        statement.add(TokenType.SEMI);
+        statement.add(TokenType.ID);
+        statement.add(TokenType.BRANCH);     
         firstSet.put("statement", statement);
         
         TNSet idStmt = new TNSet();
-        idStmt.add(Token.token_Type.ID);      
+        idStmt.add(TokenType.ID);      
         firstSet.put("id-stmt", idStmt);
         
         TNSet idStmtTail = new TNSet();
-        idStmtTail.add(Token.token_Type.LSQR);
-        idStmtTail.add(Token.token_Type.ASSIGN);
-        idStmtTail.add(Token.token_Type.LPAREN);        
+        idStmtTail.add(TokenType.LSQR);
+        idStmtTail.add(TokenType.ASSIGN);
+        idStmtTail.add(TokenType.LPAREN);        
         firstSet.put("id-stmt-tail", idStmtTail);
         
         TNSet assignStmtTail = new TNSet();
-        assignStmtTail.add(Token.token_Type.LSQR);
-        assignStmtTail.add(Token.token_Type.ASSIGN);     
+        assignStmtTail.add(TokenType.LSQR);
+        assignStmtTail.add(TokenType.ASSIGN);     
         firstSet.put("assign-stmt-tail", assignStmtTail);
         
         TNSet callStmtTail = new TNSet();
-        callStmtTail.add(Token.token_Type.LPAREN);     
+        callStmtTail.add(TokenType.LPAREN);     
         firstSet.put("call-stmt-tail", callStmtTail);
         
         TNSet callTail = new TNSet();
-        callTail.add(Token.token_Type.LPAREN);     
+        callTail.add(TokenType.LPAREN);     
         firstSet.put("call-tail", callTail);
         
         TNSet arguments = new TNSet();
-        arguments.add(Token.token_Type.MINUS);
-        arguments.add(Token.token_Type.NOT);
-        arguments.add(Token.token_Type.LPAREN); 
-        arguments.add(Token.token_Type.NUM);
-        arguments.add(Token.token_Type.BLIT);
-        arguments.add(Token.token_Type.ID);        
+        arguments.add(TokenType.MINUS);
+        arguments.add(TokenType.NOT);
+        arguments.add(TokenType.LPAREN); 
+        arguments.add(TokenType.NUM);
+        arguments.add(TokenType.BLIT);
+        arguments.add(TokenType.ID);        
         firstSet.put("arguments", arguments);
         
         TNSet compoundStmt = new TNSet();
-        compoundStmt.add(Token.token_Type.LCRLY); 
+        compoundStmt.add(TokenType.LCRLY); 
         firstSet.put("compound-stmt", compoundStmt);
         
         TNSet ifStmt = new TNSet();
-        ifStmt.add(Token.token_Type.IF);     
+        ifStmt.add(TokenType.IF);     
         firstSet.put("if-stmt", ifStmt);
         
         TNSet loopStmt = new TNSet();
-        loopStmt.add(Token.token_Type.LOOP);     
+        loopStmt.add(TokenType.LOOP);     
         firstSet.put("loop-stmt", loopStmt);
         
         TNSet exitStmt = new TNSet();
-        exitStmt.add(Token.token_Type.EXIT);       
+        exitStmt.add(TokenType.EXIT);       
         firstSet.put("exit-stmt", exitStmt);
         
         TNSet continueStmt = new TNSet();
-        continueStmt.add(Token.token_Type.CONTINUE);      
+        continueStmt.add(TokenType.CONTINUE);      
         firstSet.put("continue-stmt", continueStmt);
         
         TNSet returnStmt = new TNSet();
-        returnStmt.add(Token.token_Type.RETURN);   
+        returnStmt.add(TokenType.RETURN);   
         firstSet.put("return-stmt", returnStmt);
         
         TNSet nullStmt = new TNSet();
-        nullStmt.add(Token.token_Type.SEMI);       
+        nullStmt.add(TokenType.SEMI);       
         firstSet.put("null-stmt", nullStmt);
         
         TNSet branchStmt = new TNSet();
-        branchStmt.add(Token.token_Type.BRANCH);      
+        branchStmt.add(TokenType.BRANCH);      
         firstSet.put("branch-stmt", branchStmt);
         
         TNSet caseStmt = new TNSet();
-        caseStmt.add(Token.token_Type.CASE);
-        caseStmt.add(Token.token_Type.DEFAULT);   
+        caseStmt.add(TokenType.CASE);
+        caseStmt.add(TokenType.DEFAULT);   
         firstSet.put("case-stmt", caseStmt);
         
         TNSet experision = new TNSet();
-        experision.add(Token.token_Type.MINUS);
-        experision.add(Token.token_Type.NOT);
-        experision.add(Token.token_Type.LPAREN); 
-        experision.add(Token.token_Type.NUM);
-        experision.add(Token.token_Type.BLIT);
-        experision.add(Token.token_Type.ID);         
+        experision.add(TokenType.MINUS);
+        experision.add(TokenType.NOT);
+        experision.add(TokenType.LPAREN); 
+        experision.add(TokenType.NUM);
+        experision.add(TokenType.BLIT);
+        experision.add(TokenType.ID);         
         firstSet.put("expression", experision);
         
         TNSet addExp = new TNSet();
-        addExp.add(Token.token_Type.MINUS);
-        addExp.add(Token.token_Type.NOT);
-        addExp.add(Token.token_Type.LPAREN); 
-        addExp.add(Token.token_Type.NUM);
-        addExp.add(Token.token_Type.BLIT);
-        addExp.add(Token.token_Type.ID);         
+        addExp.add(TokenType.MINUS);
+        addExp.add(TokenType.NOT);
+        addExp.add(TokenType.LPAREN); 
+        addExp.add(TokenType.NUM);
+        addExp.add(TokenType.BLIT);
+        addExp.add(TokenType.ID);         
         firstSet.put("add-exp", addExp);
         
         TNSet term = new TNSet();
-        term.add(Token.token_Type.NOT);
-        term.add(Token.token_Type.LPAREN); 
-        term.add(Token.token_Type.NUM);
-        term.add(Token.token_Type.BLIT);
-        term.add(Token.token_Type.ID);         
+        term.add(TokenType.NOT);
+        term.add(TokenType.LPAREN); 
+        term.add(TokenType.NUM);
+        term.add(TokenType.BLIT);
+        term.add(TokenType.ID);         
         firstSet.put("term", term);
         
         TNSet factor = new TNSet();
-        factor.add(Token.token_Type.NOT);
-        factor.add(Token.token_Type.LPAREN); 
-        factor.add(Token.token_Type.NUM);
-        factor.add(Token.token_Type.BLIT);
-        factor.add(Token.token_Type.ID);         
+        factor.add(TokenType.NOT);
+        factor.add(TokenType.LPAREN); 
+        factor.add(TokenType.NUM);
+        factor.add(TokenType.BLIT);
+        factor.add(TokenType.ID);         
         firstSet.put("factor", factor);
         
         TNSet nidFactor = new TNSet();
-        nidFactor.add(Token.token_Type.NOT);
-        nidFactor.add(Token.token_Type.LPAREN); 
-        nidFactor.add(Token.token_Type.NUM);
-        nidFactor.add(Token.token_Type.BLIT);      
+        nidFactor.add(TokenType.NOT);
+        nidFactor.add(TokenType.LPAREN); 
+        nidFactor.add(TokenType.NUM);
+        nidFactor.add(TokenType.BLIT);      
         firstSet.put("nid-factor", nidFactor);
                
         TNSet idFactor = new TNSet();
-        idFactor.add(Token.token_Type.ID);     
+        idFactor.add(TokenType.ID);     
         firstSet.put("id-factor", idFactor);        
         
         TNSet idTail = new TNSet();
-        idTail.add(Token.token_Type.LSQR);
-        idTail.add(Token.token_Type.LPAREN); 
+        idTail.add(TokenType.LSQR);
+        idTail.add(TokenType.LPAREN); 
         //[TODO] add null symbol
         firstSet.put("id-tail", idTail);        
         
         TNSet varTail = new TNSet();
-        varTail.add(Token.token_Type.LSQR);
+        varTail.add(TokenType.LSQR);
         //[TODO] add null symbol
         firstSet.put("var-tail", varTail);
                 
         TNSet relop = new TNSet();
-        relop.add(Token.token_Type.LTEQ);
-        relop.add(Token.token_Type.LT);
-        relop.add(Token.token_Type.GT);
-        relop.add(Token.token_Type.GTEQ);
-        relop.add(Token.token_Type.EQ);
-        relop.add(Token.token_Type.NEQ);
+        relop.add(TokenType.LTEQ);
+        relop.add(TokenType.LT);
+        relop.add(TokenType.GT);
+        relop.add(TokenType.GTEQ);
+        relop.add(TokenType.EQ);
+        relop.add(TokenType.NEQ);
         firstSet.put("relop", relop);
                 
         TNSet addop = new TNSet();
-        addop.add(Token.token_Type.PLUS);
-        addop.add(Token.token_Type.MINUS);
-        addop.add(Token.token_Type.OR);
-        addop.add(Token.token_Type.ORELSE);
+        addop.add(TokenType.PLUS);
+        addop.add(TokenType.MINUS);
+        addop.add(TokenType.OR);
+        addop.add(TokenType.ORELSE);
         firstSet.put("addop", addop);
         
         TNSet multop = new TNSet();
-        multop.add(Token.token_Type.MULT);   
-        multop.add(Token.token_Type.DIV);
-        multop.add(Token.token_Type.MOD);
-        multop.add(Token.token_Type.AND);
-        multop.add(Token.token_Type.ANDTHEN);
+        multop.add(TokenType.MULT);   
+        multop.add(TokenType.DIV);
+        multop.add(TokenType.MOD);
+        multop.add(TokenType.AND);
+        multop.add(TokenType.ANDTHEN);
         firstSet.put("multop", multop);
                 
         TNSet uminus = new TNSet();
-        uminus.add(Token.token_Type.MINUS);
+        uminus.add(TokenType.MINUS);
         firstSet.put("uminus", uminus);
     }
     
@@ -298,75 +298,75 @@ public class Parser {
         followSet = new HashMap<String, TNSet>();
         
         TNSet programSet = new TNSet();
-        programSet.add(Token.token_Type.ENDFILE);
+        programSet.add(TokenType.ENDFILE);
         followSet.put("program", programSet);
         
         TNSet declarationSet = new TNSet();
-        declarationSet.add(Token.token_Type.INT);
-        declarationSet.add(Token.token_Type.BOOL);
-        declarationSet.add(Token.token_Type.VOID);
-        declarationSet.add(Token.token_Type.ENDFILE);
+        declarationSet.add(TokenType.INT);
+        declarationSet.add(TokenType.BOOL);
+        declarationSet.add(TokenType.VOID);
+        declarationSet.add(TokenType.ENDFILE);
         followSet.put("declaration", declarationSet);
         
         TNSet nonvoidspecifierSet = new TNSet();
-        nonvoidspecifierSet.add(Token.token_Type.ID);
+        nonvoidspecifierSet.add(TokenType.ID);
         followSet.put("nonvoid-specifer", nonvoidspecifierSet);
         
         TNSet dectailSet = new TNSet();
-        dectailSet.add(Token.token_Type.ID);
-        dectailSet.add(Token.token_Type.BOOL);
-        dectailSet.add(Token.token_Type.VOID);
-        dectailSet.add(Token.token_Type.ENDFILE);
+        dectailSet.add(TokenType.ID);
+        dectailSet.add(TokenType.BOOL);
+        dectailSet.add(TokenType.VOID);
+        dectailSet.add(TokenType.ENDFILE);
         followSet.put("dec-tail",dectailSet);
         
         TNSet vardectailSet = new TNSet();
-        vardectailSet.add(Token.token_Type.INT);
-        vardectailSet.add(Token.token_Type.BOOL);
-        vardectailSet.add(Token.token_Type.VOID);
-        vardectailSet.add(Token.token_Type.ENDFILE);
-        vardectailSet.add(Token.token_Type.LCRLY);
-        vardectailSet.add(Token.token_Type.IF);
-        vardectailSet.add(Token.token_Type.LOOP);
-        vardectailSet.add(Token.token_Type.EXIT);
-        vardectailSet.add(Token.token_Type.CONTINUE);
-        vardectailSet.add(Token.token_Type.RETURN);
-        vardectailSet.add(Token.token_Type.SEMI);
-        vardectailSet.add(Token.token_Type.ID);
-        vardectailSet.add(Token.token_Type.BRANCH);
+        vardectailSet.add(TokenType.INT);
+        vardectailSet.add(TokenType.BOOL);
+        vardectailSet.add(TokenType.VOID);
+        vardectailSet.add(TokenType.ENDFILE);
+        vardectailSet.add(TokenType.LCRLY);
+        vardectailSet.add(TokenType.IF);
+        vardectailSet.add(TokenType.LOOP);
+        vardectailSet.add(TokenType.EXIT);
+        vardectailSet.add(TokenType.CONTINUE);
+        vardectailSet.add(TokenType.RETURN);
+        vardectailSet.add(TokenType.SEMI);
+        vardectailSet.add(TokenType.ID);
+        vardectailSet.add(TokenType.BRANCH);
         followSet.put("var-dec-tail", vardectailSet);
         
         TNSet varnameSet = new TNSet();
-        varnameSet.add(Token.token_Type.COMMA);
-        varnameSet.add(Token.token_Type.SEMI);
+        varnameSet.add(TokenType.COMMA);
+        varnameSet.add(TokenType.SEMI);
         followSet.put("var-name", varnameSet);
         
         TNSet fundectailSet = dectailSet.copy();
         followSet.put("fun-dec-tail", fundectailSet);
                 
         TNSet paramsSet = new TNSet();
-        paramsSet.add(Token.token_Type.RPAREN);
+        paramsSet.add(TokenType.RPAREN);
         followSet.put("params", paramsSet);
         
         TNSet paramSet = new TNSet();
-        paramSet.add(Token.token_Type.COMMA);
-        paramSet.add(Token.token_Type.RPAREN);
+        paramSet.add(TokenType.COMMA);
+        paramSet.add(TokenType.RPAREN);
         followSet.put("param", paramSet);
         
         TNSet statementSet = new TNSet();
-        statementSet.add(Token.token_Type.LCRLY);
-        statementSet.add(Token.token_Type.IF);
-        statementSet.add(Token.token_Type.LOOP);
-        statementSet.add(Token.token_Type.EXIT);
-        statementSet.add(Token.token_Type.CONTINUE);
-        statementSet.add(Token.token_Type.RETURN);
-        statementSet.add(Token.token_Type.SEMI);
-        statementSet.add(Token.token_Type.ID);
-        statementSet.add(Token.token_Type.RCRLY);
-        statementSet.add(Token.token_Type.ELSE);
-        statementSet.add(Token.token_Type.END);
-        statementSet.add(Token.token_Type.BRANCH);
-        statementSet.add(Token.token_Type.CASE);
-        statementSet.add(Token.token_Type.DEFAULT);
+        statementSet.add(TokenType.LCRLY);
+        statementSet.add(TokenType.IF);
+        statementSet.add(TokenType.LOOP);
+        statementSet.add(TokenType.EXIT);
+        statementSet.add(TokenType.CONTINUE);
+        statementSet.add(TokenType.RETURN);
+        statementSet.add(TokenType.SEMI);
+        statementSet.add(TokenType.ID);
+        statementSet.add(TokenType.RCRLY);
+        statementSet.add(TokenType.ELSE);
+        statementSet.add(TokenType.END);
+        statementSet.add(TokenType.BRANCH);
+        statementSet.add(TokenType.CASE);
+        statementSet.add(TokenType.DEFAULT);
         followSet.put("statement", statementSet);
         
         TNSet idstmtSet = statementSet.copy();
@@ -382,27 +382,27 @@ public class Parser {
         followSet.put("call-stmt-tail", callstmttailSet);
         
         TNSet calltailSet = new TNSet();
-        for(Token.token_Type tok: firstSet.get("relop").getSet()){
+        for(TokenType tok: firstSet.get("relop").getSet()){
             calltailSet.add(tok);
         }
-        for(Token.token_Type tok: firstSet.get("addop").getSet()){
+        for(TokenType tok: firstSet.get("addop").getSet()){
             calltailSet.add(tok);
         }
-        for(Token.token_Type tok: firstSet.get("multop").getSet()){
+        for(TokenType tok: firstSet.get("multop").getSet()){
             calltailSet.add(tok);
         }
-        calltailSet.add(Token.token_Type.RPAREN);
-        calltailSet.add(Token.token_Type.RSQR);
-        calltailSet.add(Token.token_Type.SEMI);
-        calltailSet.add(Token.token_Type.COMMA);
+        calltailSet.add(TokenType.RPAREN);
+        calltailSet.add(TokenType.RSQR);
+        calltailSet.add(TokenType.SEMI);
+        calltailSet.add(TokenType.COMMA);
         followSet.put("call-tail", calltailSet);
         
         TNSet argumentsSet = new TNSet();
-        argumentsSet.add(Token.token_Type.RPAREN);
+        argumentsSet.add(TokenType.RPAREN);
         followSet.put("arguments", argumentsSet);
         
         TNSet compoundStmtSet = statementSet.copy();
-        for(Token.token_Type tok: firstSet.get("declaration").getSet()){
+        for(TokenType tok: firstSet.get("declaration").getSet()){
             compoundStmtSet.add(tok);
         }
         followSet.put("compound-stmt", compoundStmtSet);
@@ -432,29 +432,29 @@ public class Parser {
         followSet.put("case", caseSet);
 
         TNSet expressionSet = new TNSet();
-        expressionSet.add(Token.token_Type.RPAREN);
-        expressionSet.add(Token.token_Type.SEMI);
-        expressionSet.add(Token.token_Type.COMMA);
+        expressionSet.add(TokenType.RPAREN);
+        expressionSet.add(TokenType.SEMI);
+        expressionSet.add(TokenType.COMMA);
         followSet.put("expression", expressionSet);
         
         TNSet addexpSet = new TNSet();
-        for(Token.token_Type tok: firstSet.get("relop").getSet()){
+        for(TokenType tok: firstSet.get("relop").getSet()){
             addexpSet.add(tok);
         }
-        addexpSet.add(Token.token_Type.RPAREN);
-        addexpSet.add(Token.token_Type.RSQR);
-        addexpSet.add(Token.token_Type.SEMI);
-        addexpSet.add(Token.token_Type.COMMA);
+        addexpSet.add(TokenType.RPAREN);
+        addexpSet.add(TokenType.RSQR);
+        addexpSet.add(TokenType.SEMI);
+        addexpSet.add(TokenType.COMMA);
         followSet.put("add-exp", addexpSet);
         
         TNSet termSet = addexpSet.copy();
-        for(Token.token_Type tok: firstSet.get("addop").getSet()){
+        for(TokenType tok: firstSet.get("addop").getSet()){
             termSet.add(tok);
         }
         followSet.put("term", termSet);
         
         TNSet factorSet = termSet.copy();
-        for(Token.token_Type tok: firstSet.get("multop").getSet()){
+        for(TokenType tok: firstSet.get("multop").getSet()){
             factorSet.add(tok);
         }
         followSet.put("factor", factorSet);
@@ -481,7 +481,7 @@ public class Parser {
      * @param expected the expected token type to follow
      * @created by Emery
      */
-    public void match(Token.token_Type expected) {
+    public void match(TokenType expected) {
         if (lookahead == expected){
             lookahead = scn.getToken().getName();
         }
@@ -568,13 +568,13 @@ public class Parser {
      * @created by Leon
      */
     public void declaration() {
-        if(this.lookahead == Token.token_Type.VOID){
-            match(Token.token_Type.VOID);
-            match(Token.token_Type.ID);
+        if(this.lookahead == TokenType.VOID){
+            match(TokenType.VOID);
+            match(TokenType.ID);
             visit("fundecTail");
         }else if(firstSet.get("nonvoid-specifier").getSet().contains(this.lookahead)){
             visit("nonvoidSpec");
-            match(Token.token_Type.ID);
+            match(TokenType.ID);
             visit("decTail");
         }else
             console.error("declaration error: " + this.lookahead);
@@ -586,10 +586,10 @@ public class Parser {
      * @created by Emery
      */
     public void nonvoidSpec() {
-        if(lookahead == Token.token_Type.INT){
-            match(Token.token_Type.INT);
+        if(lookahead == TokenType.INT){
+            match(TokenType.INT);
         }else
-            match(Token.token_Type.BOOL);
+            match(TokenType.BOOL);
     }
     
     /**
@@ -611,16 +611,16 @@ public class Parser {
      * @created by Leon
      */
     public void vardecTail() {
-        if(this.lookahead == Token.token_Type.LSQR){
-            match(Token.token_Type.LSQR);
+        if(this.lookahead == TokenType.LSQR){
+            match(TokenType.LSQR);
             visit("addExp");
-            match(Token.token_Type.RSQR);
+            match(TokenType.RSQR);
         }
-        while(this.lookahead == Token.token_Type.COMMA){
-            match(Token.token_Type.COMMA);
+        while(this.lookahead == TokenType.COMMA){
+            match(TokenType.COMMA);
             visit("varName");
         }
-        match(Token.token_Type.SEMI);
+        match(TokenType.SEMI);
     }
     
     /**
@@ -629,11 +629,11 @@ public class Parser {
      * @created by Leon
      */
     public void varName() {
-        match(Token.token_Type.ID);
-        if(this.lookahead == Token.token_Type.LSQR){
-            match(Token.token_Type.LSQR);
+        match(TokenType.ID);
+        if(this.lookahead == TokenType.LSQR){
+            match(TokenType.LSQR);
             visit("addExp");
-            match(Token.token_Type.RSQR);
+            match(TokenType.RSQR);
         }
     }
     
@@ -642,9 +642,9 @@ public class Parser {
      * @created by Emery
      */
     public void fundecTail() {
-        match(Token.token_Type.LPAREN);
+        match(TokenType.LPAREN);
         visit("params");
-        match(Token.token_Type.RPAREN);
+        match(TokenType.RPAREN);
         visit("compoundStmt");
     }
     
@@ -655,12 +655,12 @@ public class Parser {
     public void params() {
         if(firstSet.get("param").contains(lookahead)){
             visit("param");
-            while(this.lookahead == Token.token_Type.COMMA){
-                match(Token.token_Type.COMMA);
+            while(this.lookahead == TokenType.COMMA){
+                match(TokenType.COMMA);
                 visit("param");
             }   
         }else{
-            match(Token.token_Type.VOID);
+            match(TokenType.VOID);
         }
     }
     
@@ -669,16 +669,16 @@ public class Parser {
      * @created by Emery
      */
     public void param() {
-        if(lookahead == Token.token_Type.REF){
-            match(Token.token_Type.REF);
+        if(lookahead == TokenType.REF){
+            match(TokenType.REF);
             visit("nonvoidSpec");
-            match(Token.token_Type.ID);
+            match(TokenType.ID);
         }else if(firstSet.get("nonvoid-specifier").contains(lookahead)){
             visit("nonvoidSpec");
-            match(Token.token_Type.ID);
-            if(lookahead == Token.token_Type.LSQR){
-                match(Token.token_Type.LSQR);
-                match(Token.token_Type.RSQR);
+            match(TokenType.ID);
+            if(lookahead == TokenType.LSQR){
+                match(TokenType.LSQR);
+                match(TokenType.RSQR);
             }
         }
     }
@@ -722,8 +722,8 @@ public class Parser {
      * @created by Leon
      */
     public void idstmt() {
-        if(lookahead == Token.token_Type.ID){
-            match(Token.token_Type.ID);
+        if(lookahead == TokenType.ID){
+            match(TokenType.ID);
             visit("idstmtTail");
         }else
             console.error("idstmt error: " + lookahead);
@@ -747,14 +747,14 @@ public class Parser {
      * @created by Leon
      */
     public void assignstmtTail() {
-        if(lookahead == Token.token_Type.LSQR){
-            match(Token.token_Type.LSQR);
+        if(lookahead == TokenType.LSQR){
+            match(TokenType.LSQR);
             visit("addExp");
-            match(Token.token_Type.RSQR);
+            match(TokenType.RSQR);
         }
-        match(Token.token_Type.ASSIGN);
+        match(TokenType.ASSIGN);
         visit("expression");
-        match(Token.token_Type.SEMI);
+        match(TokenType.SEMI);
     }
     
     /**
@@ -763,7 +763,7 @@ public class Parser {
      */
     public void callstmtTail() {
         visit("callTail");
-        match(Token.token_Type.SEMI);
+        match(TokenType.SEMI);
     }
     
     /**
@@ -771,11 +771,11 @@ public class Parser {
      * @created by Emery
      */
     public void callTail() {
-        match(Token.token_Type.LPAREN);
+        match(TokenType.LPAREN);
         if(firstSet.get("arguments").contains(lookahead)){
             visit("arguments");
         }
-        match(Token.token_Type.RPAREN);
+        match(TokenType.RPAREN);
     }
     
     /**
@@ -784,8 +784,8 @@ public class Parser {
      */
     public void arguments() {
         visit("expression");
-        while(lookahead == Token.token_Type.COMMA){
-            match(Token.token_Type.COMMA);
+        while(lookahead == TokenType.COMMA){
+            match(TokenType.COMMA);
             visit("expression");
         }
     }
@@ -795,16 +795,16 @@ public class Parser {
      * @created by Emery
      */
     public void compoundStmt() {
-        match(Token.token_Type.LCRLY);
+        match(TokenType.LCRLY);
         while(firstSet.get("nonvoid-specifier").contains(lookahead)){
             visit("nonvoidSpec");
-            match(Token.token_Type.ID);
+            match(TokenType.ID);
             visit("vardecTail");
         }
         do{
             visit("statement");
         }while(firstSet.get("statement").contains(lookahead));
-        match(Token.token_Type.RCRLY);
+        match(TokenType.RCRLY);
     }
     
     /**
@@ -812,13 +812,13 @@ public class Parser {
      * @created by Emery
      */
     public void ifStmt() {
-        match(Token.token_Type.IF);
-        match(Token.token_Type.LPAREN);
+        match(TokenType.IF);
+        match(TokenType.LPAREN);
         visit("expression");
-        match(Token.token_Type.RPAREN);
+        match(TokenType.RPAREN);
         visit("statement");
-        if(lookahead == Token.token_Type.ELSE){
-            match(Token.token_Type.ELSE);
+        if(lookahead == TokenType.ELSE){
+            match(TokenType.ELSE);
             visit("statement");
         }
     }
@@ -828,12 +828,12 @@ public class Parser {
      * @created by Leon
      */
     public void loopStmt() {
-        match(Token.token_Type.LOOP);
+        match(TokenType.LOOP);
         do{
             visit("statement");
         }while(firstSet.get("statement").contains(lookahead));
-        match(Token.token_Type.END);
-        match(Token.token_Type.SEMI);
+        match(TokenType.END);
+        match(TokenType.SEMI);
     }
     
     /**
@@ -841,8 +841,8 @@ public class Parser {
      * @created by Leon
      */
     public void exitStmt() {
-        match(Token.token_Type.EXIT);
-        match(Token.token_Type.SEMI);
+        match(TokenType.EXIT);
+        match(TokenType.SEMI);
     }
     
     /**
@@ -850,7 +850,7 @@ public class Parser {
      * @created by Leon
      */
     public void continueStmt() {
-        match(Token.token_Type.CONTINUE);
+        match(TokenType.CONTINUE);
     }
     
     /**
@@ -858,11 +858,11 @@ public class Parser {
      * @created by Emery
      */
     public void returnStmt() {
-        match(Token.token_Type.RETURN);
+        match(TokenType.RETURN);
         if(firstSet.get("expression").contains(lookahead)){
             visit("expression");
         }
-        match(Token.token_Type.SEMI);
+        match(TokenType.SEMI);
     }
     
     /**
@@ -870,7 +870,7 @@ public class Parser {
      * @created by Leon
      */
     public void nullStmt() {
-        match(Token.token_Type.SEMI);
+        match(TokenType.SEMI);
     }
     
     /**
@@ -878,15 +878,15 @@ public class Parser {
      * @created by Leon
      */
     public void branchStmt() {
-        match(Token.token_Type.BRANCH);
-        match(Token.token_Type.LPAREN);
+        match(TokenType.BRANCH);
+        match(TokenType.LPAREN);
         visit("addExp");
-        match(Token.token_Type.RPAREN);
+        match(TokenType.RPAREN);
         do{
             visit("caseStmt");
         }while(firstSet.get("case").contains(lookahead));
-        match(Token.token_Type.END);
-        match(Token.token_Type.SEMI);
+        match(TokenType.END);
+        match(TokenType.SEMI);
     }
     
     /**
@@ -894,14 +894,14 @@ public class Parser {
      * @created by Emery
      */
     public void caseStmt() {
-        if(lookahead == Token.token_Type.CASE){
-            match(Token.token_Type.CASE);
-            match(Token.token_Type.NUM);
-            match(Token.token_Type.COLON);
+        if(lookahead == TokenType.CASE){
+            match(TokenType.CASE);
+            match(TokenType.NUM);
+            match(TokenType.COLON);
             visit("statement");
-        }else if(lookahead == Token.token_Type.DEFAULT){
-             match(Token.token_Type.DEFAULT);
-             match(Token.token_Type.COLON);
+        }else if(lookahead == TokenType.DEFAULT){
+             match(TokenType.DEFAULT);
+             match(TokenType.COLON);
              visit("statement");
         }else
             console.error("CaseStmt Error: " + lookahead);
@@ -964,17 +964,17 @@ public class Parser {
      * @created by Leon
      */
     public void nidFactor() {
-        if(lookahead == Token.token_Type.NOT){
-            match(Token.token_Type.NOT);
+        if(lookahead == TokenType.NOT){
+            match(TokenType.NOT);
             visit("factor");
-        }else if(lookahead == Token.token_Type.LPAREN){
-            match(Token.token_Type.LPAREN);
+        }else if(lookahead == TokenType.LPAREN){
+            match(TokenType.LPAREN);
             visit("expression");
-            match(Token.token_Type.RPAREN);
-        }else if(lookahead == Token.token_Type.NUM){
-            match(Token.token_Type.NUM);
-        }else if(lookahead == Token.token_Type.BLIT){
-            match(Token.token_Type.BLIT);
+            match(TokenType.RPAREN);
+        }else if(lookahead == TokenType.NUM){
+            match(TokenType.NUM);
+        }else if(lookahead == TokenType.BLIT){
+            match(TokenType.BLIT);
         }else
             console.error("nidFactor error: " + lookahead);        
     }
@@ -984,7 +984,7 @@ public class Parser {
      * @created by Leon
      */
     public void idFactor() {
-        match(Token.token_Type.ID);
+        match(TokenType.ID);
         visit("idTail");
     }
     
@@ -1005,10 +1005,10 @@ public class Parser {
      * @created by Leon
      */
     public void varTail() {
-        if(lookahead == Token.token_Type.LSQR){
-            match(Token.token_Type.LSQR);
+        if(lookahead == TokenType.LSQR){
+            match(TokenType.LSQR);
             visit("addExp");
-            match(Token.token_Type.RSQR);
+            match(TokenType.RSQR);
         }
     }
     
@@ -1017,23 +1017,23 @@ public class Parser {
      * @created by Emery
      */
     public void relop() {
-        if(lookahead == Token.token_Type.LTEQ){
-            match(Token.token_Type.LTEQ);
+        if(lookahead == TokenType.LTEQ){
+            match(TokenType.LTEQ);
         }
-        if(lookahead == Token.token_Type.LT){
-            match(Token.token_Type.LT);
+        if(lookahead == TokenType.LT){
+            match(TokenType.LT);
         }
-        if(lookahead == Token.token_Type.GT){
-            match(Token.token_Type.GT);
+        if(lookahead == TokenType.GT){
+            match(TokenType.GT);
         }
-        if(lookahead == Token.token_Type.GTEQ){
-            match(Token.token_Type.GTEQ);
+        if(lookahead == TokenType.GTEQ){
+            match(TokenType.GTEQ);
         }
-        if(lookahead == Token.token_Type.EQ){
-            match(Token.token_Type.EQ);
+        if(lookahead == TokenType.EQ){
+            match(TokenType.EQ);
         }
-        if(lookahead == Token.token_Type.NEQ){
-            match(Token.token_Type.NEQ);
+        if(lookahead == TokenType.NEQ){
+            match(TokenType.NEQ);
         }
         
     }
@@ -1043,17 +1043,17 @@ public class Parser {
      * @created by Emery
      */
     public void addop() {
-         if(lookahead == Token.token_Type.PLUS){
-            match(Token.token_Type.PLUS);
+         if(lookahead == TokenType.PLUS){
+            match(TokenType.PLUS);
         }
-        if(lookahead == Token.token_Type.MINUS){
-            match(Token.token_Type.MINUS);
+        if(lookahead == TokenType.MINUS){
+            match(TokenType.MINUS);
         }
-        if(lookahead == Token.token_Type.OR){
-            match(Token.token_Type.OR);
+        if(lookahead == TokenType.OR){
+            match(TokenType.OR);
         }
-        //if(lookahead == Token.token_Type.||){
-        //    match(Token.token_Type.||);
+        //if(lookahead == TokenType.||){
+        //    match(TokenType.||);
         //}
     }
     
@@ -1062,20 +1062,20 @@ public class Parser {
      * @created by Leon
      */
     public void multop() {
-        if(lookahead == Token.token_Type.MULT){
-            match(Token.token_Type.MULT);
+        if(lookahead == TokenType.MULT){
+            match(TokenType.MULT);
         }
-        if(lookahead == Token.token_Type.DIV){
-            match(Token.token_Type.DIV);
+        if(lookahead == TokenType.DIV){
+            match(TokenType.DIV);
         }
-        if(lookahead == Token.token_Type.MOD){
-            match(Token.token_Type.MOD);
+        if(lookahead == TokenType.MOD){
+            match(TokenType.MOD);
         }
-        if(lookahead == Token.token_Type.AND){
-            match(Token.token_Type.AND);
+        if(lookahead == TokenType.AND){
+            match(TokenType.AND);
         }
-        // if(lookahead == Token.token_Type.&&)
-        //  match(Token.token_Type.&&);
+        // if(lookahead == TokenType.&&)
+        //  match(TokenType.&&);
         
     }
     
@@ -1084,8 +1084,8 @@ public class Parser {
      * @created by Emery
      */
     public void uminus() {
-        if(lookahead == Token.token_Type.MINUS){
-            match(Token.token_Type.MINUS);
+        if(lookahead == TokenType.MINUS){
+            match(TokenType.MINUS);
         }
     }
 }

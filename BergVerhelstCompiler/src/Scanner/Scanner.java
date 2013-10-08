@@ -61,7 +61,7 @@ public class Scanner{
         
          //if the character is the end of file return EOF token
         if(currentChar == ENDFILE)
-            return new Token(Token.token_Type.ENDFILE, ENDFILE + "", null);         
+            return new Token(TokenType.ENDFILE, ENDFILE + "", null);         
         
         //check if the symbol is a simple character
         if(isSimpleSymbol(currentChar)) 
@@ -80,7 +80,7 @@ public class Scanner{
             return getNum(currentChar);        
                 
         //returns an error as an illegal string was found
-        return new Token(Token.token_Type.ERROR, currentChar + "", "Invalid Character " 
+        return new Token(TokenType.ERROR, currentChar + "", "Invalid Character " 
                 + (int)currentChar + " of type " + getCharType(currentChar) 
                 + " and resulted in an error token");
     } 
@@ -180,7 +180,7 @@ public class Scanner{
                     if(removeComment())
                         return getToken(); // no eof continue scanning
                     else 
-                        return new Token(Token.token_Type.ENDFILE, ENDFILE + "", null); 
+                        return new Token(TokenType.ENDFILE, ENDFILE + "", null); 
                 } else if (nextChar == '=') {
                     adv.getNextChar();
                     return wordTable.get("/=");
@@ -194,13 +194,13 @@ public class Scanner{
                     if(skipLine())
                         return getToken(); // no eof continue scanning
                     else 
-                        return new Token(Token.token_Type.ENDFILE, ENDFILE + "", null); 
+                        return new Token(TokenType.ENDFILE, ENDFILE + "", null); 
                 } else 
                     return wordTable.get("-");
         }
         
 //        adv.getNextChar();
-        return new Token(Token.token_Type.ERROR, currentChar + "", currentChar + "" + nextChar + " does not form a valid symbol");
+        return new Token(TokenType.ERROR, currentChar + "", currentChar + "" + nextChar + " does not form a valid symbol");
     }
     
     /**
@@ -218,7 +218,7 @@ public class Scanner{
         
         //check if the type is boolean or endfile
         if(id.equals("true") || id.equals("false")) {
-            return new Token(Token.token_Type.BLIT, "blit", id);
+            return new Token(TokenType.BLIT, "blit", id);
         }
         
         //check if it is a key word
@@ -227,7 +227,7 @@ public class Scanner{
         
         int num = strID(id);    
         
-        return new Token(Token.token_Type.ID, id, num+"");        
+        return new Token(TokenType.ID, id, num+"");        
     }
     
     /**
@@ -257,7 +257,7 @@ public class Scanner{
             id += filterNext();
         }      
         
-        return new Token(Token.token_Type.NUM, "num", id);        
+        return new Token(TokenType.NUM, "num", id);        
     }
 
     /**
@@ -333,7 +333,7 @@ public class Scanner{
             String[] lines = tableString.split("\r\n");
             for(String line : lines){
                 String[] arr = line.split(" ");
-                Token tok = new Token(Token.token_Type.valueOf(arr[1]), arr[0], (arr.length == 3)? arr[2] : null);
+                Token tok = new Token(TokenType.valueOf(arr[1]), arr[0], (arr.length == 3)? arr[2] : null);
                 addWordToken(tok);
             }
         }catch(IOException e){
@@ -355,48 +355,48 @@ public class Scanner{
             ID, //Identifier
             NUM, //Numeral
          */
-        addWordToken(new Token(Token.token_Type.ENDFILE, "endfile"));
-        addWordToken(new Token(Token.token_Type.ERROR, "error"));
-        addWordToken(new Token(Token.token_Type.AND, "and"));
-        addWordToken(new Token(Token.token_Type.NOT, "not"));
-        addWordToken(new Token(Token.token_Type.BOOL, "bool"));
-        addWordToken(new Token(Token.token_Type.BRANCH, "branch"));
-        addWordToken(new Token(Token.token_Type.CASE, "case"));
-        addWordToken(new Token(Token.token_Type.CONTINUE, "continue"));
-        addWordToken(new Token(Token.token_Type.DEFAULT, "default"));
-        addWordToken(new Token(Token.token_Type.ELSE, "else"));
-        addWordToken(new Token(Token.token_Type.END, "end"));
-        addWordToken(new Token(Token.token_Type.IF, "if"));
-        addWordToken(new Token(Token.token_Type.INT, "int"));
-        addWordToken(new Token(Token.token_Type.LOOP, "loop"));
-        addWordToken(new Token(Token.token_Type.MOD, "mod"));
-        addWordToken(new Token(Token.token_Type.OR, "or"));
-        addWordToken(new Token(Token.token_Type.REF, "ref"));
-        addWordToken(new Token(Token.token_Type.RETURN, "return"));
-        addWordToken(new Token(Token.token_Type.VOID, "void"));
-        addWordToken(new Token(Token.token_Type.PLUS, "+"));
-        addWordToken(new Token(Token.token_Type.MINUS, "-"));
-        addWordToken(new Token(Token.token_Type.MULT, "*"));
-        addWordToken(new Token(Token.token_Type.DIV, "/"));
-        addWordToken(new Token(Token.token_Type.ANDTHEN, "&&"));
-        addWordToken(new Token(Token.token_Type.ORELSE, "||"));
-        addWordToken(new Token(Token.token_Type.LT, "<"));
-        addWordToken(new Token(Token.token_Type.LTEQ, "<="));
-        addWordToken(new Token(Token.token_Type.GT, ">"));
-        addWordToken(new Token(Token.token_Type.GTEQ, ">="));
-        addWordToken(new Token(Token.token_Type.EQ, "="));
-        addWordToken(new Token(Token.token_Type.NEQ, "/="));
-        addWordToken(new Token(Token.token_Type.ASSIGN, ":="));
-        addWordToken(new Token(Token.token_Type.SEMI, ";"));
-        addWordToken(new Token(Token.token_Type.COMMA, ","));
-        addWordToken(new Token(Token.token_Type.LPAREN, "("));
-        addWordToken(new Token(Token.token_Type.RPAREN, ")"));
-        addWordToken(new Token(Token.token_Type.LSQR, "["));
-        addWordToken(new Token(Token.token_Type.RSQR, "]"));
-        addWordToken(new Token(Token.token_Type.LCRLY, "{"));
-        addWordToken(new Token(Token.token_Type.RCRLY, "}"));
-        addWordToken(new Token(Token.token_Type.BLIT, "true", "1"));
-        addWordToken(new Token(Token.token_Type.BLIT, "false", "0"));
+        addWordToken(new Token(TokenType.ENDFILE, "endfile"));
+        addWordToken(new Token(TokenType.ERROR, "error"));
+        addWordToken(new Token(TokenType.AND, "and"));
+        addWordToken(new Token(TokenType.NOT, "not"));
+        addWordToken(new Token(TokenType.BOOL, "bool"));
+        addWordToken(new Token(TokenType.BRANCH, "branch"));
+        addWordToken(new Token(TokenType.CASE, "case"));
+        addWordToken(new Token(TokenType.CONTINUE, "continue"));
+        addWordToken(new Token(TokenType.DEFAULT, "default"));
+        addWordToken(new Token(TokenType.ELSE, "else"));
+        addWordToken(new Token(TokenType.END, "end"));
+        addWordToken(new Token(TokenType.IF, "if"));
+        addWordToken(new Token(TokenType.INT, "int"));
+        addWordToken(new Token(TokenType.LOOP, "loop"));
+        addWordToken(new Token(TokenType.MOD, "mod"));
+        addWordToken(new Token(TokenType.OR, "or"));
+        addWordToken(new Token(TokenType.REF, "ref"));
+        addWordToken(new Token(TokenType.RETURN, "return"));
+        addWordToken(new Token(TokenType.VOID, "void"));
+        addWordToken(new Token(TokenType.PLUS, "+"));
+        addWordToken(new Token(TokenType.MINUS, "-"));
+        addWordToken(new Token(TokenType.MULT, "*"));
+        addWordToken(new Token(TokenType.DIV, "/"));
+        addWordToken(new Token(TokenType.ANDTHEN, "&&"));
+        addWordToken(new Token(TokenType.ORELSE, "||"));
+        addWordToken(new Token(TokenType.LT, "<"));
+        addWordToken(new Token(TokenType.LTEQ, "<="));
+        addWordToken(new Token(TokenType.GT, ">"));
+        addWordToken(new Token(TokenType.GTEQ, ">="));
+        addWordToken(new Token(TokenType.EQ, "="));
+        addWordToken(new Token(TokenType.NEQ, "/="));
+        addWordToken(new Token(TokenType.ASSIGN, ":="));
+        addWordToken(new Token(TokenType.SEMI, ";"));
+        addWordToken(new Token(TokenType.COMMA, ","));
+        addWordToken(new Token(TokenType.LPAREN, "("));
+        addWordToken(new Token(TokenType.RPAREN, ")"));
+        addWordToken(new Token(TokenType.LSQR, "["));
+        addWordToken(new Token(TokenType.RSQR, "]"));
+        addWordToken(new Token(TokenType.LCRLY, "{"));
+        addWordToken(new Token(TokenType.RCRLY, "}"));
+        addWordToken(new Token(TokenType.BLIT, "true", "1"));
+        addWordToken(new Token(TokenType.BLIT, "false", "0"));
     }
     
     /**

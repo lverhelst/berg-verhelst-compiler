@@ -4,6 +4,15 @@ package Parser;
  *
  */
 public class ASTNode {
+    
+    public interface statement{
+        
+    }
+    
+    public interface expression{
+        
+    }
+    
     public class programNode extends ASTNode{
         
     }
@@ -24,27 +33,27 @@ public class ASTNode {
         
     }
     
-    public class assignmentNode extends ASTNode{
+    public class assignmentNode extends ASTNode implements statement{
         
     }
     
-    public class ifNode extends ASTNode{
+    public class ifNode extends ASTNode implements statement{
         
     }
     
-    public class loopNode extends ASTNode{
+    public class loopNode extends ASTNode implements statement{
         
     }
     
-    public class markerNode extends ASTNode{
+    public class markerNode extends ASTNode implements statement {
         
     }
     
-    public class returnNode extends ASTNode{
+    public class returnNode extends ASTNode implements statement{
         
     }
     
-    public class branchNode extends ASTNode{
+    public class branchNode extends ASTNode implements statement{
         
     }
     
@@ -52,23 +61,23 @@ public class ASTNode {
         
     }
     
-    public class callNode extends ASTNode{
+    public class callNode extends ASTNode implements expression, statement{
         
     }
     
-    public class variableNode extends ASTNode{
+    public class variableNode extends ASTNode implements expression{
         
     }
     
-    public class literalNode extends ASTNode{
+    public class literalNode extends ASTNode implements expression{
         
     }
     
-    public class unopNode extends ASTNode{
+    public class unopNode extends ASTNode implements expression{
         
     }
     
-    public class binopNode extends ASTNode{
+    public class binopNode extends ASTNode implements expression{
         
     }
     

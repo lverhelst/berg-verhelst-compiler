@@ -5,6 +5,7 @@ import Main.AdministrativeConsole;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.TreeMap;
+import Lexeme.TokenType;
 
 /**
  * @authors Leon Verhelst and Emery Berg

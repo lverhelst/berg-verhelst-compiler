@@ -2,6 +2,7 @@ package Parser;
 
 import Lexeme.TNSet;
 import Lexeme.Token;
+import Lexeme.TokenType;
 import Main.AdministrativeConsole;
 import java.lang.reflect.Method;
 import java.util.HashMap;

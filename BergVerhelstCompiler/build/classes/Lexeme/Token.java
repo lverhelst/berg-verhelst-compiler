@@ -6,61 +6,9 @@ package Lexeme;
  */
 
 public class Token {
-    
-   //Symbolic names of token types
-    
-    /*
-     * We may need to split this out into it's own file
-     */
-    public enum token_Type{
-        ID, //Identifier
-        NUM, //Numeral
-        BLIT, //Boolean literal
-        ENDFILE, //End of source text (this is added by the Scanner)
-        ERROR, //Erroneous token
-        AND, //and
-        NOT,
-        BOOL, //bool
-        BRANCH, //branch
-        CASE, //case
-        CONTINUE, //continue
-        DEFAULT, //default
-        ELSE, //else
-        END, //end
-        EXIT, //exit
-        IF, //if
-        INT, //int
-        LOOP, //loop
-        MOD, //mod
-        OR, //or
-        REF,  //ref
-        RETURN, //return
-        VOID, //void
-        PLUS, //+
-        MINUS, //-
-        MULT, //*
-        DIV, // /
-        ANDTHEN, // &&
-        ORELSE, // ||
-        LT, // <
-        LTEQ, // <=
-        GT, // >
-        GTEQ, // >=
-        EQ, // =
-        NEQ, // /=
-        ASSIGN, // :=
-        SEMI, // ;
-        COMMA, // ,
-        LPAREN, // (
-        RPAREN, // )
-        LSQR, // [
-        RSQR, // ]
-        LCRLY, //{
-        RCRLY //}
-   }
-    
+        
     //name is the classification of the lexeme
-    private token_Type name;
+    private TokenType name;
     //A lexeme is the actual code that this token represents
     private String lexeme;
     //Attribute value is the value of the token
@@ -74,11 +22,11 @@ public class Token {
      * @param name Token Type
      * @param lexeme Lexeme
      */
-    public Token(token_Type name, String lexeme){
+    public Token(TokenType name, String lexeme){
         this.name = name;
         this.lexeme = lexeme;
          if(lexeme.equals("error")){
-            this.name = token_Type.ID;
+            this.name = TokenType.ID;
             this.attribute_Value = "error";
          }
     }
@@ -88,12 +36,12 @@ public class Token {
      * @param lexeme The lexeme  as found by the scanner
      * @param attributeValue The attribute code as found by the scanner
      */
-    public Token(token_Type name, String lexeme, String attributeValue){
+    public Token(TokenType name, String lexeme, String attributeValue){
         this.name = name;
         this.lexeme = lexeme;
         this.attribute_Value = attributeValue;
         if(lexeme.equals("error")){
-            this.name = token_Type.ID;
+            this.name = TokenType.ID;
             this.attribute_Value = "error";
          }
     }
@@ -101,14 +49,14 @@ public class Token {
     /**
      * @return the name
      */
-    public token_Type getName() {
+    public TokenType getName() {
         return name;
     }
 
     /**
      * @param name the name to set
      */
-    public void setName(token_Type name) {
+    public void setName(TokenType name) {
         this.name = name;
     }
 
@@ -144,7 +92,7 @@ public class Token {
      */
     @Override
     public String toString(){
-        return String.format("%9s%3s",(this.lexeme == null ? "<No Lexeme>" : this.lexeme),"")+ String.format("%10s%10s","",this.name) + String.format("%10s%10s","",(this.attribute_Value == null ? "" : this.attribute_Value));
-        //return (this.lexeme == null ? "<No Lexeme>" : this.lexeme) + " -> (" + this.name + ", " + (this.attribute_Value == null ? "-" : this.attribute_Value) + ")";
+        //return String.format("%9s%3s",(this.lexeme == null ? "<No Lexeme>" : this.lexeme),"")+ String.format("%10s%10s","",this.name) + String.format("%10s%10s","",(this.attribute_Value == null ? "" : this.attribute_Value));
+        return "(" + this.name + ", " + (this.attribute_Value == null ? "-" : this.attribute_Value) + ")" + (this.lexeme == null ? "" : " => " + this.lexeme);
     }
 }

@@ -1,10 +1,9 @@
 package Parser;
 import Lexeme.TokenType;
-import java.util.ArrayList;
 /**
  *
  */
-public class ASTNode {
+public class ASTNode{
     
     public interface Statement{
         
@@ -15,27 +14,34 @@ public class ASTNode {
     }
     
     public class ProgramNode extends ASTNode{
-        
+        FuncDeclarationNode declaration;
+        ProgramNode nextNode;
     }
     
     public class FuncDeclarationNode extends ASTNode{
-        
+        ParameterNode params; 
+        CompoundNode compondStmt;
     }
     
     public class VarDeclarationNode extends ASTNode{
-        
+        UnopNode addOp;
     }
     
     public class ParameterNode extends ASTNode{
-        
+        TokenType param;
+        ParameterNode nextNode; 
     }
     
     public class CompoundNode extends ASTNode{
-        
+        TokenType specifier;
+        Expression expersion;
+        Statement statement;   
+        CompoundNode nextNode;
     }
     
     public class AssignmentNode extends ASTNode implements Statement{
-        
+        Expression index;
+        Expression expersion;        
     }
     /**
      * Class to view ifNode

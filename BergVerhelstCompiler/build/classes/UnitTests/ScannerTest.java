@@ -7,6 +7,7 @@ import Scanner.Scanner;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import Lexeme.TokenType;
 
 /**
  * Used to test the methods available in the scanner class
@@ -92,7 +93,7 @@ public class ScannerTest {
         //check found tokens against expected results from file
         do {
             token = scanner.getToken();
-            if(token.getName() == Token.token_Type.ERROR) {
+            if(token.getName() == TokenType.ERROR) {
                 if(!expected[i].equals("ERROR")) {                                  
                     System.out.println("[Failed] | Found " + token.getLexeme() + " | expected " + expected[i]);
                     check &= false; //exit if test fails
@@ -103,9 +104,9 @@ public class ScannerTest {
             }
             
              i++;
-        } while(token.getName() != Token.token_Type.ENDFILE );
+        } while(token.getName() != TokenType.ENDFILE );
         
-        if(token.getName() != Token.token_Type.ENDFILE) {
+        if(token.getName() != TokenType.ENDFILE) {
             System.out.println("[Failed] | More tokens created then expected");
             check &= false;
         }

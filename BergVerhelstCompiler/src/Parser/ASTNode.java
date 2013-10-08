@@ -1,83 +1,92 @@
 package Parser;
 
+import Lexeme.TokenType;
+
 /**
  *
  */
 public class ASTNode {
     
-    public interface statement{
+    public interface Statement{
         
     }
     
-    public interface expression{
+    public interface Expression{
         
     }
     
-    public class programNode extends ASTNode{
+    public class ProgramNode extends ASTNode{
+        FuncDeclarationNode declaration;
+        ProgramNode nextNode;
+    }
+    
+    public class FuncDeclarationNode extends ASTNode{
+        ParameterNode params; 
+        CompoundNode compondStmt;
+    }
+    
+    public class VarDeclarationNode extends ASTNode{
+        UnopNode addOp;
+    }
+    
+    public class ParameterNode extends ASTNode{
+        TokenType param;
+        ParameterNode nextNode; 
+    }
+    
+    public class CompoundNode extends ASTNode{
+        TokenType specifier;
+        Expression expersion;
+        Statement statement;   
+        CompoundNode nextNode;
+    }
+    
+    public class AssignmentNode extends ASTNode implements Statement{
+        Expression index;
+        Expression expersion;        
+    }
+    
+    public class IfNode extends ASTNode implements Statement{
         
     }
     
-    public class funcDeclarationNode extends ASTNode{
+    public class LoopNode extends ASTNode implements Statement{
         
     }
     
-    public class varDeclarationNode extends ASTNode{
+    public class MarkerNode extends ASTNode implements Statement {
         
     }
     
-    public class parameterNode extends ASTNode{
+    public class ReturnNode extends ASTNode implements Statement{
         
     }
     
-    public class compoundNode extends ASTNode{
+    public class BranchNode extends ASTNode implements Statement{
         
     }
     
-    public class assignmentNode extends ASTNode implements statement{
+    public class CaseNode extends ASTNode{
         
     }
     
-    public class ifNode extends ASTNode implements statement{
+    public class CallNode extends ASTNode implements Expression, Statement{
         
     }
     
-    public class loopNode extends ASTNode implements statement{
+    public class VariableNode extends ASTNode implements Expression{
         
     }
     
-    public class markerNode extends ASTNode implements statement {
+    public class LiteralNode extends ASTNode implements Expression{
         
     }
     
-    public class returnNode extends ASTNode implements statement{
+    public class UnopNode extends ASTNode implements Expression{
         
     }
     
-    public class branchNode extends ASTNode implements statement{
-        
-    }
-    
-    public class caseNode extends ASTNode{
-        
-    }
-    
-    public class callNode extends ASTNode implements expression, statement{
-        
-    }
-    
-    public class variableNode extends ASTNode implements expression{
-        
-    }
-    
-    public class literalNode extends ASTNode implements expression{
-        
-    }
-    
-    public class unopNode extends ASTNode implements expression{
-        
-    }
-    
-    public class binopNode extends ASTNode implements expression{
+    public class BinopNode extends ASTNode implements Expression{
         
     }
     

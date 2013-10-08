@@ -41,3 +41,4 @@ void VOID
 ] RSQR 
 { LCRLY 
 } RCRLY 
+: COLON

@@ -152,8 +152,8 @@ public class Scanner{
                 adv.getNextChar();
                 return wordTable.get(currentChar + "" + nextChar);
             case ':':
-                if(nextChar != '=') //only valid char
-                    break;
+                if(nextChar != '=') 
+                    return wordTable.get(":");
                 
                 //if valid consume char and return token
                 adv.getNextChar();
@@ -388,6 +388,7 @@ public class Scanner{
         addWordToken(new Token(TokenType.EQ, "="));
         addWordToken(new Token(TokenType.NEQ, "/="));
         addWordToken(new Token(TokenType.ASSIGN, ":="));
+        addWordToken(new Token(TokenType.COLON, ":"));
         addWordToken(new Token(TokenType.SEMI, ";"));
         addWordToken(new Token(TokenType.COMMA, ","));
         addWordToken(new Token(TokenType.LPAREN, "("));

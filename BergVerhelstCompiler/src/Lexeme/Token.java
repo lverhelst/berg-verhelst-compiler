@@ -55,7 +55,8 @@ public class Token {
         LSQR, // [
         RSQR, // ]
         LCRLY, //{
-        RCRLY //}
+        RCRLY, //}
+        COLON //:
    }
     
     //name is the classification of the lexeme

@@ -252,7 +252,8 @@ public class AdministrativeConsole {
     * @created by Emery
     */
    public void error(String errorMsg) {
-       
+       didPass = false;
+       System.out.println(linenumber + "," + charPosInLine + ": " + errorMsg);
    }
    
    /**

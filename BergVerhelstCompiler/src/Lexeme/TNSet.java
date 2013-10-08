@@ -31,4 +31,23 @@ public class TNSet {
     public boolean contains(Token.token_Type token) {
         return set.contains(token);
     }
+    
+    /**
+     * Used to return a copy of the current TNSet
+     * @return A copy of the current TNSet 
+     */
+    public TNSet copy(){
+        TNSet copiedTo = new TNSet();
+        for(Token.token_Type token : this.set){
+            copiedTo.set.add(token);
+        }
+        return copiedTo;
+    }
+    /**
+     * Used to retrieve the set of tokens for this instance of TNSet
+     * @return The set of Token.token_types
+     */
+    public ArrayList<Token.token_Type> getSet(){
+        return this.set;
+    }
 }

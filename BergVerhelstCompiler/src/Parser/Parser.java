@@ -3,6 +3,7 @@ package Parser;
 import Lexeme.TNSet;
 import Lexeme.Token;
 import Main.AdministrativeConsole;
+import java.lang.reflect.Method;
 import java.util.HashMap;
 
 /**
@@ -48,7 +49,20 @@ public class Parser {
        } while(currentToken.getName() != Token.token_Type.ENDFILE);*/
        currentToken = scn.getToken();
        lookahead = currentToken.getName();
-       program();
+       visit("program");
+    }
+    
+    public void visit(String methodName) {
+        System.out.println("Entering Method: " + methodName);
+        
+        try {
+            Method method = Parser.class.getMethod(methodName, null);
+            method.invoke(this);
+        } catch(Exception e) {
+            System.out.println("Failed to run method: " + methodName + "\n" + e.toString());
+        } 
+        
+        System.out.println("Leaving Method: " + methodName);
     }
     
     /**
@@ -545,7 +559,7 @@ public class Parser {
      */
     public void program() {
         do{
-            declaration();
+            visit("declaration");
         }while(firstSet.get("program").getSet().contains(this.lookahead));
     }
     
@@ -557,11 +571,11 @@ public class Parser {
         if(this.lookahead == Token.token_Type.VOID){
             match(Token.token_Type.VOID);
             match(Token.token_Type.ID);
-            fundecTail();
+            visit("fundecTail");
         }else if(firstSet.get("nonvoid-specifier").getSet().contains(this.lookahead)){
-            nonvoidSpec();
+            visit("nonvoidSpec");
             match(Token.token_Type.ID);
-            decTail();
+            visit("decTail");
         }else
             console.error("declaration error: " + this.lookahead);
         //syntaxError(sync);
@@ -584,10 +598,10 @@ public class Parser {
      */
     public void decTail() {
         if(firstSet.get("var-dec-tail").contains(this.lookahead)){
-            vardecTail();
+            visit("vardecTail");
         }
         if(firstSet.get("fun-dec-tail").contains(this.lookahead)){
-            fundecTail();
+            visit("fundecTail");
         }
     }
     
@@ -599,12 +613,12 @@ public class Parser {
     public void vardecTail() {
         if(this.lookahead == Token.token_Type.LSQR){
             match(Token.token_Type.LSQR);
-            addExp();
+            visit("addExp");
             match(Token.token_Type.RSQR);
         }
         while(this.lookahead == Token.token_Type.COMMA){
             match(Token.token_Type.COMMA);
-            varName();
+            visit("varName");
         }
         match(Token.token_Type.SEMI);
     }
@@ -618,7 +632,7 @@ public class Parser {
         match(Token.token_Type.ID);
         if(this.lookahead == Token.token_Type.LSQR){
             match(Token.token_Type.LSQR);
-            addExp();
+            visit("addExp");
             match(Token.token_Type.RSQR);
         }
     }
@@ -629,9 +643,9 @@ public class Parser {
      */
     public void fundecTail() {
         match(Token.token_Type.LPAREN);
-        params();
+        visit("params");
         match(Token.token_Type.RPAREN);
-        compoundStmt();
+        visit("compoundStmt");
     }
     
     /**
@@ -640,10 +654,10 @@ public class Parser {
      */
     public void params() {
         if(firstSet.get("param").contains(lookahead)){
-            param();
+            visit("param");
             while(this.lookahead == Token.token_Type.COMMA){
                 match(Token.token_Type.COMMA);
-                param();
+                visit("param");
             }   
         }else{
             match(Token.token_Type.VOID);
@@ -657,10 +671,10 @@ public class Parser {
     public void param() {
         if(lookahead == Token.token_Type.REF){
             match(Token.token_Type.REF);
-            nonvoidSpec();
+            visit("nonvoidSpec");
             match(Token.token_Type.ID);
         }else if(firstSet.get("nonvoid-specifier").contains(lookahead)){
-            nonvoidSpec();
+            visit("nonvoidSpec");
             match(Token.token_Type.ID);
             if(lookahead == Token.token_Type.LSQR){
                 match(Token.token_Type.LSQR);
@@ -675,31 +689,31 @@ public class Parser {
      */
     public void statement() {
         if(firstSet.get("id-stmt").contains(lookahead)){
-            idstmt();
+            visit("idstmt");
         }
         if(firstSet.get("compound-stmt").contains(lookahead)){
-            compoundStmt();
+            visit("compoundStmt");
         }
         if(firstSet.get("if-stmt").contains(lookahead)){
-            ifStmt();
+            visit("ifStmt");
         }
         if(firstSet.get("loop-stmt").contains(lookahead)){
-            loopStmt();
+            visit("loopStmt");
         }
         if(firstSet.get("exit-stmt").contains(lookahead)){
-            exitStmt();
+            visit("exitStmt");
         }
         if(firstSet.get("continue-stmt").contains(lookahead)){
-            continueStmt();
+            visit("continueStmt");
         }
         if(firstSet.get("return-stmt").contains(lookahead)){
-            returnStmt();
+            visit("returnStmt");
         }
         if(firstSet.get("null-stmt").contains(lookahead)){
-            nullStmt();
+            visit("nullStmt");
         }
         if(firstSet.get("branch-stmt").contains(lookahead)){
-            branchStmt();
+            visit("branchStmt");
         }
     }
     
@@ -710,7 +724,7 @@ public class Parser {
     public void idstmt() {
         if(lookahead == Token.token_Type.ID){
             match(Token.token_Type.ID);
-            idstmtTail();
+            visit("idstmtTail");
         }else
             console.error("idstmt error: " + lookahead);
     }
@@ -721,9 +735,9 @@ public class Parser {
      */
     public void idstmtTail() {
         if(firstSet.get("assign-stmt-tail").contains(lookahead)){
-            assignstmtTail();
+            visit("assignstmtTail");
         }else if(firstSet.get("call-stmt-tail").contains(lookahead)){
-            callstmtTail();
+            visit("callstmtTail");
         }else
             console.error("idstmtTail error: " +  lookahead);
     }
@@ -735,11 +749,11 @@ public class Parser {
     public void assignstmtTail() {
         if(lookahead == Token.token_Type.LSQR){
             match(Token.token_Type.LSQR);
-            addExp();
+            visit("addExp");
             match(Token.token_Type.RSQR);
         }
         match(Token.token_Type.ASSIGN);
-        expression();
+        visit("expression");
         match(Token.token_Type.SEMI);
     }
     
@@ -748,7 +762,7 @@ public class Parser {
      * @created by Emery
      */
     public void callstmtTail() {
-        callTail();
+        visit("callTail");
         match(Token.token_Type.SEMI);
     }
     
@@ -759,7 +773,7 @@ public class Parser {
     public void callTail() {
         match(Token.token_Type.LPAREN);
         if(firstSet.get("arguments").contains(lookahead)){
-            arguments();
+            visit("arguments");
         }
         match(Token.token_Type.RPAREN);
     }
@@ -769,10 +783,10 @@ public class Parser {
      * @created by Emery
      */
     public void arguments() {
-        expression();
+        visit("expression");
         while(lookahead == Token.token_Type.COMMA){
             match(Token.token_Type.COMMA);
-            expression();
+            visit("expression");
         }
     }
     
@@ -783,12 +797,12 @@ public class Parser {
     public void compoundStmt() {
         match(Token.token_Type.LCRLY);
         while(firstSet.get("nonvoid-specifier").contains(lookahead)){
-            nonvoidSpec();
+            visit("nonvoidSpec");
             match(Token.token_Type.ID);
-            vardecTail();
+            visit("vardecTail");
         }
         do{
-            statement();
+            visit("statement");
         }while(firstSet.get("statement").contains(lookahead));
         match(Token.token_Type.RCRLY);
     }
@@ -800,12 +814,12 @@ public class Parser {
     public void ifStmt() {
         match(Token.token_Type.IF);
         match(Token.token_Type.LPAREN);
-        expression();
+        visit("expression");
         match(Token.token_Type.RPAREN);
-        statement();
+        visit("statement");
         if(lookahead == Token.token_Type.ELSE){
             match(Token.token_Type.ELSE);
-            statement();
+            visit("statement");
         }
     }
     
@@ -816,7 +830,7 @@ public class Parser {
     public void loopStmt() {
         match(Token.token_Type.LOOP);
         do{
-            statement();
+            visit("statement");
         }while(firstSet.get("statement").contains(lookahead));
         match(Token.token_Type.END);
         match(Token.token_Type.SEMI);
@@ -846,7 +860,7 @@ public class Parser {
     public void returnStmt() {
         match(Token.token_Type.RETURN);
         if(firstSet.get("expression").contains(lookahead)){
-            expression();
+            visit("expression");
         }
         match(Token.token_Type.SEMI);
     }
@@ -866,10 +880,10 @@ public class Parser {
     public void branchStmt() {
         match(Token.token_Type.BRANCH);
         match(Token.token_Type.LPAREN);
-        addExp();
+        visit("addExp");
         match(Token.token_Type.RPAREN);
         do{
-            caseStmt();
+            visit("caseStmt");
         }while(firstSet.get("case").contains(lookahead));
         match(Token.token_Type.END);
         match(Token.token_Type.SEMI);
@@ -884,11 +898,11 @@ public class Parser {
             match(Token.token_Type.CASE);
             match(Token.token_Type.NUM);
             match(Token.token_Type.COLON);
-            statement();
+            visit("statement");
         }else if(lookahead == Token.token_Type.DEFAULT){
              match(Token.token_Type.DEFAULT);
              match(Token.token_Type.COLON);
-             statement();
+             visit("statement");
         }else
             console.error("CaseStmt Error: " + lookahead);
     }
@@ -900,8 +914,8 @@ public class Parser {
     public void expression() {
         addExp();
         if(firstSet.get("relop").contains(lookahead)){
-            relop();
-            addExp();
+            visit("relop");
+            visit("addExp");
         }
     }
     
@@ -911,12 +925,12 @@ public class Parser {
      */
     public void addExp() {
         if(firstSet.get("uminus").contains(lookahead)){
-            uminus();
+            visit("uminus");
         }
-        term();
+        visit("term");
         while(firstSet.get("addop").contains(lookahead)){
-            addop();
-            term();
+            visit("addop");
+            visit("term");
         }
     }
     
@@ -925,10 +939,10 @@ public class Parser {
      * @created by Emery
      */
     public void term() {
-        factor();
+        visit("factor");
         while(firstSet.get("multop").contains(lookahead)){
-            multop();
-            factor();
+            visit("multop");
+            visit("factor");
         }
     }
     
@@ -938,9 +952,9 @@ public class Parser {
      */
     public void factor() {
         if(firstSet.get("nid-factor").contains(lookahead)){
-            nidFactor();
+            visit("nidFactor");
         }else if(firstSet.get("id-factor").contains(lookahead)){
-            idFactor();
+            visit("idFactor");
         }else
             console.error("Factor error: " + lookahead);
     }
@@ -952,10 +966,10 @@ public class Parser {
     public void nidFactor() {
         if(lookahead == Token.token_Type.NOT){
             match(Token.token_Type.NOT);
-            factor();
+            visit("factor");
         }else if(lookahead == Token.token_Type.LPAREN){
             match(Token.token_Type.LPAREN);
-            expression();
+            visit("expression");
             match(Token.token_Type.RPAREN);
         }else if(lookahead == Token.token_Type.NUM){
             match(Token.token_Type.NUM);
@@ -971,7 +985,7 @@ public class Parser {
      */
     public void idFactor() {
         match(Token.token_Type.ID);
-        idTail();
+        visit("idTail");
     }
     
     /**
@@ -980,9 +994,9 @@ public class Parser {
      */
     public void idTail() {
         if(firstSet.get("var-tail").contains(lookahead)){
-            varTail();
+            visit("varTail");
         }else if(firstSet.get("call-tail").contains(lookahead)){
-            callTail();
+            visit("callTail");
         }
     }
     
@@ -993,7 +1007,7 @@ public class Parser {
     public void varTail() {
         if(lookahead == Token.token_Type.LSQR){
             match(Token.token_Type.LSQR);
-            addExp();
+            visit("addExp");
             match(Token.token_Type.RSQR);
         }
     }

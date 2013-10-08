@@ -17,6 +17,7 @@ public class Parser {
     private HashMap<String, TNSet> followSet;
     private Scanner.Scanner scn;
     private TokenType lookahead;
+    ASTNode rootNode;
     
     /**
      * Empty Constructor
@@ -50,20 +51,22 @@ public class Parser {
        } while(currentToken.getName() != TokenType.ENDFILE);*/
        currentToken = scn.getToken();
        lookahead = currentToken.getName();
-       visit("program");
+       rootNode = visit("program");
     }
     
-    public void visit(String methodName) {
+    public ASTNode visit(String methodName) {
         System.out.println("Entering Method: " + methodName);
-        
+        ASTNode node = null;
         try {
             Method method = Parser.class.getMethod(methodName, null);
-            method.invoke(this);
+            node = (ASTNode)method.invoke(this);
+
         } catch(Exception e) {
             System.out.println("Failed to run method: " + methodName + "\n" + e.toString());
         } 
         
         System.out.println("Leaving Method: " + methodName);
+        return node;
     }
     
     /**
@@ -492,26 +495,6 @@ public class Parser {
         }
 //        syntaxCheck(synch);
     }    
-    
-    
-    
-    
-    /**
-     * Used to start generating the parsing tree
-     * @created by Leon
-     */
-    public void gen() {
-           
-        
-    }
-    
-    /**
-     * Used for finding additional errors if an error is detected
-     * @created by Emery
-     */
-    public void gen(TNSet synch) {
-        
-    }
     
     /**
      * Returns the current first set, used to start gen()

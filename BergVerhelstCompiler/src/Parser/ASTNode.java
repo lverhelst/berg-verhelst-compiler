@@ -1,84 +1,128 @@
 package Parser;
-
+import Lexeme.TokenType;
+import java.util.ArrayList;
 /**
  *
  */
 public class ASTNode {
     
-    public interface statement{
+    public interface Statement{
         
     }
     
-    public interface expression{
+    public interface Expression{
         
     }
     
-    public class programNode extends ASTNode{
+    public class ProgramNode extends ASTNode{
         
     }
     
-    public class funcDeclarationNode extends ASTNode{
+    public class FuncDeclarationNode extends ASTNode{
         
     }
     
-    public class varDeclarationNode extends ASTNode{
+    public class VarDeclarationNode extends ASTNode{
         
     }
     
-    public class parameterNode extends ASTNode{
+    public class ParameterNode extends ASTNode{
         
     }
     
-    public class compoundNode extends ASTNode{
+    public class CompoundNode extends ASTNode{
         
     }
     
-    public class assignmentNode extends ASTNode implements statement{
+    public class AssignmentNode extends ASTNode implements Statement{
         
     }
-    
-    public class ifNode extends ASTNode implements statement{
-        
+    /**
+     * Class to view ifNode
+     * @Class Leon
+     */
+    public class IfNode extends ASTNode implements Statement{
+        Expression exp;
+        Statement stmt;
+        Statement elseStmt;
+    }
+    /**
+     * Class to view loop syntax
+     * @Created Leon
+     */
+    public class LoopNode extends ASTNode implements Statement{
+        Statement stmt;
+        LoopNode nextLoopNode;
+    }
+     /**
+      * The Marker Node class
+      * Markers can be the following specifiers: CONTINUE | EXIT | ENDFILE
+      * @Created Leon
+     */
+    public class MarkerNode extends ASTNode implements Statement {
+        TokenType specifier; 
+    }
+    /**
+     * A Return Node has an optional expression
+     * @Created Leon
+     */
+    public class ReturnNode extends ASTNode implements Statement{
+        //A return node has an optional expression
+        Expression exp;
+    }
+    /**
+     * 
+     */
+    public class BranchNode extends ASTNode implements Statement{
+        //Optional 
+        Expression exp;
+        CaseNode thisCase;
+        BranchNode nextNode;
     }
     
-    public class loopNode extends ASTNode implements statement{
-        
+    /**
+     * Case Node for case statements
+     * @Created Leon
+     */
+    public class CaseNode extends ASTNode{
+        Statement stmt;
     }
-    
-    public class markerNode extends ASTNode implements statement {
-        
+    /**
+     * Call Node
+     * EX. INT FOO(BAR foobar);
+     * @Created Leon
+     */
+    public class CallNode extends ASTNode implements Expression, Statement{
+        TokenType specifier;
+        Expression parameters;
     }
-    
-    public class returnNode extends ASTNode implements statement{
-        
+    /**
+     * This stores a variable ex: INT x;
+     * @Created Leon
+     */
+    public class VariableNode extends ASTNode implements Expression{
+        TokenType specifier;
     }
-    
-    public class branchNode extends ASTNode implements statement{
-        
+    /**
+     * Literals can be NUM, BLIT
+     * @Created Leon
+     */
+    public class LiteralNode extends ASTNode implements Expression{
+        TokenType specifier;
     }
-    
-    public class caseNode extends ASTNode{
-        
+    /**
+     * Unary Operation Node
+     * @Created Leon
+     */
+    public class UnopNode extends ASTNode implements Expression{
+        TokenType specifier;
     }
-    
-    public class callNode extends ASTNode implements expression, statement{
-        
-    }
-    
-    public class variableNode extends ASTNode implements expression{
-        
-    }
-    
-    public class literalNode extends ASTNode implements expression{
-        
-    }
-    
-    public class unopNode extends ASTNode implements expression{
-        
-    }
-    
-    public class binopNode extends ASTNode implements expression{
-        
+    /**
+     * Binary Operation Node
+     * @Created Leon
+     */
+    public class BinopNode extends ASTNode implements Expression{
+        TokenType specifier;
     }
     
     

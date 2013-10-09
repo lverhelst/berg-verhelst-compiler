@@ -1,2 +1,2 @@
 int x;
-int add(int x, int y) { return x+y; } 
+int add(int x, int y) { return 0;} 

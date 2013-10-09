@@ -139,7 +139,7 @@ public class ASTNode{
         
         @Override
         public String toString() {
-            return this.getClass().getName() + " " + ((index != null)?index.toString():"") + " " + ((expersion != null)?expersion.toString():"");
+            return this.getClass().getName() + " " + ((index != null)?index.toString():"") + " " + ((expersion != null)?expersion.toString():"")+ "\n";
         }
     }
     
@@ -154,7 +154,7 @@ public class ASTNode{
         
         @Override
         public String toString() {
-            return this.getClass().getName() + " " + ((exp != null)?exp.toString():"") + " " + ((stmt != null)?stmt.toString():"") + " " + ((elseStmt != null)? elseStmt.toString(): "");
+            return this.getClass().getName() + " " + ((exp != null)?exp.toString():"") + " " + ((stmt != null)?stmt.toString():"") + " " + ((elseStmt != null)? elseStmt.toString(): "")+ "\n";
         }
     }
     /**
@@ -167,7 +167,7 @@ public class ASTNode{
         
          @Override
         public String toString() {
-            return this.getClass().getName() + " " + ((stmt != null)?stmt.toString():"") + " " + ((nextLoopNode != null)?nextLoopNode.toString():"");
+            return this.getClass().getName() + " " + ((stmt != null)?stmt.toString():"") + " " + ((nextLoopNode != null)?nextLoopNode.toString():"")+ "\n";
         }
     }
      /**
@@ -180,7 +180,7 @@ public class ASTNode{
         
         @Override
         public String toString() {
-            return this.getClass().getName() + " " + ((specifier != null)?specifier.toString():"");
+            return this.getClass().getName() + " " + ((specifier != null)?specifier.toString():"")+ "\n";
         }
     }
     /**
@@ -190,9 +190,10 @@ public class ASTNode{
     public class ReturnNode extends ASTNode implements Statement{
         //A return node has an optional expression
         Expression exp;
+        
         @Override
         public String toString() {
-            return this.getClass().getName() + " " + ((exp != null)?exp.toString():"");
+            return this.getClass().getName() + " \n" + ((exp != null)?exp.toString():"")+ "\n";
         }
     }
     /**
@@ -207,7 +208,7 @@ public class ASTNode{
         
         @Override
         public String toString() {
-            return this.getClass().getName() + " " + ((exp != null)?exp.toString():"") + " " + ((thisCase != null)?thisCase.toString():"") + " " + ((nextNode != null)? nextNode.toString(): "");
+            return this.getClass().getName() + " " + ((exp != null)?exp.toString():"") + " " + ((thisCase != null)?thisCase.toString():"") + " " + ((nextNode != null)? nextNode.toString(): "")+ "\n";
         }
     }
     
@@ -220,7 +221,7 @@ public class ASTNode{
         
         @Override
         public String toString() {
-            return this.getClass().getName() + " " + ((stmt != null)?stmt.toString():"");
+            return this.getClass().getName() + " " + ((stmt != null)?stmt.toString():"")+ "\n";
         }
         
     }
@@ -236,7 +237,7 @@ public class ASTNode{
         
         @Override
         public String toString() {
-            return this.getClass().getName() + " " + ((specifier != null)?specifier.toString():"") + " " + ID + " " + ((parameters != null)? parameters.toString(): "");
+            return this.getClass().getName() + " " + ((specifier != null)?specifier.toString():"") + " " + ID + " " + ((parameters != null)? parameters.toString(): "")+ "\n";
         }
     }
     /**
@@ -248,7 +249,7 @@ public class ASTNode{
         
         @Override
         public String toString() {
-            return this.getClass().getName() + " " + ((specifier != null)?specifier.toString():"");
+            return this.getClass().getName() + " " + ((specifier != null)?specifier.toString():"")+ "\n";
         }
     }
     /**
@@ -260,7 +261,7 @@ public class ASTNode{
         
         @Override
         public String toString() {
-            return this.getClass().getName() + " " + ((specifier != null)?specifier.toString():"");
+            return this.getClass().getName() + " " + ((specifier != null)?specifier.toString():"")+ "\n";
         }
     }
     /**
@@ -273,7 +274,7 @@ public class ASTNode{
         
          @Override
         public String toString() {
-            return this.getClass().getName() + " " + ((specifier != null)?specifier.toString():"") + " " + ((Rside != null)? Rside.toString(): "");
+            return this.getClass().getName() + " " + ((specifier != null)?specifier.toString():"") + " " + ((Rside != null)? Rside.toString(): "")+ "\n";
         }
     }
     /**
@@ -287,7 +288,7 @@ public class ASTNode{
         
         @Override
         public String toString() {
-            return this.getClass().getName() + " " + ((specifier != null)?specifier.toString():"") + " " + ((Lside != null)?Lside.toString():"") + " " + ((Rside != null)? Rside.toString(): "");
+            return this.getClass().getName() + " {L:" + ((Lside != null)?Lside.toString():"") + "} OP:" + ((specifier != null)?specifier.toString():"") + " {" + ((Rside != null)? Rside.toString(): "") + "}\n";
         }
     }
     

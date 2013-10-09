@@ -1014,8 +1014,7 @@ public class Parser {
      * 
      */
     public BinopNode expression() {
-        BinopNode node = rootNode.new BinopNode();
-        node.Lside = (Expression)visit("addExp");
+        BinopNode node = (BinopNode)visit("addExp");
         if(firstSet.get("relop").contains(lookahead)){
             node.specifier = ((BinopNode) visit("relop")).specifier;
             node.Rside = (Expression)visit("addExp");
@@ -1028,15 +1027,15 @@ public class Parser {
      * @created by Emery
      */
     public BinopNode addExp() {
-        BinopNode node = rootNode.new BinopNode();
+        BinopNode node = null;
         UnopNode unaryNode = rootNode.new UnopNode();
         if(firstSet.get("uminus").contains(lookahead)){
             unaryNode.specifier = (TokenType)visit("uminus");
         }
-        unaryNode.Rside = (Expression) visit("term");
+        unaryNode.Rside = (BinopNode) visit("term");
         node.Lside = (Expression)unaryNode;
         while(firstSet.get("addop").contains(lookahead)){
-            node.specifier = ((BinopNode)visit("addop")).specifier;
+            node.specifier = (TokenType)visit("addop");
             node.Rside = (Expression)visit("term");
         }
         return node;
@@ -1050,7 +1049,7 @@ public class Parser {
         BinopNode nodeb = rootNode.new BinopNode();         
         nodeb.Lside = (Expression) visit("factor");
         while(firstSet.get("multop").contains(lookahead)){ 
-            nodeb.specifier = ((BinopNode)visit("multop")).specifier;
+            nodeb.specifier = (TokenType)visit("multop");
             nodeb.Rside = (Expression)visit("factor");
         }
         return nodeb;
@@ -1140,97 +1139,97 @@ public class Parser {
      * Used to deal with the relop phrase (34)
      * @created by Emery
      */
-    public BinopNode relop() {
-        BinopNode node = rootNode.new BinopNode();
+    public TokenType relop() {
+        TokenType type = null;
         if(lookahead == TokenType.LTEQ){
             match(TokenType.LTEQ);
-            node.specifier = TokenType.LTEQ;
+            type = TokenType.LTEQ;
         }
         if(lookahead == TokenType.LT){
             match(TokenType.LT);
-            node.specifier = TokenType.LT;
+            type = TokenType.LT;
         }
         if(lookahead == TokenType.GT){
             match(TokenType.GT);
-            node.specifier = TokenType.GT;
+            type = TokenType.GT;
         }
         if(lookahead == TokenType.GTEQ){
             match(TokenType.GTEQ);
-            node.specifier = TokenType.GTEQ;
+            type = TokenType.GTEQ;
         }
         if(lookahead == TokenType.EQ){
             match(TokenType.EQ);
-            node.specifier = TokenType.EQ;
+            type = TokenType.EQ;
         }
         if(lookahead == TokenType.NEQ){
             match(TokenType.NEQ);
-            node.specifier = TokenType.NEQ;
+            type = TokenType.NEQ;
         }
-        return node;
+        return type;
     }
     
     /**
      * Used to deal with the addop phrase (35)
      * @created by Emery
      */
-    public BinopNode addop() {
-        BinopNode node = rootNode.new BinopNode(); 
+    public TokenType addop() {
+        TokenType type = null; 
         if(lookahead == TokenType.PLUS){
             match(TokenType.PLUS);
-            node.specifier = TokenType.PLUS;
+            type = TokenType.PLUS;
         }
         if(lookahead == TokenType.MINUS){
             match(TokenType.MINUS);
-            node.specifier = TokenType.MINUS;
+            type = TokenType.MINUS;
         }
         if(lookahead == TokenType.OR){
             match(TokenType.OR);
-            node.specifier = TokenType.OR;
+            type = TokenType.OR;
         }
         //if(lookahead == TokenType.||){
         //    match(TokenType.||);
         //}
-        return node;
+        return type;
     }
     
     /**
      * Used to deal with the multop phrase (36)
      * @created by Leon
      */
-    public BinopNode multop() {
-        BinopNode node = rootNode.new BinopNode();
+    public TokenType multop() {
+        TokenType type = null;
         if(lookahead == TokenType.MULT){
             match(TokenType.MULT);
-            node.specifier = TokenType.MULT;
+            type = TokenType.MULT;
         }
         if(lookahead == TokenType.DIV){
             match(TokenType.DIV);
-            node.specifier = TokenType.DIV;
+            type = TokenType.DIV;
         }
         if(lookahead == TokenType.MOD){
             match(TokenType.MOD);
-            node.specifier = TokenType.MOD;
+            type = TokenType.MOD;
         }
         if(lookahead == TokenType.AND){
             match(TokenType.AND);
-            node.specifier = TokenType.AND;
+            type = TokenType.AND;
         }
         // if(lookahead == TokenType.&&)
         //  match(TokenType.&&);
-        return node;
+        return type;
     }
     
     /**
      * Used to deal with the uminus phrase (37)
      * @created by Emery
      */
-    public UnopNode uminus() {
-        UnopNode node = rootNode.new UnopNode();
+    public TokenType uminus() {
+        TokenType type = null;
         if(lookahead == TokenType.MINUS){
             match(TokenType.MINUS);
-            node.specifier = TokenType.MINUS;
+            type = TokenType.MINUS;
         }
-        return node;
+        return type;
     }
     
 }

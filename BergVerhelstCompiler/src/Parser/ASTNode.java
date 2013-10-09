@@ -83,12 +83,12 @@ public class ASTNode{
         
         @Override
         public String toString() {
-            String temp = "[Parameter]\n";
+            String temp = "[Parameter]";
             
             if(param != null)
                 temp += String.format("%"+ (space + param.toString().length()) + "s", param);
             
-            return temp + nextNode;
+            return temp + "\n "+ nextNode;
         }
     }
     
@@ -318,6 +318,7 @@ public class ASTNode{
          @Override
         public String toString() {
             String temp = "[Binary Operator] " + specifier + "\n";
+            temp += printFormat((ASTNode)Lside);
             temp += printFormat((ASTNode)Rside);
             
             return temp;

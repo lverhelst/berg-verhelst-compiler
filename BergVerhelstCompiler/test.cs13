@@ -1,5 +1,5 @@
 int x, y;
-int add(ref int x, int y) {return 1 * (-2);} 
+int add(ref int x, int y) {int a, b, c, d, e, f, g, h; return 1 * (-2);} 
 int readint(void){}
 void writeing(int x){}
 bool readbool(void){}

@@ -888,15 +888,20 @@ public class Parser {
     public ASTNode compoundStmt() {
         ASTNode.CompoundNode current = rootNode.new CompoundNode();
         match(TokenType.LCRLY);
-        
         while(firstSet.get("nonvoid-specifier").contains(lookahead.getName())){
-            VarDeclarationNode node = rootNode.new VarDeclarationNode();
+            VarDeclarationNode node;
             TokenType t = (TokenType)visit("nonvoidSpec");
             match(TokenType.ID);
-            visit("vardecTail");
+            node = (VarDeclarationNode)visit("vardecTail");
             node.specifier = t;
+            VarDeclarationNode temp = node;
+            while(temp.nextVarDec != null){
+                temp = temp.nextVarDec;
+                temp.specifier = t;
+            }
             current.variableDeclarations.add(node);
         }
+             
         current.statements.add((Statement)visit("statement"));
         while(firstSet.get("statement").contains(lookahead.getName())){
              current.statements.add((Statement)visit("statement"));

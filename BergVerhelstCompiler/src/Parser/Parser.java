@@ -73,15 +73,23 @@ public class Parser {
     }
     
     public Object visit(String methodName) {
-        System.out.println("Entering Method: " + methodName);
+        depth++;
+//        String enter = String.format("%"+15+"s", "Entering Method: " + methodName);
+//        System.out.format("%" + (depth + enter.length()) + "s\n" ,enter);
         Object temp = null;
         try {
             Method method = Parser.class.getMethod(methodName, null);
             temp = method.invoke(this);
+            
+//            if(temp instanceof ASTNode) {
+//                String enter = String.format("%"+15+"s", temp);
+//                System.out.format("%" + (depth + enter.length()) + "s\n" ,enter);
+//            }
         } catch(Exception e) {
             System.out.println("Failed to run method: " + methodName + "\n" + e.getCause());
         } 
-        System.out.println("Leaving Method: " + methodName);
+//        System.out.println(depth + "Leaving Method: " + methodName);
+        depth--;
         return temp;
     }
     

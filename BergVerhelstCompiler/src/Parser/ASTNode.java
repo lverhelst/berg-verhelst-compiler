@@ -5,6 +5,12 @@ import java.util.ArrayList;
  *
  */
 public class ASTNode{
+    private final int space = 4;
+    
+//    @Override
+//    public String toString() {
+//        return this.getClass().getName();
+//    }
     
     public interface Statement{}
     
@@ -18,6 +24,19 @@ public class ASTNode{
         FuncDeclarationNode funcdeclaration;
         VarDeclarationNode vardeclaration;
         ProgramNode nextNode;
+        
+        @Override
+        public String toString() {
+            String temp = "[Program]\n";
+            
+            if(funcdeclaration != null)
+                temp += String.format("%"+ space + "s", funcdeclaration);            
+            if(vardeclaration != null)
+                temp += String.format("%"+ space + "s", vardeclaration);
+            
+            temp += nextNode;
+            return temp;
+        }
     }
     
     /**
@@ -26,9 +45,21 @@ public class ASTNode{
      */
     public class FuncDeclarationNode extends ASTNode{
         int ID;
-        TokenType specfier;       
+        TokenType specifier;       
         ParameterNode params; 
         CompoundNode compoundStmt;  
+        
+        @Override
+        public String toString() {
+            String temp = "[Function Declaration] = " + ID + " : " + specifier + "\n";
+            
+            if(params != null)
+                temp += String.format("%"+ space + "s", params);
+            if(compoundStmt != null)
+                temp += String.format("%"+ space + "s", compoundStmt);  
+            
+            return temp;
+        }
     }
     
     /**
@@ -39,6 +70,16 @@ public class ASTNode{
         int ID;
         TokenType specifier;
         UnopNode addOp;  
+        
+         @Override
+        public String toString() {
+            String temp = "[Variable Declaration] = " + ID + " : " + specifier + "\n";
+            
+            if(addOp != null)
+                temp += String.format("%"+ space + "s", addOp);
+            
+            return temp;
+        }
     }
     
     /**
@@ -48,6 +89,16 @@ public class ASTNode{
     public class ParameterNode extends ASTNode{
         TokenType param;
         ParameterNode nextNode; 
+        
+        @Override
+        public String toString() {
+            String temp = "[Parameter]\n";
+            
+            if(param != null)
+                temp += String.format("%"+ space + "s", param);
+            
+            return temp + nextNode;
+        }
     }
     
     /**
@@ -56,12 +107,25 @@ public class ASTNode{
      * @Class Emery
      */
     public class CompoundNode extends ASTNode{
-        ArrayList<VarDeclarationNode> variableDeclaraions;
+        ArrayList<VarDeclarationNode> variableDeclarations;
         ArrayList<Statement> statements;   
         
         public CompoundNode(){
-            variableDeclaraions = new ArrayList<VarDeclarationNode>();
+            variableDeclarations = new ArrayList<VarDeclarationNode>();
             statements = new ArrayList<Statement>();
+        }
+        
+        @Override
+        public String toString() {
+            String temp = "[Compound]\n";
+            
+            for(VarDeclarationNode var: variableDeclarations)
+                temp += String.format("%"+ space + "s", var);
+            
+            for(Statement var: statements)
+                temp += String.format("%"+ statements + "s", var);
+            
+            return temp;
         }
     }
     

@@ -1,16 +1,1 @@
-int x, y, z, t, f;
-int add(int x, int y) {return 2 + 2;} 
-int program(void) {x := 24 * 4;} 
-int program(void) {if(true) x := 3; else x := 4;}
-void boo(void){ int x; }
-int add(ref int x, int y) {return 1 * (-2);} 
-int readint(void){;}
-void writeing(int x){;}
-bool readbool(void){;}
-void writebool(bool x){;}
-int x, y;
-int add(ref int x, int y) {int a, b, c, d, e, f, g, h; return 1 * (-2);} 
-int readint(void){}
-void writeing(int x){}
-bool readbool(void){}
-void writebool(bool x){}
+int program(void) {branch (1) case 1 : x := x + 1; default : x := 0; end; }

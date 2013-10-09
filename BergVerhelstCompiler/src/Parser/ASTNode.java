@@ -65,6 +65,8 @@ public class ASTNode{
         public String toString() {
             String temp = "[Variable Declaration] = " + ID + " : " + specifier + " " + "\n";
                     
+            if(nextVarDec != null)
+                nextVarDec.space = this.space;
             temp += printFormat(nextVarDec);
             temp += printFormat((ASTNode)offset);  
             
@@ -121,13 +123,21 @@ public class ASTNode{
      * @Class Emery
      */
     public class AssignmentNode extends ASTNode implements Statement{
+        VariableNode leftVar;
         Expression index;
         Expression expersion;   
         
         @Override
         public String toString() {
-             String temp = "[Assignment]\n";
+            if(leftVar != null)
+                leftVar.space = this.space;
+            if(index != null)
+                ((ASTNode)index).space = this.space;
+            if(expersion != null)
+                ((ASTNode)expersion).space = this.space;
+            String temp = "[Assignment]\n";
             
+            temp += printFormat((ASTNode)leftVar);
             temp += printFormat((ASTNode)index);   
             temp += printFormat((ASTNode)expersion);  
             
@@ -141,8 +151,8 @@ public class ASTNode{
      */
     public class IfNode extends ASTNode implements Statement{
         Expression exp;
-        Statement stmt;
-        Statement elseStmt;
+        ASTNode stmt;
+        ASTNode elseStmt;
         
         @Override
         public String toString() {
@@ -169,7 +179,7 @@ public class ASTNode{
             
             temp += printFormat((ASTNode)stmt); 
             
-            return printFormat(temp) + printFormat(nextLoopNode);
+            return printFormat(temp) + (nextLoopNode != null? printFormat(nextLoopNode) :"");
         }
     }
      /**
@@ -182,12 +192,12 @@ public class ASTNode{
         
         @Override
         public String toString() {
-             String temp = "[Marker]\n";
+             String temp = "[Marker] ";
             
             if(specifier != null)
                 temp += String.format("%"+ (space + specifier.toString().length()) + "s", specifier); 
             
-            return printFormat(temp);
+            return printFormat(temp) + "\n";
         }
     }
     /**
@@ -222,6 +232,9 @@ public class ASTNode{
             
             temp += printFormat((ASTNode)exp); 
             temp += printFormat(thisCase);
+            
+            if(nextNode != null)
+                nextNode.space = this.space;
             
             return printFormat(temp) + printFormat(nextNode);
         }
@@ -268,10 +281,12 @@ public class ASTNode{
      */
     public class VariableNode extends ASTNode implements Expression{
         TokenType specifier;
+        Expression offset;
+        int ID;
         
          @Override
         public String toString() {
-            return printFormat("[Variable] " + specifier + "\n");
+            return printFormat("[Variable] " + specifier + " :" + ID + (offset == null? "" : "[" + offset.toString() + "]") + "\n");
         }
     }
     /**

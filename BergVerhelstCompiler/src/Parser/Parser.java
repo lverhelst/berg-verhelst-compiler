@@ -798,11 +798,16 @@ public class Parser {
         if(lookahead.getName() == TokenType.ID){
             id = Integer.parseInt(lookahead.getAttribute_Value());
             match(TokenType.ID);
-            Object temp = visit("idstmtTail");
+            VariableNode varNode = rootNode.new VariableNode();
+            varNode.ID = id;
+            varNode.specifier = TokenType.ID;
             
-            if(temp instanceof ASTNode.AssignmentNode)
-                return (ASTNode.AssignmentNode)temp;
-            else {
+            Object temp = visit("idstmtTail");
+            if(temp instanceof ASTNode.AssignmentNode){
+                ASTNode.AssignmentNode node = (ASTNode.AssignmentNode)temp;
+                node.leftVar = varNode;
+                return node;
+            }else {
                 ((ASTNode.CallNode)temp).ID = id;
                 return (ASTNode.CallNode)temp;
             }
@@ -915,16 +920,16 @@ public class Parser {
      * @created by Emery
      * @Revised by Leon added AST
      */
-    public ASTNode ifStmt() {
+    public IfNode ifStmt() {
         IfNode node = rootNode.new IfNode();
         match(TokenType.IF);
         match(TokenType.LPAREN);
         node.exp = (Expression)visit("expression");
         match(TokenType.RPAREN);
-        node.stmt = (Statement)visit("statement");
+        node.stmt = (ASTNode)visit("statement");
         if(lookahead.getName() == TokenType.ELSE){
             match(TokenType.ELSE);
-            node.stmt = (Statement) visit("statement");
+            node.stmt = (ASTNode) visit("statement");
         }
         return node;
     }
@@ -1010,7 +1015,7 @@ public class Parser {
         match(TokenType.RPAREN);
         node.thisCase = (CaseNode)visit("caseStmt");
         BranchNode current = node;
-        while(firstSet.get("case").contains(lookahead.getName())){
+        while(firstSet.get("case-stmt").contains(lookahead.getName())){
             current.nextNode = rootNode.new BranchNode();
             current = current.nextNode;
             current.thisCase = (CaseNode)visit("caseStmt");
@@ -1113,8 +1118,7 @@ public class Parser {
             return (Expression) visit("nidFactor");
         }else if(firstSet.get("id-factor").contains(lookahead.getName())){
             return (Expression) visit("idFactor");
-        }else
-            console.error("Factor error: " + lookahead.getName());
+        }
         return null;
     }
     
@@ -1154,8 +1158,13 @@ public class Parser {
      * @created by Leon
      */
     public ASTNode idFactor() {
+        String ID = lookahead.getAttribute_Value();
         match(TokenType.ID);
-        return (ASTNode) visit("idTail");
+        VariableNode node = rootNode.new VariableNode();
+        node.specifier = TokenType.ID;
+        node.ID = Integer.parseInt(ID);
+        node.offset = (Expression)visit("idTail");      
+        return node;
     }
     
     /**
@@ -1164,7 +1173,7 @@ public class Parser {
      */
     public ASTNode idTail() {
         if(firstSet.get("var-tail").contains(lookahead.getName())){
-            return (VariableNode) visit("varTail");
+            return (ASTNode)visit("varTail");
         }else if(firstSet.get("call-tail").contains(lookahead.getName())){
             return (CallNode) visit("callTail");
         }
@@ -1175,11 +1184,11 @@ public class Parser {
      * Used to deal with the var-tail phrase (33)
      * @created by Leon
      */
-    public ASTNode varTail() {
-        ASTNode node = null;
+    public Expression varTail() {
+        Expression node = null;
         if(lookahead.getName() == TokenType.LSQR){
             match(TokenType.LSQR);
-            node = (ASTNode)visit("addExp");
+            node = (Expression)visit("addExp");
             match(TokenType.RSQR);
         }
         return node;

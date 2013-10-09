@@ -1049,7 +1049,7 @@ public class Parser {
         Expression node = null;
         UnopNode unaryNode = rootNode.new UnopNode();
         boolean isUnary = false;;
-        if(firstSet.get("uminus").contains(lookahead.getName()){
+        if(firstSet.get("uminus").contains(lookahead.getName())){
             unaryNode.specifier = (TokenType)visit("uminus");
             isUnary = true;
         }

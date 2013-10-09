@@ -609,12 +609,12 @@ public class Parser {
      * var-dec-tail -> [[ [add-exp] ]] {| , var-name |} ;
      * @created by Leon
      */
-    public void vardecTail() {        
+    public ASTNode vardecTail() {        
         VarDeclarationNode current = rootNode.new VarDeclarationNode();
         
         if(this.lookahead == TokenType.LSQR){
             match(TokenType.LSQR);
-            node.addOp = (ASTNode.UnopNode)visit("addExp");
+            current.addOp = (ASTNode.UnopNode)visit("addExp");
             match(TokenType.RSQR);
         }
         while(this.lookahead == TokenType.COMMA){
@@ -622,7 +622,7 @@ public class Parser {
             visit("varName");
         }
         match(TokenType.SEMI);
-        return node;
+        return current;
     }
     
     /**

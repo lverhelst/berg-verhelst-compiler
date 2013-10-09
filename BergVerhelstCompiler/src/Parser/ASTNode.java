@@ -5,6 +5,7 @@ import Lexeme.TokenType;
  */
 public class ASTNode{
     
+
     public interface Statement{
         
     }
@@ -19,11 +20,15 @@ public class ASTNode{
     }
     
     public class FuncDeclarationNode extends ASTNode{
+        int ID;
+        TokenType specfier;       
         ParameterNode params; 
         CompoundNode compondStmt;
     }
     
     public class VarDeclarationNode extends ASTNode{
+        int ID;
+        TokenType specifier;
         UnopNode addOp;
     }
     
@@ -130,6 +135,5 @@ public class ASTNode{
     public class BinopNode extends ASTNode implements Expression{
         TokenType specifier;
     }
-    
-    
-}
+}   
+

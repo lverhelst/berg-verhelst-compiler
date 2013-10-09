@@ -4,6 +4,11 @@ import Lexeme.TNSet;
 import Lexeme.Token;
 import Lexeme.TokenType;
 import Main.AdministrativeConsole;
+import Parser.ASTNode.CompoundNode;
+import Parser.ASTNode.FuncDeclarationNode;
+import Parser.ASTNode.ParameterNode;
+import Parser.ASTNode.ProgramNode;
+import Parser.ASTNode.VarDeclarationNode;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 
@@ -27,6 +32,7 @@ public class Parser {
         this.console = ac;
         genFirstSets();
         genFollowSets();
+        rootNode = new ASTNode();
     }
     
     /**
@@ -51,22 +57,22 @@ public class Parser {
        } while(currentToken.getName() != TokenType.ENDFILE);*/
        currentToken = scn.getToken();
        lookahead = currentToken.getName();
-       rootNode = visit("program");
+       rootNode = (ASTNode)visit("program");
+       System.out.println(rootNode);
     }
     
-    public ASTNode visit(String methodName) {
+    public Object visit(String methodName) {
         System.out.println("Entering Method: " + methodName);
-        ASTNode node = null;
+        Object temp = null;
         try {
+            
             Method method = Parser.class.getMethod(methodName, null);
-            node = (ASTNode)method.invoke(this);
-
+            temp = method.invoke(this);
         } catch(Exception e) {
-            System.out.println("Failed to run method: " + methodName + "\n" + e.toString());
+            System.out.println("Failed to run method: " + methodName + "\n" + e.getCause());
         } 
-        
         System.out.println("Leaving Method: " + methodName);
-        return node;
+        return temp;
     }
     
     /**
@@ -495,25 +501,7 @@ public class Parser {
         }
 //        syntaxCheck(synch);
     }    
-    
-    /**
-     * Returns the current first set, used to start gen()
-     * @return the first set
-     * @created by Emery
-     */
-    public TNSet first() {
-        return null;
-    }
-    
-    /**
-     * Used to find the valid tokens to follow the current token
-     * @return the valid set of tokens to follow
-     * @created by Leon
-     */
-    public TNSet followSet() {
-        return null;
-    } 
-    
+
     /**
      * Used to check if the syntax is correct, if incorrect enter error recovery
      * @param synch the set to check the lookahead against
@@ -541,52 +529,64 @@ public class Parser {
      * Used to deal with the program phrase (1)
      * @created by Emery
      */
-    public void program() {
-        do{
-            visit("declaration");
-        }while(firstSet.get("program").getSet().contains(this.lookahead));
+    public ASTNode program() {
+        ProgramNode firstNode = rootNode.new ProgramNode();
+        firstNode.declaration = (FuncDeclarationNode) visit("declaration");
+        ProgramNode current = firstNode;
+        while(firstSet.get("program").getSet().contains(this.lookahead)){
+            current.nextNode = (ProgramNode)new ASTNode();
+            current = current.nextNode;
+            current.declaration = (FuncDeclarationNode) visit("declaration");
+        }
+        return firstNode;
     }
+    
     
     /**
      * Used to deal with the declaration phrase (2)
      * @created by Leon
      */
-    public void declaration() {
+    public ASTNode declaration() {
         if(this.lookahead == TokenType.VOID){
             match(TokenType.VOID);
             match(TokenType.ID);
-            visit("fundecTail");
+            return (ASTNode)visit("fundecTail");
         }else if(firstSet.get("nonvoid-specifier").getSet().contains(this.lookahead)){
             visit("nonvoidSpec");
             match(TokenType.ID);
-            visit("decTail");
+            return (ASTNode)visit("decTail");
         }else
             console.error("declaration error: " + this.lookahead);
         //syntaxError(sync);
+        return null;
     }
     
     /**
      * Used to deal with the nonvoid-specifier phrase (3)
      * @created by Emery
      */
-    public void nonvoidSpec() {
+    public TokenType nonvoidSpec() {
         if(lookahead == TokenType.INT){
             match(TokenType.INT);
-        }else
+            return TokenType.INT;
+        }else{
             match(TokenType.BOOL);
+            return TokenType.BOOL;
+        }
     }
     
     /**
      * Used to deal with the dec-tail phrase (4)
      * @created by Emery
      */
-    public void decTail() {
+    public ASTNode decTail() {
         if(firstSet.get("var-dec-tail").contains(this.lookahead)){
-            visit("vardecTail");
+            return (ASTNode)visit("vardecTail");
         }
         if(firstSet.get("fun-dec-tail").contains(this.lookahead)){
-            visit("fundecTail");
+            return (ASTNode)visit("fundecTail");
         }
+        return null;
     }
     
     /**
@@ -594,10 +594,11 @@ public class Parser {
      * var-dec-tail -> [[ [add-exp] ]] {| , var-name |} ;
      * @created by Leon
      */
-    public void vardecTail() {
+    public ASTNode vardecTail() {
+        VarDeclarationNode node = rootNode.new VarDeclarationNode();
         if(this.lookahead == TokenType.LSQR){
             match(TokenType.LSQR);
-            visit("addExp");
+            node.addOp = (ASTNode.UnopNode)visit("addExp");
             match(TokenType.RSQR);
         }
         while(this.lookahead == TokenType.COMMA){
@@ -605,6 +606,7 @@ public class Parser {
             visit("varName");
         }
         match(TokenType.SEMI);
+        return node;
     }
     
     /**
@@ -625,46 +627,55 @@ public class Parser {
      * Used to deal with the fun-dec-tail phrase (7)
      * @created by Emery
      */
-    public void fundecTail() {
+    public ASTNode fundecTail() {
+        FuncDeclarationNode node = rootNode.new FuncDeclarationNode();
         match(TokenType.LPAREN);
-        visit("params");
+        node.params = (ParameterNode)visit("params");
         match(TokenType.RPAREN);
-        visit("compoundStmt");
+        node.compondStmt = (CompoundNode)visit("compoundStmt");
+        return node;
     }
     
     /**
      * Used to deal with the params phrase (8)
      * @created by Leon
      */
-    public void params() {
+    public ASTNode params() {
+        ParameterNode node = rootNode.new ParameterNode();
+        ParameterNode current = node;
         if(firstSet.get("param").contains(lookahead)){
-            visit("param");
+            node.param = (TokenType)visit("param");
             while(this.lookahead == TokenType.COMMA){
+                current.nextNode = rootNode.new ParameterNode();
+                current = current.nextNode;
                 match(TokenType.COMMA);
-                visit("param");
+                current.param = (TokenType)visit("param");
             }   
         }else{
             match(TokenType.VOID);
         }
+        return node;
     }
     
     /**
      * Used to deal with the param phrase (9)
      * @created by Emery
      */
-    public void param() {
+    public TokenType param() {
         if(lookahead == TokenType.REF){
             match(TokenType.REF);
             visit("nonvoidSpec");
             match(TokenType.ID);
         }else if(firstSet.get("nonvoid-specifier").contains(lookahead)){
-            visit("nonvoidSpec");
+            TokenType t = (TokenType)visit("nonvoidSpec");
             match(TokenType.ID);
             if(lookahead == TokenType.LSQR){
                 match(TokenType.LSQR);
                 match(TokenType.RSQR);
             }
+            return t;
         }
+        return null;
     }
     
     /**

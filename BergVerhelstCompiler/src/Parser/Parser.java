@@ -529,32 +529,47 @@ public class Parser {
      * Used to deal with the program phrase (1)
      * @created by Emery
      */
-    public ASTNode program() {
-        ProgramNode firstNode = rootNode.new ProgramNode();
-        firstNode.declaration = (FuncDeclarationNode) visit("declaration");
-        ProgramNode current = firstNode;
-        while(firstSet.get("program").getSet().contains(this.lookahead)){
-            current.nextNode = (ProgramNode)new ASTNode();
-            current = current.nextNode;
-            current.declaration = (FuncDeclarationNode) visit("declaration");
-        }
-        return firstNode;
-    }
+    public ASTNode program() { 
+        ProgramNode root = rootNode.new ProgramNode(); 
+        Object declaration = visit("declaration");
+        ProgramNode current = root; 
+        
+        if(declaration instanceof FuncDeclarationNode)
+            root.funcdeclaration = (FuncDeclarationNode)declaration;
+        else       
+            root.vardeclaration = (VarDeclarationNode)declaration;
+        
+        while(firstSet.get("program").getSet().contains(this.lookahead)){ 
+            current.nextNode = (ProgramNode)new ASTNode(); 
+            current = current.nextNode; 
+            
+            declaration = visit("declaration");
+            if(declaration instanceof FuncDeclarationNode)
+                current.funcdeclaration = (FuncDeclarationNode)declaration;
+            else       
+                current.vardeclaration = (VarDeclarationNode)declaration;
+        } 
+        return root; }
     
     
     /**
      * Used to deal with the declaration phrase (2)
      * @created by Leon
      */
-    public ASTNode declaration() {
+    public ASTNode declaration() {        
         if(this.lookahead == TokenType.VOID){
             match(TokenType.VOID);
             match(TokenType.ID);
-            return (ASTNode)visit("fundecTail");
+            return (FuncDeclarationNode)visit("fundecTail");
         }else if(firstSet.get("nonvoid-specifier").getSet().contains(this.lookahead)){
             visit("nonvoidSpec");
             match(TokenType.ID);
-            return (ASTNode)visit("decTail");
+            Object value = visit("decTail");
+            
+            if(value instanceof FuncDeclarationNode)
+                return (FuncDeclarationNode)value;
+            else
+                return (VarDeclarationNode)value;
         }else
             console.error("declaration error: " + this.lookahead);
         //syntaxError(sync);
@@ -594,8 +609,9 @@ public class Parser {
      * var-dec-tail -> [[ [add-exp] ]] {| , var-name |} ;
      * @created by Leon
      */
-    public ASTNode vardecTail() {
-        VarDeclarationNode node = rootNode.new VarDeclarationNode();
+    public void vardecTail() {        
+        VarDeclarationNode current = rootNode.new VarDeclarationNode();
+        
         if(this.lookahead == TokenType.LSQR){
             match(TokenType.LSQR);
             node.addOp = (ASTNode.UnopNode)visit("addExp");
@@ -628,12 +644,14 @@ public class Parser {
      * @created by Emery
      */
     public ASTNode fundecTail() {
-        FuncDeclarationNode node = rootNode.new FuncDeclarationNode();
+        FuncDeclarationNode current = rootNode.new FuncDeclarationNode();
+        
         match(TokenType.LPAREN);
-        node.params = (ParameterNode)visit("params");
+        current.params = (ASTNode.ParameterNode)visit("params");
         match(TokenType.RPAREN);
-        node.compondStmt = (CompoundNode)visit("compoundStmt");
-        return node;
+        current.compoundStmt = (ASTNode.CompoundNode)visit("compoundStmt");
+        
+        return current;
     }
     
     /**
@@ -790,6 +808,8 @@ public class Parser {
      * @created by Emery
      */
     public void compoundStmt() {
+        ASTNode.CompoundNode current = rootNode.new CompoundNode();
+        
         match(TokenType.LCRLY);
         while(firstSet.get("nonvoid-specifier").contains(lookahead)){
             visit("nonvoidSpec");
@@ -922,7 +942,7 @@ public class Parser {
         if(firstSet.get("uminus").contains(lookahead)){
             visit("uminus");
         }
-        visit("term");
+            visit("term");
         while(firstSet.get("addop").contains(lookahead)){
             visit("addop");
             visit("term");

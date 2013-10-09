@@ -122,8 +122,8 @@ public class ASTNode{
             for(VarDeclarationNode var: variableDeclarations)
                 temp += String.format("%"+ space + "s", var);
             
-            for(Statement var: statements)
-                temp += String.format("%"+ statements + "s", var);
+            for(Statement stmt: statements)
+                temp += String.format("%"+ space + "s", stmt);
             
             return temp;
         }

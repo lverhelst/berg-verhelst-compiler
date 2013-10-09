@@ -84,6 +84,11 @@ public class Parser {
         try {
             Method method = Parser.class.getMethod(methodName, null);
             temp = method.invoke(this);
+            
+//            if(temp instanceof ASTNode) {
+//                String enter = String.format("%"+15+"s", temp);
+//                System.out.format("%" + (depth + enter.length()) + "s\n" ,enter);
+//            }
         } catch(Exception e) {
             System.out.println("Failed to run method: " + methodName + "\n" + e.getCause());
         } 

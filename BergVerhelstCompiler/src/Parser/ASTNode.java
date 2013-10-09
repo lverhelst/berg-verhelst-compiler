@@ -1,18 +1,14 @@
 package Parser;
 import Lexeme.TokenType;
+import java.util.ArrayList;
 /**
  *
  */
 public class ASTNode{
     
-
-    public interface Statement{
-        
-    }
+    public interface Statement{}
     
-    public interface Expression{
-        
-    }
+    public interface Expression{}
     
     /**
      * Class to view ProgramNode
@@ -56,13 +52,17 @@ public class ASTNode{
     
     /**
      * Class to view CompoundNode
+     * Statements has to happen at least once
      * @Class Emery
      */
     public class CompoundNode extends ASTNode{
-        TokenType specifier;
-        Expression expersion;
-        Statement statement;   
-        CompoundNode nextNode;
+        ArrayList<VarDeclarationNode> variableDeclaraions;
+        ArrayList<Statement> statements;   
+        
+        public CompoundNode(){
+            variableDeclaraions = new ArrayList<VarDeclarationNode>();
+            statements = new ArrayList<Statement>();
+        }
     }
     
     /**
@@ -131,6 +131,7 @@ public class ASTNode{
      */
     public class CallNode extends ASTNode implements Expression, Statement{
         TokenType specifier;
+        int ID;
         Expression parameters;
     }
     /**

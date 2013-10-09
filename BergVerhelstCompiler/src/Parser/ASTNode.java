@@ -5,12 +5,7 @@ import java.util.ArrayList;
  *
  */
 public class ASTNode{
-    private final int space = 4;
-    
-//    @Override
-//    public String toString() {
-//        return this.getClass().getName();
-//    }
+    public int space = 0;
     
     public interface Statement{}
     
@@ -328,12 +323,13 @@ public class ASTNode{
             return temp;
         }
     }
-//    
-//    @Override
-//    public String toString() {
-//        return this.getClass().getName();
-//    }
     
+    /**
+     * Used to print nodes pretty and indented
+     * @param node the node to print
+     * @return the node in String form
+     * @created by Emery
+     */
     public String printFormat(ASTNode node) {
         String temp = "";
         String temp2;

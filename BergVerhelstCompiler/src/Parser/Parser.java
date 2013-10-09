@@ -34,7 +34,7 @@ public class Parser {
     private HashMap<String, TNSet> firstSet;
     private HashMap<String, TNSet> followSet;
     private Scanner.Scanner scn;
-    private TokenType lookahead;
+    private Token lookahead;
     ASTNode rootNode;
     private int depth;
     
@@ -70,7 +70,7 @@ public class Parser {
            }           
        } while(currentToken.getName() != TokenType.ENDFILE);*/
        currentToken = scn.getToken();
-       lookahead = currentToken.getName();
+       lookahead = currentToken;
        rootNode = (ASTNode)visit("program");
        System.out.println((ProgramNode)rootNode);
        
@@ -85,10 +85,11 @@ public class Parser {
             Method method = Parser.class.getMethod(methodName, null);
             temp = method.invoke(this);
             
-//            if(temp instanceof ASTNode) {
+            if(temp instanceof ASTNode) {
+                ((ASTNode)temp).space = depth;
 //                String enter = String.format("%"+15+"s", temp);
 //                System.out.format("%" + (depth + enter.length()) + "s\n" ,enter);
-//            }
+            }
         } catch(Exception e) {
             System.out.println("Failed to run method: " + methodName + "\n" + e.getCause());
         } 
@@ -509,18 +510,18 @@ public class Parser {
     }   
     
     /**
-     * Used to check if the lookahead matches the expected token, calls 
+     * Used to check if the lookahead.getName() matches the expected token, calls 
      * syntaxError() if match fails and enters error recovery
      * [TODO] Add synch set to the parameters for error recovery
      * @param expected the expected token type to follow
      * @created by Emery
      */
     public void match(TokenType expected) {
-        if (lookahead == expected){
-            lookahead = scn.getToken().getName();
+        if (lookahead.getName() == expected){
+            lookahead = scn.getToken();
         }
         else {
-            System.out.println("Expected: " + expected + " found: " + lookahead);
+            System.out.println("Expected: " + expected + " found: " + lookahead.getName());
             syntaxError(null);
         }
 //        syntaxCheck(synch);
@@ -528,11 +529,11 @@ public class Parser {
 
     /**
      * Used to check if the syntax is correct, if incorrect enter error recovery
-     * @param synch the set to check the lookahead against
+     * @param synch the set to check the lookahead.getName() against
      * @created by Emery
      */
     public void syntaxCheck(TNSet synch) {
-        if(!synch.contains(lookahead))
+        if(!synch.contains(lookahead.getName()))
             syntaxError(synch);
     }
     
@@ -540,13 +541,13 @@ public class Parser {
      * Used if a syntax error is detected, enters error recovery to provide 
      * addition feedback on possible other errors.
      * [Todo] Uncomment out panic mode when error recovery added
-     * @param synch the set to check the lookahead against
+     * @param synch the set to check the lookahead.getName() against
      * @created by Emery
      */
     public void syntaxError(TNSet synch) {
         console.error("error");
-//        while(!synch.contains(lookahead)) 
-//            lookahead = scn.getToken().getName();
+//        while(!synch.contains(lookahead.getName())) 
+//            lookahead.getName() = scn.getToken().getName();
     }
     
     /**
@@ -563,7 +564,7 @@ public class Parser {
         else       
             root.vardeclaration = (VarDeclarationNode)declaration;
         
-        while(firstSet.get("program").getSet().contains(this.lookahead)){ 
+        while(firstSet.get("program").getSet().contains(this.lookahead.getName())){ 
             current.nextNode = rootNode.new ProgramNode(); 
             current = current.nextNode; 
             
@@ -581,24 +582,34 @@ public class Parser {
      * Used to deal with the declaration phrase (2)
      * @created by Leon
      */
-    public ASTNode declaration() {        
-        if(this.lookahead == TokenType.VOID){
+    public ASTNode declaration() {   
+        int id;
+        if(this.lookahead.getName() == TokenType.VOID){
+            FuncDeclarationNode declaration;
             match(TokenType.VOID);
+            id = Integer.parseInt(lookahead.getAttribute_Value());
             match(TokenType.ID);
-            return (FuncDeclarationNode)visit("fundecTail");
-        }else if(firstSet.get("nonvoid-specifier").getSet().contains(this.lookahead)){
+            declaration = (FuncDeclarationNode)visit("fundecTail");
+            declaration.ID = id;
+            return declaration;
+        }else if(firstSet.get("nonvoid-specifier").getSet().contains(this.lookahead.getName())){
             TokenType functionType = (TokenType)visit("nonvoidSpec");
+            id = Integer.parseInt(lookahead.getAttribute_Value());
             match(TokenType.ID);
             Object value = visit("decTail");
             
             if(value instanceof FuncDeclarationNode){
                 FuncDeclarationNode node = (FuncDeclarationNode)value;
                 node.specifier = functionType;
+                node.ID = id;
                 return node;
-            }else
-                return (VarDeclarationNode)value;
+            }else {
+                VarDeclarationNode node = (VarDeclarationNode)value;
+                node.ID = id;
+                return node;
+            }
         }else
-            console.error("declaration error: " + this.lookahead);
+            console.error("declaration error: " + this.lookahead.getName());
         //syntaxError(sync);
         return null;
     }
@@ -608,7 +619,7 @@ public class Parser {
      * @created by Emery
      */
     public TokenType nonvoidSpec() {
-        if(lookahead == TokenType.INT){
+        if(lookahead.getName() == TokenType.INT){
             match(TokenType.INT);
             return TokenType.INT;
         }else{
@@ -622,10 +633,10 @@ public class Parser {
      * @created by Emery
      */
     public ASTNode decTail() {
-        if(firstSet.get("var-dec-tail").contains(this.lookahead)){
+        if(firstSet.get("var-dec-tail").contains(this.lookahead.getName())){
             return (VarDeclarationNode)visit("vardecTail");
         }
-        if(firstSet.get("fun-dec-tail").contains(this.lookahead)){
+        if(firstSet.get("fun-dec-tail").contains(this.lookahead.getName())){
             return (FuncDeclarationNode)visit("fundecTail");
         }
         return null;
@@ -639,12 +650,12 @@ public class Parser {
     public ASTNode vardecTail() {        
         VarDeclarationNode current = rootNode.new VarDeclarationNode();
         
-        if(this.lookahead == TokenType.LSQR){
+        if(this.lookahead.getName() == TokenType.LSQR){
             match(TokenType.LSQR);
             current.addOp = (ASTNode.UnopNode)visit("addExp");
             match(TokenType.RSQR);
         }
-        while(this.lookahead == TokenType.COMMA){
+        while(this.lookahead.getName() == TokenType.COMMA){
             match(TokenType.COMMA);
             visit("varName");
         }
@@ -660,7 +671,7 @@ public class Parser {
     public ASTNode varName() {
         ASTNode.UnopNode current = null;
         match(TokenType.ID);
-        if(this.lookahead == TokenType.LSQR){
+        if(this.lookahead.getName() == TokenType.LSQR){
             match(TokenType.LSQR);
             current = (ASTNode.UnopNode)visit("addExp");
             match(TokenType.RSQR);
@@ -688,9 +699,9 @@ public class Parser {
     public ASTNode params() {
         ParameterNode node = rootNode.new ParameterNode();
         ParameterNode current = node;
-        if(firstSet.get("param").contains(lookahead)){
+        if(firstSet.get("param").contains(lookahead.getName())){
             node.param = (TokenType)visit("param");
-            while(this.lookahead == TokenType.COMMA){
+            while(this.lookahead.getName() == TokenType.COMMA){
                 current.nextNode = rootNode.new ParameterNode();
                 current = current.nextNode;
                 match(TokenType.COMMA);
@@ -707,14 +718,14 @@ public class Parser {
      * @created by Emery
      */
     public TokenType param() {
-        if(lookahead == TokenType.REF){
+        if(lookahead.getName() == TokenType.REF){
             match(TokenType.REF);
             visit("nonvoidSpec");
             match(TokenType.ID);
-        }else if(firstSet.get("nonvoid-specifier").contains(lookahead)){
+        }else if(firstSet.get("nonvoid-specifier").contains(lookahead.getName())){
             TokenType t = (TokenType)visit("nonvoidSpec");
             match(TokenType.ID);
-            if(lookahead == TokenType.LSQR){
+            if(lookahead.getName() == TokenType.LSQR){
                 match(TokenType.LSQR);
                 match(TokenType.RSQR);
             }
@@ -729,7 +740,7 @@ public class Parser {
      * @revised by Leon added AST
      */
     public ASTNode statement() {
-        if(firstSet.get("id-stmt").contains(lookahead)){
+        if(firstSet.get("id-stmt").contains(lookahead.getName())){
             Object temp = visit("idstmt");
             
             if(temp instanceof ASTNode.AssignmentNode)
@@ -737,28 +748,28 @@ public class Parser {
             else 
                 return (ASTNode.CallNode)temp;
         }
-        if(firstSet.get("compound-stmt").contains(lookahead)){
+        if(firstSet.get("compound-stmt").contains(lookahead.getName())){
             return (CompoundNode)visit("compoundStmt");
         }
-        if(firstSet.get("if-stmt").contains(lookahead)){
+        if(firstSet.get("if-stmt").contains(lookahead.getName())){
             return (IfNode)visit("ifStmt");
         }
-        if(firstSet.get("loop-stmt").contains(lookahead)){
+        if(firstSet.get("loop-stmt").contains(lookahead.getName())){
             return (LoopNode)visit("loopStmt");
         }
-        if(firstSet.get("exit-stmt").contains(lookahead)){
+        if(firstSet.get("exit-stmt").contains(lookahead.getName())){
             return (MarkerNode)visit("exitStmt");
         }
-        if(firstSet.get("continue-stmt").contains(lookahead)){
+        if(firstSet.get("continue-stmt").contains(lookahead.getName())){
             return (MarkerNode)visit("continueStmt");
         }
-        if(firstSet.get("return-stmt").contains(lookahead)){
+        if(firstSet.get("return-stmt").contains(lookahead.getName())){
             return (ReturnNode)visit("returnStmt");
         }
-        if(firstSet.get("null-stmt").contains(lookahead)){
+        if(firstSet.get("null-stmt").contains(lookahead.getName())){
             return (ASTNode)visit("nullStmt");
         }
-        if(firstSet.get("branch-stmt").contains(lookahead)){
+        if(firstSet.get("branch-stmt").contains(lookahead.getName())){
             return (BranchNode)visit("branchStmt");
         }
         
@@ -770,16 +781,20 @@ public class Parser {
      * @created by Leon
      */
     public ASTNode idstmt() {
-        if(lookahead == TokenType.ID){
+        int id;
+        if(lookahead.getName() == TokenType.ID){
+            id = Integer.parseInt(lookahead.getAttribute_Value());
             match(TokenType.ID);
             Object temp = visit("idstmtTail");
             
             if(temp instanceof ASTNode.AssignmentNode)
                 return (ASTNode.AssignmentNode)temp;
-            else 
+            else {
+                ((ASTNode.CallNode)temp).ID = id;
                 return (ASTNode.CallNode)temp;
+            }
         }else
-            console.error("idstmt error: " + lookahead);
+            console.error("idstmt error: " + lookahead.getName());
         return null;
     }
     
@@ -788,12 +803,12 @@ public class Parser {
      * @created by Leon
      */
     public ASTNode idstmtTail() {
-        if(firstSet.get("assign-stmt-tail").contains(lookahead)){
+        if(firstSet.get("assign-stmt-tail").contains(lookahead.getName())){
             return (ASTNode.AssignmentNode)visit("assignstmtTail");
-        }else if(firstSet.get("call-stmt-tail").contains(lookahead)){
+        }else if(firstSet.get("call-stmt-tail").contains(lookahead.getName())){
             return (ASTNode.CallNode)visit("callstmtTail");
         }else
-            console.error("idstmtTail error: " +  lookahead);
+            console.error("idstmtTail error: " +  lookahead.getName());
         return null;
     }
     
@@ -804,7 +819,7 @@ public class Parser {
     public ASTNode assignstmtTail() {
         ASTNode.AssignmentNode current = rootNode.new  AssignmentNode();
         
-        if(lookahead == TokenType.LSQR){
+        if(lookahead.getName() == TokenType.LSQR){
             match(TokenType.LSQR);
 //            current.index = visit("addExp");
             visit("addExp");
@@ -835,7 +850,7 @@ public class Parser {
      */
     public void callTail() {
         match(TokenType.LPAREN);
-        if(firstSet.get("arguments").contains(lookahead)){
+        if(firstSet.get("arguments").contains(lookahead.getName())){
             visit("arguments");
         }
         match(TokenType.RPAREN);
@@ -847,7 +862,7 @@ public class Parser {
      */
     public void arguments() {
         visit("expression");
-        while(lookahead == TokenType.COMMA){
+        while(lookahead.getName() == TokenType.COMMA){
             match(TokenType.COMMA);
             visit("expression");
         }
@@ -861,7 +876,7 @@ public class Parser {
         ASTNode.CompoundNode current = rootNode.new CompoundNode();
         match(TokenType.LCRLY);
         
-        while(firstSet.get("nonvoid-specifier").contains(lookahead)){
+        while(firstSet.get("nonvoid-specifier").contains(lookahead.getName())){
             VarDeclarationNode node = rootNode.new VarDeclarationNode();
             TokenType t = (TokenType)visit("nonvoidSpec");
             match(TokenType.ID);
@@ -870,7 +885,7 @@ public class Parser {
             current.variableDeclarations.add(node);
         }
         current.statements.add((Statement)visit("statement"));
-        while(firstSet.get("statement").contains(lookahead)){
+        while(firstSet.get("statement").contains(lookahead.getName())){
              current.statements.add((Statement)visit("statement"));
         }
         match(TokenType.RCRLY);
@@ -889,7 +904,7 @@ public class Parser {
         node.exp = (Expression)visit("expression");
         match(TokenType.RPAREN);
         node.stmt = (Statement)visit("statement");
-        if(lookahead == TokenType.ELSE){
+        if(lookahead.getName() == TokenType.ELSE){
             match(TokenType.ELSE);
             node.stmt = (Statement) visit("statement");
         }
@@ -906,7 +921,7 @@ public class Parser {
         LoopNode current = node;
         match(TokenType.LOOP);
         node.stmt = (Statement)visit("statement");
-        while(firstSet.get("statement").contains(lookahead)){
+        while(firstSet.get("statement").contains(lookahead.getName())){
             current.nextLoopNode = rootNode.new LoopNode();
             current = current.nextLoopNode;
             current.stmt = (Statement)visit("statement");
@@ -949,7 +964,7 @@ public class Parser {
     public ASTNode returnStmt() {
         ReturnNode node = rootNode.new ReturnNode();
         match(TokenType.RETURN);
-        if(firstSet.get("expression").contains(lookahead)){
+        if(firstSet.get("expression").contains(lookahead.getName())){
             node.exp = (Expression)visit("expression");
         }
         match(TokenType.SEMI);
@@ -977,7 +992,7 @@ public class Parser {
         match(TokenType.RPAREN);
         node.thisCase = (CaseNode)visit("caseStmt");
         BranchNode current = node;
-        while(firstSet.get("case").contains(lookahead)){
+        while(firstSet.get("case").contains(lookahead.getName())){
             current.nextNode = rootNode.new BranchNode();
             current = current.nextNode;
             current.thisCase = (CaseNode)visit("caseStmt");
@@ -994,17 +1009,17 @@ public class Parser {
      */
     public ASTNode caseStmt() {
         CaseNode node = rootNode.new CaseNode();
-        if(lookahead == TokenType.CASE){
+        if(lookahead.getName() == TokenType.CASE){
             match(TokenType.CASE);
             match(TokenType.NUM);
             match(TokenType.COLON);
             node.stmt = (Statement)visit("statement");
-        }else if(lookahead == TokenType.DEFAULT){
+        }else if(lookahead.getName() == TokenType.DEFAULT){
              match(TokenType.DEFAULT);
              match(TokenType.COLON);
              node.stmt = (Statement)visit("statement");
         }//else
-         //   console.error("CaseStmt Error: " + lookahead);
+         //   console.error("CaseStmt Error: " + lookahead.getName());
         return node;
     }
     
@@ -1016,7 +1031,7 @@ public class Parser {
     public Expression expression() {
         Expression node = (Expression)visit("addExp");
         
-        if(firstSet.get("relop").contains(lookahead)){
+        if(firstSet.get("relop").contains(lookahead.getName())){
             BinopNode bnode =  rootNode.new BinopNode();
             bnode.Lside = node;
             bnode.specifier = (TokenType)visit("relop");
@@ -1034,7 +1049,7 @@ public class Parser {
         Expression node = null;
         UnopNode unaryNode = rootNode.new UnopNode();
         boolean isUnary = false;;
-        if(firstSet.get("uminus").contains(lookahead)){
+        if(firstSet.get("uminus").contains(lookahead.getName()){
             unaryNode.specifier = (TokenType)visit("uminus");
             isUnary = true;
         }
@@ -1045,7 +1060,7 @@ public class Parser {
             node = (Expression)visit("term");  
         }
         
-        while(firstSet.get("addop").contains(lookahead)){
+        while(firstSet.get("addop").contains(lookahead.getName())){
             BinopNode subNode = rootNode.new BinopNode();
             subNode.Lside = node;
             subNode.specifier = (TokenType)visit("addop");
@@ -1061,7 +1076,7 @@ public class Parser {
      */
     public Expression term() {
         Expression node = (Expression) visit("factor");
-        while(firstSet.get("multop").contains(lookahead)){ 
+        while(firstSet.get("multop").contains(lookahead.getName())){ 
             BinopNode subNode = rootNode.new BinopNode();
             subNode.Lside = node;
             subNode.specifier = (TokenType)visit("multop");
@@ -1076,12 +1091,12 @@ public class Parser {
      * @created by Leon
      */
     public Expression factor() {
-        if(firstSet.get("nid-factor").contains(lookahead)){
+        if(firstSet.get("nid-factor").contains(lookahead.getName())){
             return (Expression) visit("nidFactor");
-        }else if(firstSet.get("id-factor").contains(lookahead)){
+        }else if(firstSet.get("id-factor").contains(lookahead.getName())){
             return (Expression) visit("idFactor");
         }else
-            console.error("Factor error: " + lookahead);
+            console.error("Factor error: " + lookahead.getName());
         return null;
     }
     
@@ -1090,27 +1105,27 @@ public class Parser {
      * @created by Leon
      */
     public ASTNode nidFactor() {
-        if(lookahead == TokenType.NOT){
+        if(lookahead.getName() == TokenType.NOT){
             match(TokenType.NOT);
             return (ASTNode)visit("factor");
-        }else if(lookahead == TokenType.LPAREN){
+        }else if(lookahead.getName() == TokenType.LPAREN){
             ASTNode node;
             match(TokenType.LPAREN);
             node = (ASTNode)visit("expression");
             match(TokenType.RPAREN);
             return node;
-        }else if(lookahead == TokenType.NUM){
+        }else if(lookahead.getName() == TokenType.NUM){
             LiteralNode node = rootNode.new LiteralNode();
             match(TokenType.NUM);
             node.specifier = TokenType.NUM;
             return node;
-        }else if(lookahead == TokenType.BLIT){
+        }else if(lookahead.getName() == TokenType.BLIT){
             LiteralNode node = rootNode.new LiteralNode();
             match(TokenType.BLIT);
             node.specifier = TokenType.BLIT;
             return node;
         }else{
-            console.error("nidFactor error: " + lookahead);  
+            console.error("nidFactor error: " + lookahead.getName());  
             return null;
         }
     }
@@ -1129,9 +1144,9 @@ public class Parser {
      * @created by Leon
      */
     public ASTNode idTail() {
-        if(firstSet.get("var-tail").contains(lookahead)){
+        if(firstSet.get("var-tail").contains(lookahead.getName())){
             return (VariableNode) visit("varTail");
-        }else if(firstSet.get("call-tail").contains(lookahead)){
+        }else if(firstSet.get("call-tail").contains(lookahead.getName())){
             return (CallNode) visit("callTail");
         }
         return null;
@@ -1143,7 +1158,7 @@ public class Parser {
      */
     public ASTNode varTail() {
         ASTNode node = null;
-        if(lookahead == TokenType.LSQR){
+        if(lookahead.getName() == TokenType.LSQR){
             match(TokenType.LSQR);
             node = (ASTNode)visit("addExp");
             match(TokenType.RSQR);
@@ -1157,27 +1172,27 @@ public class Parser {
      */
     public TokenType relop() {
         TokenType type = null;
-        if(lookahead == TokenType.LTEQ){
+        if(lookahead.getName() == TokenType.LTEQ){
             match(TokenType.LTEQ);
             type = TokenType.LTEQ;
         }
-        if(lookahead == TokenType.LT){
+        if(lookahead.getName() == TokenType.LT){
             match(TokenType.LT);
             type = TokenType.LT;
         }
-        if(lookahead == TokenType.GT){
+        if(lookahead.getName() == TokenType.GT){
             match(TokenType.GT);
             type = TokenType.GT;
         }
-        if(lookahead == TokenType.GTEQ){
+        if(lookahead.getName() == TokenType.GTEQ){
             match(TokenType.GTEQ);
             type = TokenType.GTEQ;
         }
-        if(lookahead == TokenType.EQ){
+        if(lookahead.getName() == TokenType.EQ){
             match(TokenType.EQ);
             type = TokenType.EQ;
         }
-        if(lookahead == TokenType.NEQ){
+        if(lookahead.getName() == TokenType.NEQ){
             match(TokenType.NEQ);
             type = TokenType.NEQ;
         }
@@ -1190,19 +1205,19 @@ public class Parser {
      */
     public TokenType addop() {
         TokenType type = null; 
-        if(lookahead == TokenType.PLUS){
+        if(lookahead.getName() == TokenType.PLUS){
             match(TokenType.PLUS);
             type = TokenType.PLUS;
         }
-        if(lookahead == TokenType.MINUS){
+        if(lookahead.getName() == TokenType.MINUS){
             match(TokenType.MINUS);
             type = TokenType.MINUS;
         }
-        if(lookahead == TokenType.OR){
+        if(lookahead.getName() == TokenType.OR){
             match(TokenType.OR);
             type = TokenType.OR;
         }
-        //if(lookahead == TokenType.||){
+        //if(lookahead.getName() == TokenType.||){
         //    match(TokenType.||);
         //}
         return type;
@@ -1214,23 +1229,23 @@ public class Parser {
      */
     public TokenType multop() {
         TokenType type = null;
-        if(lookahead == TokenType.MULT){
+        if(lookahead.getName() == TokenType.MULT){
             match(TokenType.MULT);
             type = TokenType.MULT;
         }
-        if(lookahead == TokenType.DIV){
+        if(lookahead.getName() == TokenType.DIV){
             match(TokenType.DIV);
             type = TokenType.DIV;
         }
-        if(lookahead == TokenType.MOD){
+        if(lookahead.getName() == TokenType.MOD){
             match(TokenType.MOD);
             type = TokenType.MOD;
         }
-        if(lookahead == TokenType.AND){
+        if(lookahead.getName() == TokenType.AND){
             match(TokenType.AND);
             type = TokenType.AND;
         }
-        // if(lookahead == TokenType.&&)
+        // if(lookahead.getName() == TokenType.&&)
         //  match(TokenType.&&);
         return type;
     }
@@ -1241,7 +1256,7 @@ public class Parser {
      */
     public TokenType uminus() {
         TokenType type = null;
-        if(lookahead == TokenType.MINUS){
+        if(lookahead.getName() == TokenType.MINUS){
             match(TokenType.MINUS);
             type = TokenType.MINUS;
         }

@@ -33,6 +33,7 @@ public class Parser {
     private Scanner.Scanner scn;
     private TokenType lookahead;
     ASTNode rootNode;
+    private int depth;
     
     /**
      * Empty Constructor
@@ -43,6 +44,7 @@ public class Parser {
         genFirstSets();
         genFollowSets();
         rootNode = new ASTNode();
+        depth = 0;
     }
     
     /**
@@ -523,7 +525,7 @@ public class Parser {
     /**
      * Used if a syntax error is detected, enters error recovery to provide 
      * addition feedback on possible other errors.
-     * [Todo] Uncomment out panic mode when error reocvery added
+     * [Todo] Uncomment out panic mode when error recovery added
      * @param synch the set to check the lookahead against
      * @created by Emery
      */
@@ -641,13 +643,16 @@ public class Parser {
      * var-name -> ID [[ [add-exp] ]]
      * @created by Leon
      */
-    public void varName() {
+    public ASTNode varName() {
+        ASTNode.UnopNode current = null;
         match(TokenType.ID);
         if(this.lookahead == TokenType.LSQR){
             match(TokenType.LSQR);
-            visit("addExp");
+            current = (ASTNode.UnopNode)visit("addExp");
             match(TokenType.RSQR);
         }
+        
+        return current;
     }
     
     /**
@@ -712,7 +717,12 @@ public class Parser {
      */
     public ASTNode statement() {
         if(firstSet.get("id-stmt").contains(lookahead)){
-            return (ASTNode)visit("idstmt");
+            Object temp = visit("idstmt");
+            
+            if(temp instanceof ASTNode.AssignmentNode)
+                return (ASTNode.AssignmentNode)temp;
+            else 
+                return (ASTNode.CallNode)temp;
         }
         if(firstSet.get("compound-stmt").contains(lookahead)){
             return (CompoundNode)visit("compoundStmt");
@@ -738,6 +748,7 @@ public class Parser {
         if(firstSet.get("branch-stmt").contains(lookahead)){
             return (BranchNode)visit("branchStmt");
         }
+        
         return null;
     }
     
@@ -745,49 +756,64 @@ public class Parser {
      * Used to deal with the id-stmt phrase (11)
      * @created by Leon
      */
-    public void idstmt() {
+    public ASTNode idstmt() {
         if(lookahead == TokenType.ID){
             match(TokenType.ID);
-            visit("idstmtTail");
+            Object temp = visit("idstmtTail");
+            
+            if(temp instanceof ASTNode.AssignmentNode)
+                return (ASTNode.AssignmentNode)temp;
+            else 
+                return (ASTNode.CallNode)temp;
         }else
             console.error("idstmt error: " + lookahead);
+        return null;
     }
     
     /**
      * Used to deal with the id-stmt-tail phrase (12)
      * @created by Leon
      */
-    public void idstmtTail() {
+    public ASTNode idstmtTail() {
         if(firstSet.get("assign-stmt-tail").contains(lookahead)){
-            visit("assignstmtTail");
+            return (ASTNode.AssignmentNode)visit("assignstmtTail");
         }else if(firstSet.get("call-stmt-tail").contains(lookahead)){
-            visit("callstmtTail");
+            return (ASTNode.CallNode)visit("callstmtTail");
         }else
             console.error("idstmtTail error: " +  lookahead);
+        return null;
     }
     
     /**
      * Used to deal with the assign-stmt-tail phrase (13)
      * @created by Leon
      */
-    public void assignstmtTail() {
+    public ASTNode assignstmtTail() {
+        ASTNode.AssignmentNode current = rootNode.new  AssignmentNode();
+        
         if(lookahead == TokenType.LSQR){
             match(TokenType.LSQR);
+//            current.index = visit("addExp");
             visit("addExp");
             match(TokenType.RSQR);
         }
         match(TokenType.ASSIGN);
+//        current.expersion = visit("expression");
         visit("expression");
         match(TokenType.SEMI);
+        
+        return current;
     }
     
     /**
      * Used to deal with the call-stmt-tail phrase (14)
      * @created by Emery
      */
-    public void callstmtTail() {
-        visit("callTail");
+    public ASTNode callstmtTail() {
+        ASTNode.CallNode current = (ASTNode.CallNode)visit("callTail");
         match(TokenType.SEMI);
+        
+        return current;
     }
     
     /**

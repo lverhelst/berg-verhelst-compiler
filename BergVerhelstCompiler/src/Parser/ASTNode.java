@@ -28,7 +28,7 @@ public class ASTNode{
         int ID;
         TokenType specfier;       
         ParameterNode params; 
-        CompoundNode compoundStmt;
+        CompoundNode compoundStmt;  
     }
     
     /**
@@ -38,7 +38,7 @@ public class ASTNode{
     public class VarDeclarationNode extends ASTNode{
         int ID;
         TokenType specifier;
-        UnopNode addOp;
+        UnopNode addOp;  
     }
     
     /**

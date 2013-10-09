@@ -1,2 +1,7 @@
-int x;
+int readint(void){;}
+void writeing(int x){;}
+bool readbool(void){;}
+void writebool(bool x){;}
+int x, y;
 int add(int x, int y) {return 2 + 2;} 
+int program(void) {x := 24 * 4 ;}

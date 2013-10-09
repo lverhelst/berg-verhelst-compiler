@@ -1013,11 +1013,15 @@ public class Parser {
      * @created by Emery
      * 
      */
-    public BinopNode expression() {
-        BinopNode node = (BinopNode)visit("addExp");
+    public Expression expression() {
+        Expression node = (Expression)visit("addExp");
+        
         if(firstSet.get("relop").contains(lookahead)){
-            node.specifier = ((BinopNode) visit("relop")).specifier;
-            node.Rside = (Expression)visit("addExp");
+            BinopNode bnode =  rootNode.new BinopNode();
+            bnode.Lside = node;
+            bnode.specifier = (TokenType)visit("relop");
+            bnode.Rside = (Expression)visit("addExp");
+            node = (Expression)bnode;
         }
         return node;
     }
@@ -1026,17 +1030,27 @@ public class Parser {
      * Used to deal with the add-exp phrase (27)
      * @created by Emery
      */
-    public BinopNode addExp() {
-        BinopNode node = null;
+    public Expression addExp() {
+        Expression node = null;
         UnopNode unaryNode = rootNode.new UnopNode();
+        boolean isUnary = false;;
         if(firstSet.get("uminus").contains(lookahead)){
             unaryNode.specifier = (TokenType)visit("uminus");
+            isUnary = true;
         }
-        unaryNode.Rside = (BinopNode) visit("term");
-        node.Lside = (Expression)unaryNode;
+        if(isUnary){
+            unaryNode.Rside = (Expression)visit("term");
+            node = unaryNode;
+        }else{
+            node = (Expression)visit("term");  
+        }
+        
         while(firstSet.get("addop").contains(lookahead)){
-            node.specifier = (TokenType)visit("addop");
-            node.Rside = (Expression)visit("term");
+            BinopNode subNode = rootNode.new BinopNode();
+            subNode.Lside = node;
+            subNode.specifier = (TokenType)visit("addop");
+            subNode.Rside = (Expression)visit("term");
+            node = subNode;
         }
         return node;
     }
@@ -1045,25 +1059,27 @@ public class Parser {
      * Used to deal with the term phrase (28)
      * @created by Emery
      */
-    public BinopNode term() {
-        BinopNode nodeb = rootNode.new BinopNode();         
-        nodeb.Lside = (Expression) visit("factor");
+    public Expression term() {
+        Expression node = (Expression) visit("factor");
         while(firstSet.get("multop").contains(lookahead)){ 
-            nodeb.specifier = (TokenType)visit("multop");
-            nodeb.Rside = (Expression)visit("factor");
+            BinopNode subNode = rootNode.new BinopNode();
+            subNode.Lside = node;
+            subNode.specifier = (TokenType)visit("multop");
+            subNode.Rside = (Expression)visit("factor");
+            node = subNode;
         }
-        return nodeb;
+        return node;
     }
     
     /**
      * Used to deal with the factor phrase (29)
      * @created by Leon
      */
-    public ASTNode factor() {
+    public Expression factor() {
         if(firstSet.get("nid-factor").contains(lookahead)){
-            return (ASTNode) visit("nidFactor");
+            return (Expression) visit("nidFactor");
         }else if(firstSet.get("id-factor").contains(lookahead)){
-            return (ASTNode) visit("idFactor");
+            return (Expression) visit("idFactor");
         }else
             console.error("Factor error: " + lookahead);
         return null;

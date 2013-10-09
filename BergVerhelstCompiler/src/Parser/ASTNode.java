@@ -28,6 +28,7 @@ public class ASTNode{
         @Override
         public String toString() {
             String temp = "[Program]\n";
+            String temp2;
             
             if(funcdeclaration != null)
                 temp += String.format("%"+ space + "s", funcdeclaration);            
@@ -121,9 +122,9 @@ public class ASTNode{
             
             for(VarDeclarationNode var: variableDeclarations)
                 temp += String.format("%"+ space + "s", var);
-            
-            for(Statement stmt: statements)
-                temp += String.format("%"+ space + "s", stmt);
+ 
+            for(Statement var: statements)
+                temp += String.format("%"+ space + "s", var);
             
             return temp;
         }
@@ -135,7 +136,12 @@ public class ASTNode{
      */
     public class AssignmentNode extends ASTNode implements Statement{
         Expression index;
-        Expression expersion;        
+        Expression expersion;   
+        
+        @Override
+        public String toString() {
+            return this.getClass().getName() + " " + ((index != null)?index.toString():"") + " " + ((expersion != null)?expersion.toString():"");
+        }
     }
     
     /**
@@ -146,6 +152,11 @@ public class ASTNode{
         Expression exp;
         Statement stmt;
         Statement elseStmt;
+        
+        @Override
+        public String toString() {
+            return this.getClass().getName() + " " + ((exp != null)?exp.toString():"") + " " + ((stmt != null)?stmt.toString():"") + " " + ((elseStmt != null)? elseStmt.toString(): "");
+        }
     }
     /**
      * Class to view loop syntax
@@ -154,6 +165,11 @@ public class ASTNode{
     public class LoopNode extends ASTNode implements Statement{
         Statement stmt;
         LoopNode nextLoopNode;
+        
+         @Override
+        public String toString() {
+            return this.getClass().getName() + " " + ((stmt != null)?stmt.toString():"") + " " + ((nextLoopNode != null)?nextLoopNode.toString():"");
+        }
     }
      /**
       * The Marker Node class
@@ -162,6 +178,11 @@ public class ASTNode{
      */
     public class MarkerNode extends ASTNode implements Statement {
         TokenType specifier; 
+        
+        @Override
+        public String toString() {
+            return this.getClass().getName() + " " + ((specifier != null)?specifier.toString():"");
+        }
     }
     /**
      * A Return Node has an optional expression
@@ -170,6 +191,10 @@ public class ASTNode{
     public class ReturnNode extends ASTNode implements Statement{
         //A return node has an optional expression
         Expression exp;
+        @Override
+        public String toString() {
+            return this.getClass().getName() + " " + ((exp != null)?exp.toString():"");
+        }
     }
     /**
      * 
@@ -179,6 +204,12 @@ public class ASTNode{
         Expression exp;
         CaseNode thisCase;
         BranchNode nextNode;
+        
+        
+        @Override
+        public String toString() {
+            return this.getClass().getName() + " " + ((exp != null)?exp.toString():"") + " " + ((thisCase != null)?thisCase.toString():"") + " " + ((nextNode != null)? nextNode.toString(): "");
+        }
     }
     
     /**
@@ -187,6 +218,12 @@ public class ASTNode{
      */
     public class CaseNode extends ASTNode{
         Statement stmt;
+        
+        @Override
+        public String toString() {
+            return this.getClass().getName() + " " + ((stmt != null)?stmt.toString():"");
+        }
+        
     }
     /**
      * Call Node
@@ -197,6 +234,11 @@ public class ASTNode{
         TokenType specifier;
         int ID;
         Expression parameters;
+        
+        @Override
+        public String toString() {
+            return this.getClass().getName() + " " + ((specifier != null)?specifier.toString():"") + " " + ID + " " + ((parameters != null)? parameters.toString(): "");
+        }
     }
     /**
      * This stores a variable ex: INT x;
@@ -204,6 +246,11 @@ public class ASTNode{
      */
     public class VariableNode extends ASTNode implements Expression{
         TokenType specifier;
+        
+        @Override
+        public String toString() {
+            return this.getClass().getName() + " " + ((specifier != null)?specifier.toString():"");
+        }
     }
     /**
      * Literals can be NUM, BLIT
@@ -211,6 +258,11 @@ public class ASTNode{
      */
     public class LiteralNode extends ASTNode implements Expression{
         TokenType specifier;
+        
+        @Override
+        public String toString() {
+            return this.getClass().getName() + " " + ((specifier != null)?specifier.toString():"");
+        }
     }
     /**
      * Unary Operation Node
@@ -218,6 +270,12 @@ public class ASTNode{
      */
     public class UnopNode extends ASTNode implements Expression{
         TokenType specifier;
+        Expression Rside;
+        
+         @Override
+        public String toString() {
+            return this.getClass().getName() + " " + ((specifier != null)?specifier.toString():"") + " " + ((Rside != null)? Rside.toString(): "");
+        }
     }
     /**
      * Binary Operation Node
@@ -225,6 +283,18 @@ public class ASTNode{
      */
     public class BinopNode extends ASTNode implements Expression{
         TokenType specifier;
+        Expression Lside;
+        Expression Rside;
+        
+        @Override
+        public String toString() {
+            return this.getClass().getName() + " " + ((specifier != null)?specifier.toString():"") + " " + ((Lside != null)?Lside.toString():"") + " " + ((Rside != null)? Rside.toString(): "");
+        }
+    }
+    
+    @Override
+    public String toString() {
+        return this.getClass().getName();
     }
 }   
 

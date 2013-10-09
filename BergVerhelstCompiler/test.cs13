@@ -8,3 +8,9 @@ int readint(void){;}
 void writeing(int x){;}
 bool readbool(void){;}
 void writebool(bool x){;}
+int x, y;
+int add(ref int x, int y) {int a, b, c, d, e, f, g, h; return 1 * (-2);} 
+int readint(void){}
+void writeing(int x){}
+bool readbool(void){}
+void writebool(bool x){}

@@ -123,7 +123,7 @@ public class ASTNode{
                 temp += String.format("%"+ space + "s", var);
             
             for(Statement var: statements)
-                temp += String.format("%"+ statements + "s", var);
+                temp += String.format("%"+ space + "s", var);
             
             return temp;
         }

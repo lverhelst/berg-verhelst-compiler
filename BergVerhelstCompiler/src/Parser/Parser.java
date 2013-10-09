@@ -593,7 +593,7 @@ public class Parser {
             
             if(value instanceof FuncDeclarationNode){
                 FuncDeclarationNode node = (FuncDeclarationNode)value;
-                node.specfier = functionType;
+                node.specifier = functionType;
                 return node;
             }else
                 return (VarDeclarationNode)value;
@@ -867,7 +867,7 @@ public class Parser {
             match(TokenType.ID);
             visit("vardecTail");
             node.specifier = t;
-            current.variableDeclaraions.add(node);
+            current.variableDeclarations.add(node);
         }
         current.statements.add((Statement)visit("statement"));
         while(firstSet.get("statement").contains(lookahead)){

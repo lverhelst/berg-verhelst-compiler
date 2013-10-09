@@ -30,10 +30,8 @@ public class ASTNode{
             String temp = "[Program]\n";
             String temp2;
             
-            if(funcdeclaration != null)
-                temp += String.format("%"+ space + "s", funcdeclaration);            
-            if(vardeclaration != null)
-                temp += String.format("%"+ space + "s", vardeclaration);
+            temp += printFormat(funcdeclaration);            
+            temp += printFormat(vardeclaration);
             
             temp += nextNode;
             return temp;
@@ -53,11 +51,9 @@ public class ASTNode{
         @Override
         public String toString() {
             String temp = "[Function Declaration] = " + ID + " : " + specifier + "\n";
-            
-            if(params != null)
-                temp += String.format("%"+ space + "s", params);
-            if(compoundStmt != null)
-                temp += String.format("%"+ space + "s", compoundStmt);  
+                        
+            temp += printFormat(params);   
+            temp += printFormat(compoundStmt);  
             
             return temp;
         }
@@ -76,8 +72,7 @@ public class ASTNode{
         public String toString() {
             String temp = "[Variable Declaration] = " + ID + " : " + specifier + "\n";
             
-            if(addOp != null)
-                temp += String.format("%"+ space + "s", addOp);
+            temp += printFormat(addOp);  
             
             return temp;
         }
@@ -96,7 +91,7 @@ public class ASTNode{
             String temp = "[Parameter]\n";
             
             if(param != null)
-                temp += String.format("%"+ space + "s", param);
+                temp += String.format("%"+ (space + param.toString().length()) + "s", param);
             
             return temp + nextNode;
         }
@@ -121,10 +116,10 @@ public class ASTNode{
             String temp = "[Compound]\n";
             
             for(VarDeclarationNode var: variableDeclarations)
-                temp += String.format("%"+ space + "s", var);
+                temp += printFormat(var);  
  
-            for(Statement var: statements)
-                temp += String.format("%"+ space + "s", var);
+            for(Statement stmt: statements)
+                temp += printFormat((ASTNode)stmt);  
             
             return temp;
         }
@@ -140,7 +135,12 @@ public class ASTNode{
         
         @Override
         public String toString() {
-            return this.getClass().getName() + " " + ((index != null)?index.toString():"") + " " + ((expersion != null)?expersion.toString():"");
+             String temp = "[Assignment]\n";
+            
+            temp += printFormat((ASTNode)index);   
+            temp += printFormat((ASTNode)expersion);  
+            
+            return temp;
         }
     }
     
@@ -155,7 +155,13 @@ public class ASTNode{
         
         @Override
         public String toString() {
-            return this.getClass().getName() + " " + ((exp != null)?exp.toString():"") + " " + ((stmt != null)?stmt.toString():"") + " " + ((elseStmt != null)? elseStmt.toString(): "");
+             String temp = "[If]\n";
+            
+            temp += printFormat((ASTNode)exp);   
+            temp += printFormat((ASTNode)stmt);  
+            temp += printFormat((ASTNode)elseStmt); 
+            
+            return temp;
         }
     }
     /**
@@ -166,9 +172,13 @@ public class ASTNode{
         Statement stmt;
         LoopNode nextLoopNode;
         
-         @Override
+        @Override
         public String toString() {
-            return this.getClass().getName() + " " + ((stmt != null)?stmt.toString():"") + " " + ((nextLoopNode != null)?nextLoopNode.toString():"");
+             String temp = "[Loop]\n";
+            
+            temp += printFormat((ASTNode)stmt); 
+            
+            return temp + nextLoopNode;
         }
     }
      /**
@@ -181,7 +191,12 @@ public class ASTNode{
         
         @Override
         public String toString() {
-            return this.getClass().getName() + " " + ((specifier != null)?specifier.toString():"");
+             String temp = "[Marker]\n";
+            
+            if(specifier != null)
+                temp += String.format("%"+ (space + specifier.toString().length()) + "s", specifier); 
+            
+            return temp;
         }
     }
     /**
@@ -191,9 +206,14 @@ public class ASTNode{
     public class ReturnNode extends ASTNode implements Statement{
         //A return node has an optional expression
         Expression exp;
+        
         @Override
         public String toString() {
-            return this.getClass().getName() + " " + ((exp != null)?exp.toString():"");
+             String temp = "[Return]\n";
+            
+            temp += printFormat((ASTNode)exp); 
+            
+            return temp;
         }
     }
     /**
@@ -204,11 +224,15 @@ public class ASTNode{
         Expression exp;
         CaseNode thisCase;
         BranchNode nextNode;
-        
-        
+                
         @Override
         public String toString() {
-            return this.getClass().getName() + " " + ((exp != null)?exp.toString():"") + " " + ((thisCase != null)?thisCase.toString():"") + " " + ((nextNode != null)? nextNode.toString(): "");
+             String temp = "[Branch]\n";
+            
+            temp += printFormat((ASTNode)exp); 
+            temp += printFormat(thisCase);
+            
+            return temp + nextNode;
         }
     }
     
@@ -221,9 +245,12 @@ public class ASTNode{
         
         @Override
         public String toString() {
-            return this.getClass().getName() + " " + ((stmt != null)?stmt.toString():"");
+             String temp = "[Branch]\n";
+            
+            temp += printFormat((ASTNode)stmt); 
+            
+            return temp;
         }
-        
     }
     /**
      * Call Node
@@ -237,7 +264,11 @@ public class ASTNode{
         
         @Override
         public String toString() {
-            return this.getClass().getName() + " " + ((specifier != null)?specifier.toString():"") + " " + ID + " " + ((parameters != null)? parameters.toString(): "");
+            String temp = "[Call] " + ID + " : " + specifier + "\n";
+            
+            temp += printFormat((ASTNode)parameters); 
+            
+            return temp;
         }
     }
     /**
@@ -247,9 +278,9 @@ public class ASTNode{
     public class VariableNode extends ASTNode implements Expression{
         TokenType specifier;
         
-        @Override
+         @Override
         public String toString() {
-            return this.getClass().getName() + " " + ((specifier != null)?specifier.toString():"");
+            return "[Variable] " + specifier + "\n";
         }
     }
     /**
@@ -259,9 +290,9 @@ public class ASTNode{
     public class LiteralNode extends ASTNode implements Expression{
         TokenType specifier;
         
-        @Override
+         @Override
         public String toString() {
-            return this.getClass().getName() + " " + ((specifier != null)?specifier.toString():"");
+            return "[Literal] " + specifier + "\n";
         }
     }
     /**
@@ -274,7 +305,10 @@ public class ASTNode{
         
          @Override
         public String toString() {
-            return this.getClass().getName() + " " + ((specifier != null)?specifier.toString():"") + " " + ((Rside != null)? Rside.toString(): "");
+            String temp = "[Unary Operator] " + specifier + "\n";
+            temp += printFormat((ASTNode)Rside);
+            
+            return temp;
         }
     }
     /**
@@ -286,15 +320,30 @@ public class ASTNode{
         Expression Lside;
         Expression Rside;
         
-        @Override
+         @Override
         public String toString() {
-            return this.getClass().getName() + " " + ((specifier != null)?specifier.toString():"") + " " + ((Lside != null)?Lside.toString():"") + " " + ((Rside != null)? Rside.toString(): "");
+            String temp = "[Binary Operator] " + specifier + "\n";
+            temp += printFormat((ASTNode)Rside);
+            
+            return temp;
         }
     }
+//    
+//    @Override
+//    public String toString() {
+//        return this.getClass().getName();
+//    }
     
-    @Override
-    public String toString() {
-        return this.getClass().getName();
+    public String printFormat(ASTNode node) {
+        String temp = "";
+        String temp2;
+        
+        if(node != null) {
+            temp2 = node.toString(); //used for formatting of strings
+            temp += String.format("%"+ (space + temp2.length()) + "s", temp2);
+        }
+        
+        return temp;
     }
 }   
 

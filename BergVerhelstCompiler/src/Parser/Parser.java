@@ -81,19 +81,18 @@ public class Parser {
         String enter = String.format("%"+15+"s", "Entering Method: " + methodName);
         System.out.format("%" + (depth + enter.length()) + "s\n" ,enter);
         Object temp = null;
+        
         try {
             Method method = Parser.class.getMethod(methodName, null);
             temp = method.invoke(this);
             
             if(temp instanceof ASTNode) {
                 ((ASTNode)temp).space = depth;
-//                String enter = String.format("%"+15+"s", temp);
-//                System.out.format("%" + (depth + enter.length()) + "s\n" ,enter);
             }
         } catch(Exception e) {
             System.out.println("Failed to run method: " + methodName + "\n" + e.getCause());
         } 
-//        System.out.println(depth + "Leaving Method: " + methodName);
+        
         depth--;
         String leaving = String.format("%"+15+"s", "Leaving Method: " + methodName);
         System.out.format("%" + (depth + leaving.length()) + "s\n" ,leaving);
@@ -835,12 +834,12 @@ public class Parser {
         
         if(lookahead.getName() == TokenType.LSQR){
             match(TokenType.LSQR);
-//            current.index = visit("addExp");
+            current.index = (Expression)visit("addExp");
             visit("addExp");
             match(TokenType.RSQR);
         }
         match(TokenType.ASSIGN);
-//        current.expersion = visit("expression");
+        current.expersion = (Expression)visit("expression");
         visit("expression");
         match(TokenType.SEMI);
         

@@ -26,10 +26,9 @@ public class ASTNode{
             String temp2;
             
             temp += printFormat(funcdeclaration);            
-            temp += printFormat(vardeclaration);
+            temp += printFormat(vardeclaration);  
             
-            temp += nextNode;
-            return printFormat(temp);
+            return printFormat(temp) + printFormat(nextNode);
         }
     }
     
@@ -237,7 +236,7 @@ public class ASTNode{
         
         @Override
         public String toString() {
-             String temp = "[Branch]\n";
+             String temp = "[Case]\n";
             
             temp += printFormat((ASTNode)stmt); 
             
@@ -332,11 +331,9 @@ public class ASTNode{
      */
     public String printFormat(ASTNode node) {
         String temp = "";
-        String temp2;
         
         if(node != null) {
-            temp2 = node.toString(); //used for formatting of strings
-            temp += String.format("%"+ (space + temp2.length()) + "s", temp2);
+            temp = printFormat(node.toString()); //used for formatting of strings
         }
         
         return temp;

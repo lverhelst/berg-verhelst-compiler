@@ -1,5 +1,6 @@
 package Parser;
 import Lexeme.TokenType;
+import java.util.ArrayList;
 /**
  *
  */
@@ -32,7 +33,7 @@ public class ASTNode{
         int ID;
         TokenType specfier;       
         ParameterNode params; 
-        CompoundNode compoundStmt;
+        CompoundNode compoundStmt;  
     }
     
     /**
@@ -42,7 +43,7 @@ public class ASTNode{
     public class VarDeclarationNode extends ASTNode{
         int ID;
         TokenType specifier;
-        UnopNode addOp;
+        UnopNode addOp;  
     }
     
     /**
@@ -59,10 +60,8 @@ public class ASTNode{
      * @Class Emery
      */
     public class CompoundNode extends ASTNode{
-        TokenType specifier;
-        Expression expersion;
-        Statement statement;   
-        CompoundNode nextNode;
+        ArrayList<Expression> expersion;
+        ArrayList<Statement> statement;  
     }
     
     /**

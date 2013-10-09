@@ -1,2 +1,6 @@
-int x;
-int add(int x, int y) {return 2 + 2;} 
+int x, y;
+int add(ref int x, int y) {return 1 * (-2);} 
+int readint(void){}
+void writeing(int x){}
+bool readbool(void){}
+void writebool(bool x){}

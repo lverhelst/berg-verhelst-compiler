@@ -591,6 +591,7 @@ public class Parser {
             match(TokenType.ID);
             declaration = (FuncDeclarationNode)visit("fundecTail");
             declaration.ID = id;
+            declaration.specifier = TokenType.VOID;
             return declaration;
         }else if(firstSet.get("nonvoid-specifier").getSet().contains(this.lookahead.getName())){
             TokenType functionType = (TokenType)visit("nonvoidSpec");
@@ -606,6 +607,12 @@ public class Parser {
             }else {
                 VarDeclarationNode node = (VarDeclarationNode)value;
                 node.ID = id;
+                node.specifier = functionType;
+                VarDeclarationNode current = node;
+                while(current.nextVarDec != null){
+                    current = current.nextVarDec;
+                    current.specifier = functionType;
+                }
                 return node;
             }
         }else
@@ -648,19 +655,23 @@ public class Parser {
      * @created by Leon
      */
     public ASTNode vardecTail() {        
-        VarDeclarationNode current = rootNode.new VarDeclarationNode();
-        
+        VarDeclarationNode node = rootNode.new VarDeclarationNode();
+        VarDeclarationNode next;
+        VarDeclarationNode current;
         if(this.lookahead.getName() == TokenType.LSQR){
             match(TokenType.LSQR);
-            current.addOp = (ASTNode.UnopNode)visit("addExp");
+            node.offset = (Expression)visit("addExp");
             match(TokenType.RSQR);
         }
+        current = node;
         while(this.lookahead.getName() == TokenType.COMMA){
             match(TokenType.COMMA);
-            visit("varName");
+            next = (VarDeclarationNode)visit("varName");
+            current.nextVarDec = next;
+            current = next;
         }
         match(TokenType.SEMI);
-        return current;
+        return node;
     }
     
     /**
@@ -668,12 +679,14 @@ public class Parser {
      * var-name -> ID [[ [add-exp] ]]
      * @created by Leon
      */
-    public ASTNode varName() {
-        ASTNode.UnopNode current = null;
+    public VarDeclarationNode varName() {
+        VarDeclarationNode current = rootNode.new VarDeclarationNode();
+        current.ID = Integer.parseInt(lookahead.getAttribute_Value());
         match(TokenType.ID);
+         
         if(this.lookahead.getName() == TokenType.LSQR){
             match(TokenType.LSQR);
-            current = (ASTNode.UnopNode)visit("addExp");
+            current.offset = (Expression)visit("addExp");
             match(TokenType.RSQR);
         }
         return current;
@@ -709,6 +722,7 @@ public class Parser {
             }   
         }else{
             match(TokenType.VOID);
+            node.param = TokenType.VOID;
         }
         return node;
     }
@@ -720,8 +734,9 @@ public class Parser {
     public TokenType param() {
         if(lookahead.getName() == TokenType.REF){
             match(TokenType.REF);
-            visit("nonvoidSpec");
+            TokenType t = (TokenType)visit("nonvoidSpec");
             match(TokenType.ID);
+            return t;
         }else if(firstSet.get("nonvoid-specifier").contains(lookahead.getName())){
             TokenType t = (TokenType)visit("nonvoidSpec");
             match(TokenType.ID);
@@ -771,8 +786,7 @@ public class Parser {
         }
         if(firstSet.get("branch-stmt").contains(lookahead.getName())){
             return (BranchNode)visit("branchStmt");
-        }
-        
+        }        
         return null;
     }
     
@@ -1033,10 +1047,10 @@ public class Parser {
         
         if(firstSet.get("relop").contains(lookahead.getName())){
             BinopNode bnode =  rootNode.new BinopNode();
-            bnode.Lside = node;
+            bnode.Rside = node;
             bnode.specifier = (TokenType)visit("relop");
-            bnode.Rside = (Expression)visit("addExp");
-            node = (Expression)bnode;
+            bnode.Lside = (Expression)visit("addExp");
+            node = bnode;
         }
         return node;
     }
@@ -1062,9 +1076,9 @@ public class Parser {
         
         while(firstSet.get("addop").contains(lookahead.getName())){
             BinopNode subNode = rootNode.new BinopNode();
-            subNode.Lside = node;
+            subNode.Rside = node;
             subNode.specifier = (TokenType)visit("addop");
-            subNode.Rside = (Expression)visit("term");
+            subNode.Lside = (Expression)visit("term");
             node = subNode;
         }
         return node;
@@ -1116,6 +1130,7 @@ public class Parser {
             return node;
         }else if(lookahead.getName() == TokenType.NUM){
             LiteralNode node = rootNode.new LiteralNode();
+            node.lexeme = lookahead.getAttribute_Value();
             match(TokenType.NUM);
             node.specifier = TokenType.NUM;
             return node;

@@ -46,10 +46,8 @@ public class ASTNode{
         @Override
         public String toString() {
             String temp = "[Function Declaration] = " + ID + " : " + specifier + "\n";
-                        
             temp += printFormat(params);   
             temp += printFormat(compoundStmt);  
-            
             return printFormat(temp);
         }
     }
@@ -61,13 +59,15 @@ public class ASTNode{
     public class VarDeclarationNode extends ASTNode{
         int ID;
         TokenType specifier;
-        UnopNode addOp;  
+        Expression offset;
+        VarDeclarationNode nextVarDec;
         
          @Override
         public String toString() {
-            String temp = "[Variable Declaration] = " + ID + " : " + specifier + "\n";
-            
-            temp += printFormat(addOp);  
+            String temp = "[Variable Declaration] = " + ID + " : " + specifier + " " + "\n";
+                    
+            temp += printFormat(nextVarDec);
+            temp += printFormat((ASTNode)offset);  
             
             return printFormat(temp);
         }
@@ -281,10 +281,12 @@ public class ASTNode{
      */
     public class LiteralNode extends ASTNode implements Expression{
         TokenType specifier;
+        String lexeme;
         
          @Override
         public String toString() {
-            return printFormat("[Literal] " + specifier + "\n");
+            return printFormat("[Literal] " + specifier + (lexeme != null? " lexeme: " + lexeme: "") + "\n");
+                    
         }
     }
     /**

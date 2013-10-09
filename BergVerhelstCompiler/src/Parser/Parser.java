@@ -1017,7 +1017,7 @@ public class Parser {
         BinopNode node = rootNode.new BinopNode();
         node.Lside = (Expression)visit("addExp");
         if(firstSet.get("relop").contains(lookahead)){
-            node.specifier = (TokenType) visit("relop");
+            node.specifier = ((BinopNode) visit("relop")).specifier;
             node.Rside = (Expression)visit("addExp");
         }
         return node;
@@ -1036,7 +1036,7 @@ public class Parser {
         unaryNode.Rside = (Expression) visit("term");
         node.Lside = (Expression)unaryNode;
         while(firstSet.get("addop").contains(lookahead)){
-            node.specifier = (TokenType)visit("addop");
+            node.specifier = ((BinopNode)visit("addop")).specifier;
             node.Rside = (Expression)visit("term");
         }
         return node;
@@ -1050,7 +1050,7 @@ public class Parser {
         BinopNode nodeb = rootNode.new BinopNode();         
         nodeb.Lside = (Expression) visit("factor");
         while(firstSet.get("multop").contains(lookahead)){ 
-            nodeb.specifier = (TokenType)visit("multop");
+            nodeb.specifier = ((BinopNode)visit("multop")).specifier;
             nodeb.Rside = (Expression)visit("factor");
         }
         return nodeb;

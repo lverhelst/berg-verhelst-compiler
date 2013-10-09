@@ -6,11 +6,13 @@ import Lexeme.TokenType;
 import Main.AdministrativeConsole;
 import Parser.ASTNode.BinopNode;
 import Parser.ASTNode.BranchNode;
+import Parser.ASTNode.CallNode;
 import Parser.ASTNode.CaseNode;
 import Parser.ASTNode.CompoundNode;
 import Parser.ASTNode.Expression;
 import Parser.ASTNode.FuncDeclarationNode;
 import Parser.ASTNode.IfNode;
+import Parser.ASTNode.LiteralNode;
 import Parser.ASTNode.LoopNode;
 import Parser.ASTNode.MarkerNode;
 import Parser.ASTNode.ParameterNode;
@@ -19,6 +21,7 @@ import Parser.ASTNode.ReturnNode;
 import Parser.ASTNode.Statement;
 import Parser.ASTNode.UnopNode;
 import Parser.ASTNode.VarDeclarationNode;
+import Parser.ASTNode.VariableNode;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 
@@ -69,11 +72,14 @@ public class Parser {
        currentToken = scn.getToken();
        lookahead = currentToken.getName();
        rootNode = (ASTNode)visit("program");
-       System.out.println(rootNode);
+       System.out.println((ProgramNode)rootNode);
+       
     }
     
     public Object visit(String methodName) {
-        System.out.println("Entering Method: " + methodName);
+        depth++;
+        String enter = String.format("%"+15+"s", "Entering Method: " + methodName);
+        System.out.format("%" + (depth + enter.length()) + "s\n" ,enter);
         Object temp = null;
         try {
             Method method = Parser.class.getMethod(methodName, null);
@@ -81,7 +87,10 @@ public class Parser {
         } catch(Exception e) {
             System.out.println("Failed to run method: " + methodName + "\n" + e.getCause());
         } 
-        System.out.println("Leaving Method: " + methodName);
+//        System.out.println(depth + "Leaving Method: " + methodName);
+        depth--;
+        String leaving = String.format("%"+15+"s", "Leaving Method: " + methodName);
+        System.out.format("%" + (depth + leaving.length()) + "s\n" ,leaving);
         return temp;
     }
     
@@ -651,7 +660,6 @@ public class Parser {
             current = (ASTNode.UnopNode)visit("addExp");
             match(TokenType.RSQR);
         }
-        
         return current;
     }
     
@@ -956,16 +964,22 @@ public class Parser {
      * @Created by Leon
      * @Revised by Leon added AST
      */
-    public void branchStmt() {
+    public ASTNode branchStmt() {
+        BranchNode node = rootNode.new BranchNode();
         match(TokenType.BRANCH);
         match(TokenType.LPAREN);
-        visit("addExp");
+        node.exp = (Expression)visit("addExp");
         match(TokenType.RPAREN);
-        do{
-            visit("caseStmt");
-        }while(firstSet.get("case").contains(lookahead));
+        node.thisCase = (CaseNode)visit("caseStmt");
+        BranchNode current = node;
+        while(firstSet.get("case").contains(lookahead)){
+            current.nextNode = rootNode.new BranchNode();
+            current = current.nextNode;
+            current.thisCase = (CaseNode)visit("caseStmt");
+        }
         match(TokenType.END);
         match(TokenType.SEMI);
+        return node;
     }
     
     /**
@@ -994,105 +1008,127 @@ public class Parser {
      * @created by Emery
      * 
      */
-    public void expression() {
-        visit("addExp");
+    public BinopNode expression() {
+        BinopNode node = rootNode.new BinopNode();
+        node.Lside = (Expression)visit("addExp");
         if(firstSet.get("relop").contains(lookahead)){
-            visit("relop");
-            visit("addExp");
+            node.specifier = (TokenType) visit("relop");
+            node.Rside = (Expression)visit("addExp");
         }
+        return node;
     }
     
     /**
      * Used to deal with the add-exp phrase (27)
      * @created by Emery
      */
-    public void addExp() {
+    public BinopNode addExp() {
+        BinopNode node = rootNode.new BinopNode();
+        UnopNode unaryNode = rootNode.new UnopNode();
         if(firstSet.get("uminus").contains(lookahead)){
-            visit("uminus");
+            unaryNode.specifier = (TokenType)visit("uminus");
         }
-        visit("term");
+        unaryNode.Rside = (Expression) visit("term");
+        node.Lside = (Expression)unaryNode;
         while(firstSet.get("addop").contains(lookahead)){
-            visit("addop");
-            visit("term");
+            node.specifier = (TokenType)visit("addop");
+            node.Rside = (Expression)visit("term");
         }
+        return node;
     }
     
     /**
      * Used to deal with the term phrase (28)
      * @created by Emery
      */
-    public void term() {
-        visit("factor");
-        while(firstSet.get("multop").contains(lookahead)){
-            visit("multop");
-            visit("factor");
+    public BinopNode term() {
+        BinopNode nodeb = rootNode.new BinopNode();         
+        nodeb.Lside = (Expression) visit("factor");
+        while(firstSet.get("multop").contains(lookahead)){ 
+            nodeb.specifier = (TokenType)visit("multop");
+            nodeb.Rside = (Expression)visit("factor");
         }
+        return nodeb;
     }
     
     /**
      * Used to deal with the factor phrase (29)
      * @created by Leon
      */
-    public void factor() {
+    public ASTNode factor() {
         if(firstSet.get("nid-factor").contains(lookahead)){
-            visit("nidFactor");
+            return (ASTNode) visit("nidFactor");
         }else if(firstSet.get("id-factor").contains(lookahead)){
-            visit("idFactor");
+            return (ASTNode) visit("idFactor");
         }else
             console.error("Factor error: " + lookahead);
+        return null;
     }
     
     /**
      * Used to deal with the nid-factor phrase (30)
      * @created by Leon
      */
-    public void nidFactor() {
+    public ASTNode nidFactor() {
         if(lookahead == TokenType.NOT){
             match(TokenType.NOT);
-            visit("factor");
+            return (ASTNode)visit("factor");
         }else if(lookahead == TokenType.LPAREN){
+            ASTNode node;
             match(TokenType.LPAREN);
-            visit("expression");
+            node = (ASTNode)visit("expression");
             match(TokenType.RPAREN);
+            return node;
         }else if(lookahead == TokenType.NUM){
+            LiteralNode node = rootNode.new LiteralNode();
             match(TokenType.NUM);
+            node.specifier = TokenType.NUM;
+            return node;
         }else if(lookahead == TokenType.BLIT){
+            LiteralNode node = rootNode.new LiteralNode();
             match(TokenType.BLIT);
-        }else
-            console.error("nidFactor error: " + lookahead);        
+            node.specifier = TokenType.BLIT;
+            return node;
+        }else{
+            console.error("nidFactor error: " + lookahead);  
+            return null;
+        }
     }
     
     /**
      * Used to deal with the id-factor phrase (31)
      * @created by Leon
      */
-    public void idFactor() {
+    public ASTNode idFactor() {
         match(TokenType.ID);
-        visit("idTail");
+        return (ASTNode) visit("idTail");
     }
     
     /**
      * Used to deal with the id-tail phrase (32)
      * @created by Leon
      */
-    public void idTail() {
+    public ASTNode idTail() {
         if(firstSet.get("var-tail").contains(lookahead)){
-            visit("varTail");
+            return (VariableNode) visit("varTail");
         }else if(firstSet.get("call-tail").contains(lookahead)){
-            visit("callTail");
+            return (CallNode) visit("callTail");
         }
+        return null;
     }
     
     /**
      * Used to deal with the var-tail phrase (33)
      * @created by Leon
      */
-    public void varTail() {
+    public ASTNode varTail() {
+        ASTNode node = null;
         if(lookahead == TokenType.LSQR){
             match(TokenType.LSQR);
-            visit("addExp");
+            node = (ASTNode)visit("addExp");
             match(TokenType.RSQR);
         }
+        return node;
     }
     
     /**
@@ -1191,4 +1227,5 @@ public class Parser {
         }
         return node;
     }
+    
 }

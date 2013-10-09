@@ -13,25 +13,46 @@ public class ASTNode{
         
     }
     
+    /**
+     * Class to view ProgramNode
+     * @Class Emery
+     */
     public class ProgramNode extends ASTNode{
-        FuncDeclarationNode declaration;
+        FuncDeclarationNode funcdeclaration;
+        VarDeclarationNode vardeclaration;
         ProgramNode nextNode;
     }
     
+    /**
+     * Class to view FuncDeclarationNode
+     * @Class Emery
+     */
     public class FuncDeclarationNode extends ASTNode{
         ParameterNode params; 
-        CompoundNode compondStmt;
+        CompoundNode compoundStmt;
     }
     
+    /**
+     * Class to view VarDeclarationNode
+     * @Class Emery
+     */
     public class VarDeclarationNode extends ASTNode{
         UnopNode addOp;
     }
     
+    /**
+     * Class to view ParameterNode
+     * @Class Emery
+     */
     public class ParameterNode extends ASTNode{
         TokenType param;
         ParameterNode nextNode; 
     }
     
+    /**
+     * Class to view CompoundNode
+     * @Class Emery
+     */
     public class CompoundNode extends ASTNode{
         TokenType specifier;
         Expression expersion;
@@ -39,10 +60,15 @@ public class ASTNode{
         CompoundNode nextNode;
     }
     
+    /**
+     * Class to view AssignmentNode
+     * @Class Emery
+     */
     public class AssignmentNode extends ASTNode implements Statement{
         Expression index;
         Expression expersion;        
     }
+    
     /**
      * Class to view ifNode
      * @Class Leon

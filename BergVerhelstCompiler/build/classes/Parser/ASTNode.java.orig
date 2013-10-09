@@ -83,9 +83,18 @@ public class ASTNode{
         
         @Override
         public String toString() {
+<<<<<<< HEAD
+            String temp = "[Parameter]";
+            
+            if(param != null)
+                temp += String.format("%"+ (space + param.toString().length()) + "s", param);
+            
+            return temp + "\n "+ nextNode;
+=======
             String temp = "[Parameter] " + param + "\n";
             
             return printFormat(temp) + printFormat(nextNode);
+>>>>>>> 79c140a399873d758320d6ed7c8e8cc715669586
         }
     }
     

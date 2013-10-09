@@ -29,7 +29,7 @@ public class ASTNode{
             temp += printFormat(vardeclaration);
             
             temp += nextNode;
-            return temp;
+            return printFormat(temp);
         }
     }
     
@@ -50,7 +50,7 @@ public class ASTNode{
             temp += printFormat(params);   
             temp += printFormat(compoundStmt);  
             
-            return temp;
+            return printFormat(temp);
         }
     }
     
@@ -69,7 +69,7 @@ public class ASTNode{
             
             temp += printFormat(addOp);  
             
-            return temp;
+            return printFormat(temp);
         }
     }
     
@@ -83,12 +83,9 @@ public class ASTNode{
         
         @Override
         public String toString() {
-            String temp = "[Parameter]\n";
+            String temp = "[Parameter] " + param + "\n";
             
-            if(param != null)
-                temp += String.format("%"+ (space + param.toString().length()) + "s", param);
-            
-            return temp + nextNode;
+            return printFormat(temp) + printFormat(nextNode);
         }
     }
     
@@ -116,7 +113,7 @@ public class ASTNode{
             for(Statement stmt: statements)
                 temp += printFormat((ASTNode)stmt);  
             
-            return temp;
+            return printFormat(temp);
         }
     }
     
@@ -135,7 +132,7 @@ public class ASTNode{
             temp += printFormat((ASTNode)index);   
             temp += printFormat((ASTNode)expersion);  
             
-            return temp;
+            return printFormat(temp);
         }
     }
     
@@ -156,7 +153,7 @@ public class ASTNode{
             temp += printFormat((ASTNode)stmt);  
             temp += printFormat((ASTNode)elseStmt); 
             
-            return temp;
+            return printFormat(temp);
         }
     }
     /**
@@ -173,7 +170,7 @@ public class ASTNode{
             
             temp += printFormat((ASTNode)stmt); 
             
-            return temp + nextLoopNode;
+            return printFormat(temp) + printFormat(nextLoopNode);
         }
     }
      /**
@@ -191,7 +188,7 @@ public class ASTNode{
             if(specifier != null)
                 temp += String.format("%"+ (space + specifier.toString().length()) + "s", specifier); 
             
-            return temp;
+            return printFormat(temp);
         }
     }
     /**
@@ -208,7 +205,7 @@ public class ASTNode{
             
             temp += printFormat((ASTNode)exp); 
             
-            return temp;
+            return printFormat(temp);
         }
     }
     /**
@@ -227,7 +224,7 @@ public class ASTNode{
             temp += printFormat((ASTNode)exp); 
             temp += printFormat(thisCase);
             
-            return temp + nextNode;
+            return printFormat(temp) + printFormat(nextNode);
         }
     }
     
@@ -244,7 +241,7 @@ public class ASTNode{
             
             temp += printFormat((ASTNode)stmt); 
             
-            return temp;
+            return printFormat(temp);
         }
     }
     /**
@@ -263,7 +260,7 @@ public class ASTNode{
             
             temp += printFormat((ASTNode)parameters); 
             
-            return temp;
+            return printFormat(temp);
         }
     }
     /**
@@ -275,7 +272,7 @@ public class ASTNode{
         
          @Override
         public String toString() {
-            return "[Variable] " + specifier + "\n";
+            return printFormat("[Variable] " + specifier + "\n");
         }
     }
     /**
@@ -287,7 +284,7 @@ public class ASTNode{
         
          @Override
         public String toString() {
-            return "[Literal] " + specifier + "\n";
+            return printFormat("[Literal] " + specifier + "\n");
         }
     }
     /**
@@ -303,7 +300,7 @@ public class ASTNode{
             String temp = "[Unary Operator] " + specifier + "\n";
             temp += printFormat((ASTNode)Rside);
             
-            return temp;
+            return printFormat(temp);
         }
     }
     /**
@@ -318,9 +315,10 @@ public class ASTNode{
          @Override
         public String toString() {
             String temp = "[Binary Operator] " + specifier + "\n";
+            temp += printFormat((ASTNode)Lside);
             temp += printFormat((ASTNode)Rside);
             
-            return temp;
+            return printFormat(temp);
         }
     }
     
@@ -340,6 +338,16 @@ public class ASTNode{
         }
         
         return temp;
+    }
+    
+     /**
+     * Used to print strings pretty and indented
+     * @param  string the string to format
+     * @return the String to print formatted
+     * @created by Emery
+     */
+    public String printFormat(String string) {
+        return String.format("%"+ (space + string.length()) + "s", string);
     }
 }   
 

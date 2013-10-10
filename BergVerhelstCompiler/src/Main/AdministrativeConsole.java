@@ -8,6 +8,12 @@ import UnitTests.UnitTester;
 import java.io.IOException;
 import java.util.InputMismatchException;
 import java.util.HashMap;
+import org.apache.commons.cli.*;
+
+
+
+//Command Line Parsing Libary: commons-cli-1.2
+
 /**
  *
  * @author Leon Verhelst and Emery Berg
@@ -15,6 +21,9 @@ import java.util.HashMap;
 public class AdministrativeConsole {
    
    HashMap<String, String> arguments;
+   private CommandLineParser cliparser;
+   private CommandLine cmd;
+   public Options opts;
    
    private enum valid_arguments{
        f ("-f", true),
@@ -45,57 +54,87 @@ public class AdministrativeConsole {
     * @param args Arguments/Parameters
     */
    public AdministrativeConsole(String[] args){
+       //Set up command line parser       
+       initializeCliParser(args);
        //Set parameters for admin console
-       setParameters(args);
+       //setParameters(args);
+   }
+   
+   private void initializeCliParser(String [] args){
+       opts = new Options();
+       Option helpOption = new Option("help", false, "Displays Help Menu");
+       Option lexOption = new Option("scan", false, "Process up to Lexical Phase");
+       Option parseOption = new Option("parse", false, "Process up to the Parser Phase");
+       //Option semOption = new Option("sem", false, "Process up to the Semantic Phase");
+       //Option tupOption = new Option("tup", false, "Process up to the Tuple Phase");
+       Option compOption = new Option ("compile", false, "Process all phases and compile (Default)");
+       Option quietOption = new Option ("q", false, "Only display error messages (Default)");
+       Option verboseOption = new Option("v", false, "Display all Trace Messages");
+       Option outOption = new Option("o", true, "Print to file (default (System.out))");
+       Option errOption = new Option("err", true, "Print error (default (System.out))");
+       Option uiOption = new Option("ui", false, "UI option)");
+       opts.addOption(helpOption);
+       opts.addOption(lexOption);
+       opts.addOption(parseOption);
+       opts.addOption(compOption);
+       opts.addOption(quietOption);
+       opts.addOption(verboseOption);
+       opts.addOption(outOption);
+       opts.addOption(errOption);
+       opts.addOption(uiOption);
+       cliparser = new BasicParser();
+       try{
+           cmd = cliparser.parse(opts, args);
+       }catch(ParseException pe){
+           System.out.println(pe.getLocalizedMessage());
+           usage(opts);
+       }
+       
    }
    /**
     * Runs the compiler with set params
     */
    public void executeCompiler(){
        //Display help if it exists
-       if(arguments.containsKey("help")){
-           displayHelp();
+       if(cmd.hasOption("h")){
+           usage(opts);
        }
        
-       if(arguments.containsKey("test")){
-           runUnitTests();
-       }else{
+       
+       //if(arguments.containsKey("test")){
+       //    runUnitTests();
+       //}else{
             //If the UI option is specified it takes precendence over all others
             //Display UI, otherwise run the compiler with the other provided arguments
-            if(arguments.containsKey("ui")){
+            if(cmd.hasOption("ui")){
                 runUI();
             }else{
-                if(arguments.containsKey("f") || arguments.containsKey("load"))
-                    runFileProcess();
+                runFileProcess();
             }
-       }
+       //}
    }
    
    /**
     * Read and Compile the file
     */
    private void runFileProcess(){
-       String fileName = arguments.get("f");
-       if(fileName == null)
-           fileName = arguments.get("load");
-       
-      //Verify valid file name
-       if(!fileName.endsWith("cs13")){
-           System.out.println("Administrative Console - Invalid File Name: " + fileName);
-       }else{
-           FileReader reader = new FileReader(fileName);
-           try{
-                //Load the file into our string buffer
-                fileAsString = "\r\n" + reader.readFileToString() + '\u001a';
-                fileByLines = fileAsString.split("\n");
-                //Scan the file
-                //Only run the file process if f is specified,
-                //otherwise we will be satisfied with merely loading the file (for Unit Test reasons)
-                if(arguments.containsKey("f"))
-                    parseFile();
-           }catch(IOException e){
-               System.out.println("Administrative Console: " + e.toString());
-           }
+       didPass = true;
+       for (String fileName : cmd.getArgs()){
+            reset();
+            //Verify valid file name
+            if(!fileName.endsWith("cs13")){
+                System.out.println("Administrative Console - Invalid File Name: " + fileName);
+            }else{
+                FileReader reader = new FileReader(fileName);
+                try{
+                        //Load the file into our string buffer
+                        fileAsString = "\r\n" + reader.readFileToString() + '\u001a';
+                        fileByLines = fileAsString.split("\n");
+                        parseFile();
+                }catch(IOException e){
+                    System.out.println("Administrative Console: " + e.toString());
+                }
+            }
        }
    }
    
@@ -124,7 +163,7 @@ public class AdministrativeConsole {
     */
    private void setParameters(String[] args)
    {   
-       resetParameters();
+       reset();
        //Get arguments and associated values
        //Verify and set arguments
        //Do this first so that when ScanFile() runs it will have the appropriate arguments
@@ -160,7 +199,7 @@ public class AdministrativeConsole {
    /**
     * Resets all parameters
     */
-   private void resetParameters(){
+   private void reset(){
        arguments = new HashMap();
        didPass = true;
        fileAsString = "";
@@ -192,7 +231,7 @@ public class AdministrativeConsole {
             switch(option){
                 case 1:
                     //Case 1: Scan file, no parameters
-                    resetParameters();
+                    reset();
                     System.out.print("Enter File Name:");
                     line = kbd.nextLine();   
                     String[] args = {"-f ", line};
@@ -202,7 +241,7 @@ public class AdministrativeConsole {
                     break;
                 case 2:
                     //Case 2: Scan file with trace token parameter
-                    resetParameters();
+                    reset();
                     System.out.print("Enter File Name:");
                     line = kbd.nextLine();
                     System.out.print("Save Trace to file? (y/n)");
@@ -224,7 +263,7 @@ public class AdministrativeConsole {
                     break;
                 case 3:
                     //Case 3: Run unit tests
-                    resetParameters();
+                    reset();
                     //parameters
                     String[] unitargs = {"-test"}; 
                     setParameters(unitargs);
@@ -253,7 +292,7 @@ public class AdministrativeConsole {
     */
    public void error(String errorMsg) {
        didPass = false;
-       System.out.println(linenumber + "," + charPosInLine + ": " + errorMsg);
+       System.out.println("Error " + linenumber + "," + charPosInLine + ": " + errorMsg);
    }
    
    /**
@@ -262,14 +301,6 @@ public class AdministrativeConsole {
    private void parseFile(){
        //Check trace
        String line;
-       try{
-            if(arguments.containsKey("out"))
-                writer = new Writer(arguments.get("out"));
-       }catch(IOException e){
-           writer = null;
-           arguments.remove("out");
-           System.out.println("Could not write to output file: " + e.toString());
-       }
        //We are not supposed to print the file at the beginning of the parsing run
        /*if((arguments.containsKey("tr") && arguments.get("tr").equals("token")) || arguments.containsKey("out")){
            for(int i = 1; i < fileByLines.length; i++){
@@ -281,16 +312,11 @@ public class AdministrativeConsole {
        }*/
        //Parse
        Parser prs = new Parser(this);
-       prs.parse(arguments.containsKey("tr") && arguments.get("tr").equals("token"));
+       prs.parse(cmd.hasOption("v"));
        if(this.didPass){
            System.out.println("PASS");
        }else{
            System.out.println("FAIL");
-       }
-       
-       if(writer != null){
-           System.out.println("Trace Exists in: " + arguments.get("out"));
-           writer.close();
        }
        System.out.println("Administrative Console - Completed Scan");
    }  
@@ -301,9 +327,7 @@ public class AdministrativeConsole {
     */
    public void handleErrorToken(Token erroneousToken){
        didPass = false;
-       System.out.println("   " + linenumber + ": " + erroneousToken);
-       if(arguments.containsKey("out"))
-           writer.writeLine("   " + linenumber + ": " + erroneousToken+ "\r\n");
+       System.out.println("Error:   " + linenumber + ": " + erroneousToken);
    }
    /**
     * Returns the next available character
@@ -319,11 +343,9 @@ public class AdministrativeConsole {
            linenumber++;
            charPosInLine = 0;
            //Check if we need to print out the current line
-           if(arguments.containsKey("tr") && arguments.get("tr").equals("token")){
+           if(cmd.hasOption("v")){
                 line = "Line " + linenumber + ": " + fileByLines[linenumber];
                 System.out.println(line);
-                if(arguments.containsKey("out"))
-                   writer.writeLine(line + "\r\n");
            }
        }
        return returnChar;
@@ -350,8 +372,6 @@ public class AdministrativeConsole {
      */
     public void printTraceInformation(Token t){
         System.out.println("   " + linenumber + ": " + t);
-        if(arguments.containsKey("out"))
-           writer.writeLine("   " + linenumber + ": " + t.toString() + "\r\n");
     }
     /**
      * Print Help Information
@@ -383,4 +403,10 @@ public class AdministrativeConsole {
             runFileProcess();
        }         
    }  
+   
+   
+   private void usage(Options options){
+        HelpFormatter formatter = new HelpFormatter();
+        formatter.printHelp( "AdministrativeConsole", options );
+    }
 }

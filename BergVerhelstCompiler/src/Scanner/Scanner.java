@@ -1,20 +1,30 @@
 package Scanner;
 import FileIO.FileReader;
 import Lexeme.Token;
-import Main.AdministrativeConsole;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.TreeMap;
 import Lexeme.TokenType;
+import java.io.PrintWriter;
 
 /**
  * @authors Leon Verhelst and Emery Berg
  * Creates tokens from an input of characters
  */
-public class Scanner{
-    private AdministrativeConsole adv;
+public class Scanner {
+    private String fileAsString;
+    private String[] fileByLines;
+    private FileReader fileReader;
+    private PrintWriter printWriter;
     private final char ENDFILE = 26;
     private int currentID;
+    private boolean quite;
+    private boolean verbose;
+    private boolean printFile;
+    private int linenumber;
+    private int charPosInLine;
+    private int characterposition;
+   
     
     /*
      * The symbol table stores identifier lexemes (spellings) and assigned them numerical indices
@@ -31,13 +41,11 @@ public class Scanner{
      * Keywords are to be added first, then the identifiers as we find them
      */
     private TreeMap<String, Token> wordTable;
-    
+        
     /**
      * Creates the scanner object used to retrieve tokens for the compile
-     * @param adv the administrativeConsole to get input from
      */
-    public Scanner(AdministrativeConsole adv){
-        this.adv = adv;
+    public Scanner(){
         this.generateWordTableFromFile();
         
         //if file fails load defaults
@@ -55,18 +63,21 @@ public class Scanner{
      */
     public Token getToken(){ 
         Token toRet = getNextToken();
-        //if(trace)
-        //printWriter.print(toRet);
+        
         System.out.print(toRet + "\n");
         return toRet;
     } 
     
+    /**
+     * Gets the next token
+     * @return 
+     */
     private Token getNextToken(){
-        char currentChar = adv.getNextChar();        
+        char currentChar = getNextChar();        
         
         //filter out the white spaces
         while(currentChar != ENDFILE && (isInvisible(currentChar) || isWhiteSpace(currentChar)))
-            currentChar = adv.getNextChar();
+            currentChar = getNextChar();
         
          //if the character is the end of file return EOF token
         if(currentChar == ENDFILE)
@@ -101,16 +112,16 @@ public class Scanner{
      * @return the next non invisible character (white space included)
      */
     private char filterNext() {        
-        char currentChar = adv.getNextChar();
+        char currentChar = getNextChar();
         
         //remove invisible characters
         while(!isWhiteSpace(currentChar) && isInvisible(currentChar)) {
-            adv.getNextChar();
+            getNextChar();
             
             if(currentChar == ENDFILE)
                 return currentChar;
             
-            currentChar = adv.peekNextChar();            
+            currentChar = peekNextChar();            
         }
         
         return currentChar;
@@ -121,16 +132,16 @@ public class Scanner{
      * @return the peeked non invisible character (white space included)
      */
     private char filterPeek() {        
-        char currentChar = adv.peekNextChar();
+        char currentChar = peekNextChar();
         
         //remove invisible characters
         while(!isWhiteSpace(currentChar) && isInvisible(currentChar) && currentChar != ENDFILE) {
-            adv.getNextChar();            
+            getNextChar();            
             
             if(currentChar == ENDFILE)
                 return currentChar;
             
-            currentChar = adv.peekNextChar();            
+            currentChar = peekNextChar();            
         }
         
         return currentChar;
@@ -152,28 +163,28 @@ public class Scanner{
                     break;
                 
                 //if valid consume char and return token
-                adv.getNextChar();
+                getNextChar();
                 return wordTable.get(currentChar + "" + nextChar);
             case '|':
                 if(nextChar != '|') //only valid char
                     break; 
                 
                 //if valid consume char and return token
-                adv.getNextChar();
+                getNextChar();
                 return wordTable.get(currentChar + "" + nextChar);
             case ':':
                 if(nextChar != '=') 
                     return wordTable.get(":");
                 
                 //if valid consume char and return token
-                adv.getNextChar();
+                getNextChar();
                 return wordTable.get(currentChar + "" + nextChar);
             case '<':
                 if(nextChar != '=') 
                     return wordTable.get("<");
                 else {
                     //if valid consume char and return token
-                    adv.getNextChar();
+                    getNextChar();
                     return wordTable.get("<=");
                 }
             case '>':
@@ -181,26 +192,26 @@ public class Scanner{
                     return wordTable.get(">");
                 else {
                     //if valid consume char and return token
-                    adv.getNextChar();
+                    getNextChar();
                     return wordTable.get(">=");
                 }
             case '/': //start comment
                 if(nextChar == '*') { 
-                    adv.getNextChar();
+                    getNextChar();
                     
                     if(removeComment())
                         return getToken(); // no eof continue scanning
                     else 
                         return new Token(TokenType.ENDFILE, ENDFILE + "", null); 
                 } else if (nextChar == '=') {
-                    adv.getNextChar();
+                    getNextChar();
                     return wordTable.get("/=");
                 }
                 else                            
                     return wordTable.get("/");
             case '-': //comment out line
                 if(nextChar == '-') {
-                    adv.getNextChar();
+                    getNextChar();
                     
                     if(skipLine())
                         return getToken(); // no eof continue scanning
@@ -210,7 +221,6 @@ public class Scanner{
                     return wordTable.get("-");
         }
         
-//        adv.getNextChar();
         return new Token(TokenType.ERROR, currentChar + "", currentChar + "" + nextChar + " does not form a valid symbol");
     }
     
@@ -223,7 +233,7 @@ public class Scanner{
         String id = currentChar + "";
        
         //consume characters until invalid or end of file
-        while(adv.hasNextChar() && isCharacter(filterPeek())) {
+        while(hasNextChar() && isCharacter(filterPeek())) {
             id += filterNext();
         }
         
@@ -264,7 +274,7 @@ public class Scanner{
         char nextChar;
        
         //consume characters until invalid or end of file
-        while(adv.hasNextChar() && isNumeric(filterPeek())) {
+        while(hasNextChar() && isNumeric(filterPeek())) {
             id += filterNext();
         }      
         
@@ -276,11 +286,11 @@ public class Scanner{
      * @return true if the line was skipped, false if EOF was found
      */
     private boolean skipLine() {
-        char nextChar = adv.getNextChar();
+        char nextChar = getNextChar();
         
         //scan until the end of the file is found or a newline
-        while(adv.hasNextChar() && adv.peekNextChar() != '\n') {
-            if(adv.getNextChar() == ENDFILE) 
+        while(hasNextChar() && peekNextChar() != '\n') {
+            if(getNextChar() == ENDFILE) 
                  return false;
         }
         
@@ -294,19 +304,19 @@ public class Scanner{
     private boolean removeComment() {        
         int commentDepth = 1; //starts at one level
         
-        while(adv.hasNextChar()) {
-            char currentChar = adv.getNextChar();
+        while(hasNextChar()) {
+            char currentChar = getNextChar();
             
             switch(currentChar) {
                 case '/': //check for opening symbol
-                    if(adv.peekNextChar() == '*') {
-                        adv.getNextChar();
+                    if(peekNextChar() == '*') {
+                        getNextChar();
                         commentDepth++;
                     }
                     break;
                 case '*': //check for closing symbol
-                    if(adv.peekNextChar() == '/') {
-                        adv.getNextChar();
+                    if(peekNextChar() == '/') {
+                        getNextChar();
                         commentDepth--;
                     }
                     break;
@@ -544,5 +554,70 @@ public class Scanner{
         }  
         
         return charSet;
+    }
+    
+        /**
+    * Returns the next available character
+    * @return Next Character in the String
+    */
+   public char getNextChar(){
+       String line;
+       //Get next character
+       char returnChar = fileAsString.charAt(characterposition++);
+       charPosInLine++;
+       //Check if we progress to next line
+       if(returnChar == '\n'){
+           linenumber++;
+           charPosInLine = 0;
+           
+           if(verbose){
+                line = "Line " + linenumber + ": " + fileByLines[linenumber];
+                System.out.println(line);
+                if(printFile)
+                   printWriter.print(line + "\r\n");
+           }
+       }
+       return returnChar;
+    }
+   
+       /**
+     * Used to peek at the next character without moving the cursor
+     * @return the next character in the input string
+     */
+    public char peekNextChar() {
+        return fileAsString.charAt(characterposition);
+    }
+    
+    /**
+     * Used to check if there is another character in the Input String 
+     * @return true if there is another character
+     */
+    public boolean hasNextChar() {
+        return (characterposition) < fileAsString.length();
+    }
+    
+    /**
+     * Used to set the output device
+     * @param printWriter the output device 
+     * @created by Emery
+     */
+    public void setTrace(PrintWriter printWriter) {
+        this.printWriter = printWriter;
+    }
+    
+    /**
+     * Used to set the input device
+     * @param fileReader the input stream to use
+     * @created by Emery
+     */
+    public void setInput(FileReader fileReader) {
+        try{
+                //Load the file into our string buffer
+                fileAsString = "\n" + fileReader.readFileToString() + '\u001a';
+                fileByLines = fileAsString.split("\n");
+        }catch(IOException e){
+               System.out.println("Administrative Console: " + e.toString());
+        }
+        this.fileReader = fileReader;
     }
 }

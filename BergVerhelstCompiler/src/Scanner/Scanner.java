@@ -64,7 +64,7 @@ public class Scanner {
     public Token getToken(){ 
         Token toRet = getNextToken();
         
-        print(toRet + "\n");
+        print(toRet.toString());
         return toRet;
     } 
     
@@ -358,7 +358,7 @@ public class Scanner {
                 addWordToken(tok);
             }
         }catch(IOException e){
-            printError(e.toString() + "\r\n");
+            printError(e.toString());
             return false;
         }
         return true;
@@ -571,7 +571,7 @@ public class Scanner {
            charPosInLine = 0;
            
            line = "Line " + linenumber + ": " + fileByLines[linenumber];
-           print(line + "\r\n");
+           print(line);
        }
        return returnChar;
     }
@@ -612,7 +612,7 @@ public class Scanner {
                 fileAsString = "\n" + fileReader.readFileToString() + '\u001a';
                 fileByLines = fileAsString.split("\n");
         }catch(IOException e){
-               printError("Administrative Console: " + e.toString() + "\n");
+               printError("Administrative Console: " + e.toString());
         }
         this.fileReader = fileReader;
     }
@@ -627,7 +627,7 @@ public class Scanner {
             System.out.println(line);
 
             if(printFile)
-              printWriter.print(line);
+              printWriter.print(line + "\r\n");
         }
     }
     
@@ -639,6 +639,6 @@ public class Scanner {
         System.out.println(line);
 
         if(printFile)
-          printWriter.print(line);
+          printWriter.print(line + "\r\n");
     } 
 }

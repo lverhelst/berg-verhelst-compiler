@@ -23,7 +23,6 @@ import Parser.ASTNode.UnopNode;
 import Parser.ASTNode.VarDeclarationNode;
 import Parser.ASTNode.VariableNode;
 import Scanner.Scanner;
-import java.io.IOException;
 import java.io.PrintWriter;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -71,7 +70,7 @@ public class Parser {
        print("Loaded: " + lookahead.getName());
        rootNode = (ASTNode)visit("program");
        //Print AST
-       print((ProgramNode)rootNode);
+       print(((ProgramNode)rootNode).toString());
     }
     
     public Object visit(String methodName) {

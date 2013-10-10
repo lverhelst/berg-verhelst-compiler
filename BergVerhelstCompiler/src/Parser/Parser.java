@@ -23,6 +23,7 @@ import Parser.ASTNode.UnopNode;
 import Parser.ASTNode.VarDeclarationNode;
 import Parser.ASTNode.VariableNode;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 /**
@@ -71,7 +72,9 @@ public class Parser {
        } while(currentToken.getName() != TokenType.ENDFILE);*/
        currentToken = scn.getToken();
        lookahead = currentToken;
+       System.out.println("Loaded: " + lookahead.getName());
        rootNode = (ASTNode)visit("program");
+       //Print AST
        System.out.println((ProgramNode)rootNode);
        
     }
@@ -517,7 +520,9 @@ public class Parser {
      */
     public void match(TokenType expected) {
         if (lookahead.getName() == expected){
+            System.out.println("Matched: " + expected);
             lookahead = scn.getToken();
+            System.out.println("Loaded: " + lookahead.getName());
         }
         else {
             System.out.println("Expected: " + expected + " found: " + lookahead.getName());
@@ -555,24 +560,40 @@ public class Parser {
      */
     public ASTNode program() { 
         ProgramNode root = rootNode.new ProgramNode(); 
+        FuncDeclarationNode currentFunc =  null;
+        VarDeclarationNode currentVarDec = null;
+       
         Object declaration = visit("declaration");
-        ProgramNode current = root; 
-        
-        if(declaration instanceof FuncDeclarationNode)
+        if(declaration instanceof FuncDeclarationNode){
             root.funcdeclaration = (FuncDeclarationNode)declaration;
-        else       
+            currentFunc = root.funcdeclaration;
+        }
+        else{       
             root.vardeclaration = (VarDeclarationNode)declaration;
+            currentVarDec = root.vardeclaration;
+        }
         
         while(firstSet.get("program").getSet().contains(this.lookahead.getName())){ 
-            current.nextNode = rootNode.new ProgramNode(); 
-            current = current.nextNode; 
-            
             declaration = visit("declaration");
-            if(declaration instanceof FuncDeclarationNode)
-                current.funcdeclaration = (FuncDeclarationNode)declaration;
-            else       
-                current.vardeclaration = (VarDeclarationNode)declaration;
-        } 
+            if(declaration instanceof FuncDeclarationNode){
+                if(currentFunc == null){
+                    root.funcdeclaration = (FuncDeclarationNode)declaration;
+                    currentFunc = root.funcdeclaration; 
+                }else{
+                    currentFunc.nextFuncDec = (FuncDeclarationNode)declaration;
+                    currentFunc = currentFunc.nextFuncDec;
+                }
+               
+            }else       {
+                if(currentVarDec == null){
+                     root.vardeclaration = (VarDeclarationNode)declaration;
+                     currentVarDec = root.vardeclaration;
+                }else{
+                    currentVarDec.nextVarDec = (VarDeclarationNode)declaration;
+                    currentVarDec = currentVarDec.nextVarDec;
+                }
+           }
+        }
         return root; 
     }
     
@@ -824,7 +845,9 @@ public class Parser {
         if(firstSet.get("assign-stmt-tail").contains(lookahead.getName())){
             return (ASTNode.AssignmentNode)visit("assignstmtTail");
         }else if(firstSet.get("call-stmt-tail").contains(lookahead.getName())){
-            return (ASTNode.CallNode)visit("callstmtTail");
+            CallNode node = rootNode.new CallNode();
+            node.arguments = (ArrayList<Expression>)visit("callstmtTail");
+            return node;
         }else
             console.error("idstmtTail error: " +  lookahead.getName());
         return null;
@@ -855,35 +878,39 @@ public class Parser {
      * Used to deal with the call-stmt-tail phrase (14)
      * @created by Emery
      */
-    public ASTNode callstmtTail() {
-        ASTNode.CallNode current = (ASTNode.CallNode)visit("callTail");
+    public ArrayList<Expression> callstmtTail() {
+        ArrayList<Expression> argList = (ArrayList<Expression>)visit("callTail");
         match(TokenType.SEMI);
-        
-        return current;
+        return argList;
     }
     
     /**
      * Used to deal with the call-tail phrase (15)
      * @created by Emery
      */
-    public void callTail() {
+    public CallNode callTail() {
+        CallNode node = rootNode.new CallNode();
         match(TokenType.LPAREN);
         if(firstSet.get("arguments").contains(lookahead.getName())){
-            visit("arguments");
+            node.arguments = (ArrayList<Expression>)visit("arguments");
         }
         match(TokenType.RPAREN);
+        return node;
     }
     
     /**
      * Used to deal with the arguments phrase (16)
      * @created by Emery
      */
-    public void arguments() {
-        visit("expression");
+    public ArrayList<Expression> arguments() {
+        ArrayList<Expression> argList = new ArrayList<Expression>();
+        argList.add((Expression)visit("expression"));
         while(lookahead.getName() == TokenType.COMMA){
             match(TokenType.COMMA);
-            visit("expression");
+            Expression e = (Expression)visit("expression");
+            argList.add(e);
         }
+        return argList;
     }
     
     /**
@@ -929,7 +956,7 @@ public class Parser {
         node.stmt = (ASTNode)visit("statement");
         if(lookahead.getName() == TokenType.ELSE){
             match(TokenType.ELSE);
-            node.stmt = (ASTNode) visit("statement");
+            node.elseStmt = (ASTNode) visit("statement");
         }
         return node;
     }
@@ -946,8 +973,8 @@ public class Parser {
         node.stmt = (Statement)visit("statement");
         while(firstSet.get("statement").contains(lookahead.getName())){
             current.nextLoopNode = rootNode.new LoopNode();
+            current.nextLoopNode.stmt = (Statement)visit("statement");
             current = current.nextLoopNode;
-            current.stmt = (Statement)visit("statement");
         }
         match(TokenType.END);
         match(TokenType.SEMI);
@@ -1163,8 +1190,20 @@ public class Parser {
         VariableNode node = rootNode.new VariableNode();
         node.specifier = TokenType.ID;
         node.ID = Integer.parseInt(ID);
-        node.offset = (Expression)visit("idTail");      
-        return node;
+        
+        ASTNode e = (ASTNode)visit("idTail"); 
+        if(e != null && e.getClass() != CallNode.class){
+            node.offset = (Expression)e;
+            return node;
+        }else{
+            if(e == null)
+                return node;
+            //IS Call
+            CallNode cnode = (CallNode)e;
+            cnode.specifier = TokenType.ID;
+            cnode.ID = Integer.parseInt(ID);
+            return cnode;
+        }
     }
     
     /**
@@ -1245,9 +1284,10 @@ public class Parser {
             match(TokenType.OR);
             type = TokenType.OR;
         }
-        //if(lookahead.getName() == TokenType.||){
-        //    match(TokenType.||);
-        //}
+        if(lookahead.getName() == TokenType.ORELSE){
+            match(TokenType.ORELSE);
+            type = TokenType.ORELSE;
+        }
         return type;
     }
     
@@ -1273,8 +1313,10 @@ public class Parser {
             match(TokenType.AND);
             type = TokenType.AND;
         }
-        // if(lookahead.getName() == TokenType.&&)
-        //  match(TokenType.&&);
+        if(lookahead.getName() == TokenType.ANDTHEN){
+            match(TokenType.ANDTHEN);
+            type = TokenType.ANDTHEN;
+        }
         return type;
     }
     

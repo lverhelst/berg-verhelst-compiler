@@ -18,17 +18,15 @@ public class ASTNode{
     public class ProgramNode extends ASTNode{
         FuncDeclarationNode funcdeclaration;
         VarDeclarationNode vardeclaration;
-        ProgramNode nextNode;
+        //ProgramNode nextNode;
         
         @Override
         public String toString() {
             String temp = "[Program]\n";
             String temp2;
-            
-            temp += printFormat(funcdeclaration);            
             temp += printFormat(vardeclaration);  
-            
-            return printFormat(temp) + printFormat(nextNode);
+            temp += printFormat(funcdeclaration);            
+            return printFormat(temp);//+ printFormat(nextNode);
         }
     }
     
@@ -41,13 +39,14 @@ public class ASTNode{
         TokenType specifier;       
         ParameterNode params; 
         CompoundNode compoundStmt;  
+        FuncDeclarationNode nextFuncDec;
         
         @Override
         public String toString() {
             String temp = "[Function Declaration] = " + ID + " : " + specifier + "\n";
             temp += printFormat(params);   
             temp += printFormat(compoundStmt);  
-            return printFormat(temp);
+            return printFormat(temp) + printFormat(nextFuncDec);
         }
     }
     
@@ -60,17 +59,18 @@ public class ASTNode{
         TokenType specifier;
         Expression offset;
         VarDeclarationNode nextVarDec;
-        
+                
          @Override
         public String toString() {
             String temp = "[Variable Declaration] = " + ID + " : " + specifier + " " + "\n";
                     
-            if(nextVarDec != null)
+            if(nextVarDec != null){
                 nextVarDec.space = this.space;
-            temp += printFormat(nextVarDec);
+            }
+           // temp += printFormat(nextVarDec);
             temp += printFormat((ASTNode)offset);  
             
-            return printFormat(temp);
+            return printFormat(temp) + printFormat(nextVarDec);
         }
     }
     
@@ -85,7 +85,9 @@ public class ASTNode{
         @Override
         public String toString() {
             String temp = "[Parameter] " + param + "\n";
-            
+            if(nextNode != null){
+                nextNode.space = this.space;
+            }
             return printFormat(temp) + printFormat(nextNode);
         }
     }
@@ -175,11 +177,15 @@ public class ASTNode{
         
         @Override
         public String toString() {
-             String temp = "[Loop]\n";
-            
+            String temp = "[Loop]\n";
             temp += printFormat((ASTNode)stmt); 
-            
-            return printFormat(temp) + (nextLoopNode != null? printFormat(nextLoopNode) :"");
+            LoopNode current = this;            
+            while(current.nextLoopNode != null){
+                current.nextLoopNode.space = this.space;
+                temp += printFormat((ASTNode)(current.nextLoopNode).stmt);
+                current = current.nextLoopNode;
+            }
+            return printFormat(temp);
         }
     }
      /**
@@ -264,14 +270,18 @@ public class ASTNode{
     public class CallNode extends ASTNode implements Expression, Statement{
         TokenType specifier;
         int ID;
-        Expression parameters;
+        ArrayList<Expression> arguments;
+        
+        public CallNode(){
+            arguments = new ArrayList<Expression>();
+        }
         
         @Override
         public String toString() {
             String temp = "[Call] " + ID + " : " + specifier + "\n";
-            
-            temp += printFormat((ASTNode)parameters); 
-            
+            for(Expression e: arguments){
+                temp += printFormat((ASTNode)e); 
+            }
             return printFormat(temp);
         }
     }

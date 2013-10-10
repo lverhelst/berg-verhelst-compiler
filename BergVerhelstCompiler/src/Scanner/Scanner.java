@@ -54,6 +54,14 @@ public class Scanner{
      * @return the next valid token
      */
     public Token getToken(){ 
+        Token toRet = getNextToken();
+        //if(trace)
+        //printWriter.print(toRet);
+        System.out.print(toRet + "\n");
+        return toRet;
+    } 
+    
+    private Token getNextToken(){
         char currentChar = adv.getNextChar();        
         
         //filter out the white spaces
@@ -84,7 +92,9 @@ public class Scanner{
         return new Token(TokenType.ERROR, currentChar + "", "Invalid Character " 
                 + (int)currentChar + " of type " + getCharType(currentChar) 
                 + " and resulted in an error token");
-    } 
+    }
+    
+    
     
     /**
      * Used to filter out invisible characters (white spaces are not skipped)

@@ -12,15 +12,15 @@ import java.io.PrintWriter;
  * Creates tokens from an input of characters
  */
 public class Scanner {
-    private String fileAsString;
-    private String[] fileByLines;
-    private FileReader fileReader;
-    private PrintWriter printWriter;
     private final char ENDFILE = 26;
     private int currentID;
+    private FileReader fileReader;
+    private PrintWriter printWriter;
     private boolean quite;
     private boolean verbose;
     private boolean printFile;
+    private String fileAsString;
+    private String[] fileByLines;
     private int linenumber;
     private int charPosInLine;
     private int characterposition;
@@ -73,7 +73,7 @@ public class Scanner {
      */
     public Token getToken(){ 
         Token toRet = getNextToken();
-        System.out.print(toRet + "\n");
+        print(toRet.toString());
         return toRet;
     } 
     
@@ -367,7 +367,7 @@ public class Scanner {
                 addWordToken(tok);
             }
         }catch(IOException e){
-            System.out.println(e.toString());
+            printError(e.toString());
             return false;
         }
         return true;
@@ -579,12 +579,8 @@ public class Scanner {
            linenumber++;
            charPosInLine = 0;
            
-           if(verbose){
-                line = "Line " + linenumber + ": " + fileByLines[linenumber];
-                System.out.println(line);
-                if(printFile)
-                   printWriter.print(line + "\r\n");
-           }
+           line = "Line " + linenumber + ": " + fileByLines[linenumber];
+           print(line);
        }
        return returnChar;
     }
@@ -625,8 +621,33 @@ public class Scanner {
                 fileAsString = fileReader.readFileToString() + '\u001a';
                 fileByLines = fileAsString.split("\n");
         }catch(IOException e){
-               System.out.println("Scanner: " + e.toString());
+               printError("Administrative Console: " + e.toString());
         }
         this.fileReader = fileReader;
     }
+    
+    
+    /**
+     * Used to print messages to the console or file if set to
+     * @param line the string to print
+     */
+    public void print(String line) {
+        if(verbose) {  
+            System.out.println(line);
+
+            if(printFile)
+              printWriter.print(line + "\r\n");
+        }
+    }
+    
+    /**
+     * Used to print error messages to the console or file if set to
+     * @param line the line to print
+     */
+    public void printError(String line) {
+        System.out.println(line);
+
+        if(printFile)
+          printWriter.print(line + "\r\n");
+    } 
 }

@@ -2,7 +2,6 @@ package UnitTests;
 
 import FileIO.FileReader;
 import Lexeme.Token;
-import Main.AdministrativeConsole;
 import Scanner.Scanner;
 import java.io.IOException;
 import java.lang.reflect.Method;
@@ -14,15 +13,13 @@ import Lexeme.TokenType;
  * @author Emery
  */
 public class ScannerTest {
-    private AdministrativeConsole adminCon;
     private Scanner scanner;
     
     /**
      * Creates the unit tester for the scanner
      * @param adv the administrative console to use
      */
-    public ScannerTest(AdministrativeConsole adv) {
-        this.adminCon = adv;
+    public ScannerTest() {
         scanner = new Scanner();
     }
     
@@ -85,7 +82,7 @@ public class ScannerTest {
             return false;
         }
         
-        //adminCon.loadFile("unit/scannerToken.cs13");
+        scanner.setInput(new FileReader("unit/scannerToken.cs13"));
         Token token;
         boolean check = true;
         int i = 0;        

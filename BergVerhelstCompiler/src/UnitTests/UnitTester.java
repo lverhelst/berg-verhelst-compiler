@@ -23,7 +23,7 @@ public class UnitTester {
     public void runAllUnitTests(){
         AdministrativeConsoleUnitTest acut = new AdministrativeConsoleUnitTest();
         acut.runAllUnitTests();
-        ScannerTest scan = new ScannerTest(adv);
+        ScannerTest scan = new ScannerTest();
         scan.runAllUnitTests();
         TokenTest tknt = new TokenTest();
         tknt.runAllUnitTests();

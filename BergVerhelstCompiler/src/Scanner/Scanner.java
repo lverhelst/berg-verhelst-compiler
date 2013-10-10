@@ -17,8 +17,8 @@ public class Scanner {
     private FileReader fileReader;
     private PrintWriter printWriter;
     private boolean quite;
-    private boolean verbose;
-    private boolean printFile;
+    public boolean verbose;
+    public boolean printFile;
     private String fileAsString;
     private String[] fileByLines;
     private int linenumber;
@@ -73,7 +73,7 @@ public class Scanner {
      */
     public Token getToken(){ 
         Token toRet = getNextToken();
-        print(toRet.toString());
+        print("    " + linenumber + ":  " + toRet.toString());
         return toRet;
     } 
     
@@ -578,8 +578,7 @@ public class Scanner {
        if(returnChar == '\n'){
            linenumber++;
            charPosInLine = 0;
-           
-           line = "Line " + linenumber + ": " + fileByLines[linenumber];
+           line = "Line " + linenumber + ": " + fileByLines[linenumber].trim();
            print(line);
        }
        return returnChar;
@@ -618,7 +617,7 @@ public class Scanner {
     public void setInput(FileReader fileReader) {
         try{
                 //Load the file into our string buffer
-                fileAsString = fileReader.readFileToString() + '\u001a';
+                fileAsString =  "\n" + fileReader.readFileToString() + '\u001a';
                 fileByLines = fileAsString.split("\n");
         }catch(IOException e){
                printError("Administrative Console: " + e.toString());
@@ -634,7 +633,6 @@ public class Scanner {
     public void print(String line) {
         if(verbose) {  
             System.out.println(line);
-
             if(printFile)
               printWriter.print(line + "\r\n");
         }

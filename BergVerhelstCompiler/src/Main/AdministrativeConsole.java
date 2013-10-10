@@ -4,7 +4,7 @@ import Parser.Parser;
 import Scanner.Scanner;
 import UnitTests.UnitTester;
 import java.io.File;
-import FileIO.FileReader;
+import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.InputMismatchException;
@@ -48,6 +48,7 @@ public class AdministrativeConsole {
    int charPosInLine;
    int characterposition;
    private boolean didPass;
+   private boolean invalidOption;
    /**
     * Create Administrative console with the provided parameters
     * @param args Arguments/Parameters
@@ -58,7 +59,11 @@ public class AdministrativeConsole {
        //Set parameters for admin console
        //setParameters(args);
    }
-   
+   /**
+    * Initialize compiler
+    * @Author Leon
+    * @param args Arguments to the compiler
+    */
    private void initializeCliParser(String [] args){
        opts = new Options();
        Option helpOption = new Option("help", false, "Displays Help Menu");
@@ -70,8 +75,9 @@ public class AdministrativeConsole {
        Option quietOption = new Option ("q", false, "Only display error messages (Default)");
        Option verboseOption = new Option("v", false, "Display all Trace Messages");
        Option outOption = new Option("o", true, "Print to file (default (System.out))");
+       
        Option errOption = new Option("err", true, "Print error (default (System.out))");
-       Option uiOption = new Option("ui", false, "UI option)");
+       //Option uiOption = new Option("ui", false, "UI option)");
        opts.addOption(helpOption);
        opts.addOption(lexOption);
        opts.addOption(parseOption);
@@ -80,20 +86,27 @@ public class AdministrativeConsole {
        opts.addOption(verboseOption);
        opts.addOption(outOption);
        opts.addOption(errOption);
-       opts.addOption(uiOption);
+       //opts.addOption(uiOption);
        cliparser = new BasicParser();
        try{
            cmd = cliparser.parse(opts, args);
        }catch(ParseException pe){
            System.out.println(pe.getLocalizedMessage());
            usage(opts);
+           invalidOption = true;
        }
        
    }
    /**
     * Runs the compiler with set params
+    * @Author Leon
     */
    public void executeCompiler(){
+       if(invalidOption){
+           System.out.println("Invalid Option: Compiler Terminated");
+           return;
+       }
+       
        //Display help if it exists
        if(cmd.hasOption("h")){
            usage(opts);
@@ -107,6 +120,7 @@ public class AdministrativeConsole {
    
    /**
     * Read and Compile the file
+    * @Author Leon
     */
    private void runFileProcess(){
        didPass = true;
@@ -274,17 +288,40 @@ public class AdministrativeConsole {
                    writer.writeLine(line);
            }
        }*/
+       //Create new Scanner
        Scanner scn = new Scanner();
        scn.setInput(new FileIO.FileReader(filename));
-       scn.setTrace(new PrintWriter(System.out));
-       //Parse
-       Parser prs = new Parser(this, scn);
-       prs.parse(cmd.hasOption("v"));
-       if(this.didPass){
-           System.out.println("PASS");
+       PrintWriter pWriter = new PrintWriter(System.out);
+       if(cmd.hasOption("o")){
+           try{
+               pWriter = new PrintWriter(cmd.getOptionValue("o"));
+               scn.setTrace(pWriter);
+               scn.printFile = true;
+           }catch(FileNotFoundException fnfe){
+               System.out.println("Could not write to file: " + cmd.getOptionValue("o") + "\n" + fnfe.getLocalizedMessage());
+           }
        }else{
-           System.out.println("FAIL");
+           scn.setTrace(pWriter);
        }
+       scn.verbose = cmd.hasOption("v");
+       //Parse
+       //Create new Parser
+       Parser prs = new Parser(scn);
+       if(cmd.hasOption("scan")){
+           prs.verbose = false;
+       }else{
+           prs.verbose = cmd.hasOption("v");
+       }
+       prs.setTrace(pWriter);
+       if(cmd.hasOption("o")){
+               prs.printFile = true;
+       }
+       prs.parse(cmd.hasOption("v"));
+       System.out.println((didPass)? "PASS": "FAIL");
+       if(cmd.hasOption("o")){
+            pWriter.print((didPass)? "PASS": "FAIL");
+       }
+       pWriter.close();
        System.out.println("Administrative Console - Completed Scan");
    }  
    

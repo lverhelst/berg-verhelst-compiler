@@ -43,8 +43,8 @@ public class Parser {
     private FileReader fileReader;
     private PrintWriter printWriter;
     private boolean quite;
-    private boolean verbose;
-    private boolean printFile;
+    public boolean verbose;
+    public boolean printFile;
     
     /**
      * Empty Constructor
@@ -57,19 +57,7 @@ public class Parser {
         rootNode = new ASTNode();
         depth = 0;
     }
-    
-    public Parser(AdministrativeConsole ac, Scanner.Scanner scan){
-        this.console = ac;
-        genFirstSets();
-        genFollowSets();
-        rootNode = new ASTNode();
-        depth = 0;
-        this.scn = scan;
-    }
-    
-    
-    
-    
+
     /**
      * Method stub for next phase, currently retrieves all tokens
      * @param showTrace 
@@ -1346,6 +1334,7 @@ public class Parser {
      */
     public void setTrace(PrintWriter printWriter) {
         this.printWriter = printWriter;
+        
     }
     
     /**
@@ -1363,7 +1352,6 @@ public class Parser {
     public void print(String line) {
         if(verbose) {  
             System.out.println(line);
-
             if(printFile)
               printWriter.print(line + "\r\n");
         }

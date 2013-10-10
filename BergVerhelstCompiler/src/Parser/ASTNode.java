@@ -22,7 +22,7 @@ public class ASTNode{
         
         @Override
         public String toString() {
-            String temp = "[Program]\n";
+            String temp = "[Program]\r\n";
             String temp2;
             temp += printFormat(vardeclaration);  
             temp += printFormat(funcdeclaration);            
@@ -43,7 +43,7 @@ public class ASTNode{
         
         @Override
         public String toString() {
-            String temp = "[Function Declaration] = " + ID + " : " + specifier + "\n";
+            String temp = "[Function Declaration] = " + ID + " : " + specifier + "\r\n";
             temp += printFormat(params);   
             temp += printFormat(compoundStmt);  
             return printFormat(temp) + printFormat(nextFuncDec);
@@ -62,7 +62,7 @@ public class ASTNode{
                 
          @Override
         public String toString() {
-            String temp = "[Variable Declaration] = " + ID + " : " + specifier + " " + "\n";
+            String temp = "[Variable Declaration] = " + ID + " : " + specifier + " " + "\r\n";
                     
             if(nextVarDec != null){
                 nextVarDec.space = this.space;
@@ -84,7 +84,7 @@ public class ASTNode{
         
         @Override
         public String toString() {
-            String temp = "[Parameter] " + param + "\n";
+            String temp = "[Parameter] " + param + "\r\n";
             if(nextNode != null){
                 nextNode.space = this.space;
             }
@@ -108,7 +108,7 @@ public class ASTNode{
         
         @Override
         public String toString() {
-            String temp = "[Compound]\n";
+            String temp = "[Compound]\r\n";
             
             for(VarDeclarationNode var: variableDeclarations)
                 temp += printFormat(var);  
@@ -137,7 +137,7 @@ public class ASTNode{
                 ((ASTNode)index).space = this.space;
             if(expersion != null)
                 ((ASTNode)expersion).space = this.space;
-            String temp = "[Assignment]\n";
+            String temp = "[Assignment]\r\n";
             
             temp += printFormat((ASTNode)leftVar);
             temp += printFormat((ASTNode)index);   
@@ -158,7 +158,7 @@ public class ASTNode{
         
         @Override
         public String toString() {
-             String temp = "[If]\n";
+             String temp = "[If]\r\n";
             
             temp += printFormat((ASTNode)exp);   
             temp += printFormat((ASTNode)stmt);  
@@ -177,7 +177,7 @@ public class ASTNode{
         
         @Override
         public String toString() {
-            String temp = "[Loop]\n";
+            String temp = "[Loop]\r\n";
             temp += printFormat((ASTNode)stmt); 
             LoopNode current = this;            
             while(current.nextLoopNode != null){
@@ -203,7 +203,7 @@ public class ASTNode{
             if(specifier != null)
                 temp += String.format("%"+ (space + specifier.toString().length()) + "s", specifier); 
             
-            return printFormat(temp) + "\n";
+            return printFormat(temp) + "\r\n";
         }
     }
     /**
@@ -216,7 +216,7 @@ public class ASTNode{
         
         @Override
         public String toString() {
-             String temp = "[Return]\n";
+             String temp = "[Return]\r\n";
             
             temp += printFormat((ASTNode)exp); 
             
@@ -224,7 +224,7 @@ public class ASTNode{
         }
     }
     /**
-     * 
+     * @Created Emery
      */
     public class BranchNode extends ASTNode implements Statement{
         //Optional 
@@ -234,7 +234,7 @@ public class ASTNode{
                 
         @Override
         public String toString() {
-             String temp = "[Branch]\n";
+             String temp = "[Branch]\r\n";
             
             temp += printFormat((ASTNode)exp); 
             temp += printFormat(thisCase);
@@ -255,7 +255,7 @@ public class ASTNode{
         
         @Override
         public String toString() {
-             String temp = "[Case]\n";
+             String temp = "[Case]\r\n";
             
             temp += printFormat((ASTNode)stmt); 
             
@@ -278,7 +278,7 @@ public class ASTNode{
         
         @Override
         public String toString() {
-            String temp = "[Call] " + ID + " : " + specifier + "\n";
+            String temp = "[Call] " + ID + " : " + specifier + "\r\n";
             for(Expression e: arguments){
                 temp += printFormat((ASTNode)e); 
             }
@@ -296,7 +296,7 @@ public class ASTNode{
         
          @Override
         public String toString() {
-            return printFormat("[Variable] " + specifier + " :" + ID + (offset == null? "" : "[" + offset.toString() + "]") + "\n");
+            return printFormat("[Variable] " + specifier + " :" + ID + (offset == null? "" : "[" + offset.toString() + "]") + "\r\n");
         }
     }
     /**
@@ -309,7 +309,7 @@ public class ASTNode{
         
          @Override
         public String toString() {
-            return printFormat("[Literal] " + specifier + (lexeme != null? " lexeme: " + lexeme: "") + "\n");
+            return printFormat("[Literal] " + specifier + (lexeme != null? " lexeme: " + lexeme: "") + "\r\n");
                     
         }
     }
@@ -323,7 +323,7 @@ public class ASTNode{
         
          @Override
         public String toString() {
-            String temp = "[Unary Operator] " + specifier + "\n";
+            String temp = "[Unary Operator] " + specifier + "\r\n";
             temp += printFormat((ASTNode)Rside);
             
             return printFormat(temp);
@@ -340,7 +340,7 @@ public class ASTNode{
         
          @Override
         public String toString() {
-            String temp = "[Binary Operator] " + specifier + "\n";
+            String temp = "[Binary Operator] " + specifier + "\r\n";
             temp += printFormat((ASTNode)Lside);
             temp += printFormat((ASTNode)Rside);
             

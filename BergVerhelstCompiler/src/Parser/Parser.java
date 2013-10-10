@@ -1,9 +1,9 @@
 package Parser;
 
+import FileIO.FileReader;
 import Lexeme.TNSet;
 import Lexeme.Token;
 import Lexeme.TokenType;
-import Main.AdministrativeConsole;
 import Parser.ASTNode.BinopNode;
 import Parser.ASTNode.BranchNode;
 import Parser.ASTNode.CallNode;
@@ -22,6 +22,9 @@ import Parser.ASTNode.Statement;
 import Parser.ASTNode.UnopNode;
 import Parser.ASTNode.VarDeclarationNode;
 import Parser.ASTNode.VariableNode;
+import Scanner.Scanner;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -31,20 +34,25 @@ import java.util.HashMap;
  * Parser class for parsing the tokens from the Scanner
  */
 public class Parser {
-    private AdministrativeConsole console;
     private HashMap<String, TNSet> firstSet;
     private HashMap<String, TNSet> followSet;
-    private Scanner.Scanner scn;
+    private Scanner scn;
     private Token lookahead;
     ASTNode rootNode;
     private int depth;
+    
+    private FileReader fileReader;
+    private PrintWriter printWriter;
+    private boolean quite;
+    private boolean verbose;
+    private boolean printFile;
     
     /**
      * Empty Constructor
      * @created by Leon
      */
-    public Parser(AdministrativeConsole ac){
-        this.console = ac;
+    public Parser(Scanner scanner) {
+        this.scn = scanner;
         genFirstSets();
         genFollowSets();
         rootNode = new ASTNode();
@@ -57,32 +65,19 @@ public class Parser {
      * @created by Leon
      */
     public void parse(Boolean showTrace){
-       scn = new Scanner.Scanner(console);
        Token currentToken;
-       //Continue scanning until endfile is reached
-       /*do {
-           currentToken = scn.getToken();
-           if(currentToken.getName() != TokenType.ERROR ){
-               if(showTrace){
-                    console.printTraceInformation(currentToken);
-               }
-           }else{
-              console.handleErrorToken(currentToken);
-           }           
-       } while(currentToken.getName() != TokenType.ENDFILE);*/
        currentToken = scn.getToken();
        lookahead = currentToken;
-       System.out.println("Loaded: " + lookahead.getName());
+       print("Loaded: " + lookahead.getName());
        rootNode = (ASTNode)visit("program");
        //Print AST
-       System.out.println((ProgramNode)rootNode);
-       
+       print((ProgramNode)rootNode);
     }
     
     public Object visit(String methodName) {
         depth++;
-        String enter = String.format("%"+15+"s", "Entering Method: " + methodName);
-        System.out.format("%" + (depth + enter.length()) + "s\n" ,enter);
+        String enter = "Entering Method: " + methodName;
+        print(String.format("%" + (depth + enter.length()) + "s", enter));
         Object temp = null;
         
         try {
@@ -93,12 +88,12 @@ public class Parser {
                 ((ASTNode)temp).space = depth;
             }
         } catch(Exception e) {
-            System.out.println("Failed to run method: " + methodName + "\n" + e.getCause());
+            printError("Failed to run method: " + methodName + "\n" + e.getCause());
         } 
         
         depth--;
-        String leaving = String.format("%"+15+"s", "Leaving Method: " + methodName);
-        System.out.format("%" + (depth + leaving.length()) + "s\n" ,leaving);
+        String leaving = "Leaving Method: " + methodName;
+        print(String.format("%" + (depth + enter.length()) + "s", leaving));
         return temp;
     }
     
@@ -520,12 +515,12 @@ public class Parser {
      */
     public void match(TokenType expected) {
         if (lookahead.getName() == expected){
-            System.out.println("Matched: " + expected);
+            print("Matched: " + expected);
             lookahead = scn.getToken();
-            System.out.println("Loaded: " + lookahead.getName());
+            print("Loaded: " + lookahead.getName());
         }
         else {
-            System.out.println("Expected: " + expected + " found: " + lookahead.getName());
+            print("Expected: " + expected + " found: " + lookahead.getName());
             syntaxError(null);
         }
 //        syntaxCheck(synch);
@@ -549,7 +544,7 @@ public class Parser {
      * @created by Emery
      */
     public void syntaxError(TNSet synch) {
-        console.error("error");
+        printError("error");
 //        while(!synch.contains(lookahead.getName())) 
 //            lookahead.getName() = scn.getToken().getName();
     }
@@ -636,7 +631,7 @@ public class Parser {
                 return node;
             }
         }else
-            console.error("declaration error: " + this.lookahead.getName());
+            printError("declaration error: " + this.lookahead.getName());
         //syntaxError(sync);
         return null;
     }
@@ -833,7 +828,7 @@ public class Parser {
                 return (ASTNode.CallNode)temp;
             }
         }else
-            console.error("idstmt error: " + lookahead.getName());
+            printError("idstmt error: " + lookahead.getName());
         return null;
     }
     
@@ -849,7 +844,7 @@ public class Parser {
             node.arguments = (ArrayList<Expression>)visit("callstmtTail");
             return node;
         }else
-            console.error("idstmtTail error: " +  lookahead.getName());
+            printError("idstmtTail error: " +  lookahead.getName());
         return null;
     }
     
@@ -1069,7 +1064,7 @@ public class Parser {
              match(TokenType.COLON);
              node.stmt = (Statement)visit("statement");
         }//else
-         //   console.error("CaseStmt Error: " + lookahead.getName());
+         //   printError("CaseStmt Error: " + lookahead.getName());
         return node;
     }
     
@@ -1175,7 +1170,7 @@ public class Parser {
             node.specifier = TokenType.BLIT;
             return node;
         }else{
-            console.error("nidFactor error: " + lookahead.getName());  
+            printError("nidFactor error: " + lookahead.getName());  
             return null;
         }
     }
@@ -1333,4 +1328,44 @@ public class Parser {
         return type;
     }
     
+    /**
+     * Used to set the output device
+     * @param printWriter the output device 
+     * @created by Emery
+     */
+    public void setTrace(PrintWriter printWriter) {
+        this.printWriter = printWriter;
+    }
+    
+    /**
+     * Used to set the scanner to be used by the parser
+     * @param scanner the scanner to be used
+     */
+    public void setScanner(Scanner scanner) {
+        this.scn = scanner;
+    }
+    
+    /**
+     * Used to print messages to the console or file if set to
+     * @param line the string to print
+     */
+    public void print(String line) {
+        if(verbose) {  
+            System.out.println(line);
+
+            if(printFile)
+              printWriter.print(line + "\r\n");
+        }
+    }
+    
+    /**
+     * Used to print error messages to the console or file if set to
+     * @param line the line to print
+     */
+    public void printError(String line) {
+        System.out.println(line);
+
+        if(printFile)
+          printWriter.print(line + "\r\n");
+    } 
 }

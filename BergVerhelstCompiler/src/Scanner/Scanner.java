@@ -46,6 +46,7 @@ public class Scanner {
      * Creates the scanner object used to retrieve tokens for the compile
      */
     public Scanner(){
+        reset();
         this.generateWordTableFromFile();
         
         //if file fails load defaults
@@ -55,6 +56,15 @@ public class Scanner {
         symbolTable = new HashMap();
                             
         currentID = 0;    
+        
+    }
+    
+    private void reset(){
+       fileAsString = "";
+       fileByLines = null;
+       linenumber = 0;
+       charPosInLine = 0;
+       characterposition = 0;
     }
     
     /**
@@ -63,7 +73,6 @@ public class Scanner {
      */
     public Token getToken(){ 
         Token toRet = getNextToken();
-        
         System.out.print(toRet + "\n");
         return toRet;
     } 
@@ -613,10 +622,10 @@ public class Scanner {
     public void setInput(FileReader fileReader) {
         try{
                 //Load the file into our string buffer
-                fileAsString = "\n" + fileReader.readFileToString() + '\u001a';
+                fileAsString = fileReader.readFileToString() + '\u001a';
                 fileByLines = fileAsString.split("\n");
         }catch(IOException e){
-               System.out.println("Administrative Console: " + e.toString());
+               System.out.println("Scanner: " + e.toString());
         }
         this.fileReader = fileReader;
     }

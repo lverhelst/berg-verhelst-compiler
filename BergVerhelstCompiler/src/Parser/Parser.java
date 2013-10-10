@@ -51,13 +51,26 @@ public class Parser {
         depth = 0;
     }
     
+    public Parser(AdministrativeConsole ac, Scanner.Scanner scan){
+        this.console = ac;
+        genFirstSets();
+        genFollowSets();
+        rootNode = new ASTNode();
+        depth = 0;
+        this.scn = scan;
+    }
+    
+    
+    
+    
     /**
      * Method stub for next phase, currently retrieves all tokens
      * @param showTrace 
      * @created by Leon
      */
     public void parse(Boolean showTrace){
-       scn = new Scanner.Scanner(console);
+       //scn = new Scanner.Scanner();
+       
        Token currentToken;
        //Continue scanning until endfile is reached
        /*do {

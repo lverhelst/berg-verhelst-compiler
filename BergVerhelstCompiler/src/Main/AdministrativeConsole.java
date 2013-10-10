@@ -1,13 +1,13 @@
 package Main;
-import FileIO.FileReader;
-import FileIO.Writer;
 import Lexeme.Token;
-import java.io.File;
 import Parser.Parser;
+import Scanner.Scanner;
 import UnitTests.UnitTester;
-import java.io.IOException;
-import java.util.InputMismatchException;
+import java.io.File;
+import FileIO.FileReader;
+import java.io.PrintWriter;
 import java.util.HashMap;
+import java.util.InputMismatchException;
 import org.apache.commons.cli.*;
 
 
@@ -40,7 +40,6 @@ public class AdministrativeConsole {
            this.requiresValue = requiresValue;
        }
    }
-   Writer writer;
    
    String fileAsString;
    String[] fileByLines;
@@ -99,19 +98,11 @@ public class AdministrativeConsole {
        if(cmd.hasOption("h")){
            usage(opts);
        }
-       
-       
-       //if(arguments.containsKey("test")){
-       //    runUnitTests();
-       //}else{
-            //If the UI option is specified it takes precendence over all others
-            //Display UI, otherwise run the compiler with the other provided arguments
-            if(cmd.hasOption("ui")){
-                runUI();
-            }else{
-                runFileProcess();
-            }
-       //}
+        if(cmd.hasOption("ui")){
+            runUI();
+        }else{
+            runFileProcess();
+        }
    }
    
    /**
@@ -125,35 +116,8 @@ public class AdministrativeConsole {
             if(!fileName.endsWith("cs13")){
                 System.out.println("Administrative Console - Invalid File Name: " + fileName);
             }else{
-                FileReader reader = new FileReader(fileName);
-                try{
-                        //Load the file into our string buffer
-                        fileAsString = "\r\n" + reader.readFileToString() + '\u001a';
-                        fileByLines = fileAsString.split("\n");
-                        parseFile();
-                }catch(IOException e){
-                    System.out.println("Administrative Console: " + e.toString());
-                }
+                parseFile(fileName);
             }
-       }
-   }
-   
-   /**
-    * Used to load files for testing in unit test
-    * @param fileName the name of the file to load
-    */
-   public void loadFile(String fileName) {
-       if(!fileName.endsWith("cs13")){
-           System.out.println("Administrative Console - Invalid File Name: " + fileName);
-       }else{
-           FileReader reader = new FileReader(fileName);
-           try{
-                //Load the file into our string buffer
-                fileAsString = "\n" + reader.readFileToString() + '\u001a';
-                fileByLines = fileAsString.split("\n");
-           }catch(IOException e){
-               System.out.println("Administrative Console: " + e.toString());
-           }
        }
    }
    
@@ -298,7 +262,7 @@ public class AdministrativeConsole {
    /**
     * Parse input File
     */
-   private void parseFile(){
+   private void parseFile(String filename){
        //Check trace
        String line;
        //We are not supposed to print the file at the beginning of the parsing run
@@ -310,8 +274,11 @@ public class AdministrativeConsole {
                    writer.writeLine(line);
            }
        }*/
+       Scanner scn = new Scanner();
+       scn.setInput(new FileIO.FileReader(filename));
+       scn.setTrace(new PrintWriter(System.out));
        //Parse
-       Parser prs = new Parser(this);
+       Parser prs = new Parser(this, scn);
        prs.parse(cmd.hasOption("v"));
        if(this.didPass){
            System.out.println("PASS");

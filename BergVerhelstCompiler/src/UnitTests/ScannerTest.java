@@ -23,7 +23,7 @@ public class ScannerTest {
      */
     public ScannerTest(AdministrativeConsole adv) {
         this.adminCon = adv;
-        scanner = new Scanner(adv);
+        scanner = new Scanner();
     }
     
     /**
@@ -85,7 +85,7 @@ public class ScannerTest {
             return false;
         }
         
-        adminCon.loadFile("unit/scannerToken.cs13");
+        //adminCon.loadFile("unit/scannerToken.cs13");
         Token token;
         boolean check = true;
         int i = 0;        

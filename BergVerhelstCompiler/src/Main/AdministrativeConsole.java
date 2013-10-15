@@ -265,29 +265,12 @@ public class AdministrativeConsole {
    }
    
    /**
-    * Used to print error messages in output and to file if parameter set
-    * @created by Emery
-    */
-   public void error(String errorMsg) {
-       didPass = false;
-       System.out.println("Error " + linenumber + "," + charPosInLine + ": " + errorMsg);
-   }
-   
-   /**
     * Parse input File
     */
    private void parseFile(String filename){
        //Check trace
        String line;
-       //We are not supposed to print the file at the beginning of the parsing run
-       /*if((arguments.containsKey("tr") && arguments.get("tr").equals("token")) || arguments.containsKey("out")){
-           for(int i = 1; i < fileByLines.length; i++){
-               line = String.format("%3d", i) + "| " + fileByLines[i] + "\n";
-               System.out.print(line);
-               if(arguments.containsKey("out"))
-                   writer.writeLine(line);
-           }
-       }*/
+       
        //Create new Scanner
        Scanner scn = new Scanner();
        scn.setInput(new FileIO.FileReader(filename));
@@ -316,7 +299,8 @@ public class AdministrativeConsole {
        if(cmd.hasOption("o")){
                prs.printFile = true;
        }
-       prs.parse(cmd.hasOption("v"));
+       
+       didPass &= prs.parse(cmd.hasOption("v"));
        System.out.println((didPass)? "PASS": "FAIL");
        if(cmd.hasOption("o")){
             pWriter.print((didPass)? "PASS": "FAIL");

@@ -14,11 +14,10 @@ import java.io.PrintWriter;
 public class Scanner {
     private final char ENDFILE = 26;
     private int currentID;
-    private FileReader fileReader;
     private PrintWriter printWriter;
-    private boolean quite;
     public boolean verbose;
     public boolean printFile;
+    public boolean error;
     private String fileAsString;
     private String[] fileByLines;
     private int linenumber;
@@ -65,6 +64,7 @@ public class Scanner {
        linenumber = 0;
        charPosInLine = 0;
        characterposition = 0;
+       error = false;
     }
     
     /**
@@ -622,7 +622,6 @@ public class Scanner {
         }catch(IOException e){
                printError("Administrative Console: " + e.toString());
         }
-        this.fileReader = fileReader;
     }
     
     
@@ -631,7 +630,7 @@ public class Scanner {
      * @param line the string to print
      */
     public void print(String line) {
-        if(verbose) {  
+        if(verbose && !error) {  
             System.out.println(line);
             if(printFile)
               printWriter.print(line + "\r\n");
@@ -643,6 +642,7 @@ public class Scanner {
      * @param line the line to print
      */
     public void printError(String line) {
+        error = true;
         System.out.println(line);
 
         if(printFile)

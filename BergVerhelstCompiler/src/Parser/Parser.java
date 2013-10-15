@@ -45,6 +45,7 @@ public class Parser {
     private boolean quite;
     public boolean verbose;
     public boolean printFile;
+    public boolean error;
     
     /**
      * Empty Constructor
@@ -61,9 +62,11 @@ public class Parser {
     /**
      * Method stub for next phase, currently retrieves all tokens
      * @param showTrace 
-     * @created by Leon
+     * @return boolean value representing pass(true) or fail (false)
+     * @created by Leon, Modified by Emery
      */
-    public void parse(Boolean showTrace){
+    public boolean parse(Boolean showTrace){
+       error = false; //ensure error value is reset for all runs
        Token currentToken;
        currentToken = scn.getToken();
        lookahead = currentToken;
@@ -71,14 +74,24 @@ public class Parser {
        rootNode = (ASTNode)visit("program");
        //Print AST
        print(((ProgramNode)rootNode).toString());
+       
+       //checks if both parser and scanner ran without an error and returns value
+       return !error && !scn.error;
     }
     
+    /**
+     * Virtual method caller used to construct the AST and print feedback
+     * @param methodName the name of the method to call
+     * @return The value returned from the method
+     * @created by Emery
+     */
     public Object visit(String methodName) {
         depth++;
         String enter = "Entering Method: " + methodName;
         print(String.format("%" + (depth + enter.length()) + "s", enter));
         Object temp = null;
         
+        //run method and retrieve value
         try {
             Method method = Parser.class.getMethod(methodName, null);
             temp = method.invoke(this);
@@ -284,12 +297,10 @@ public class Parser {
         TNSet idTail = new TNSet();
         idTail.add(TokenType.LSQR);
         idTail.add(TokenType.LPAREN); 
-        //[TODO] add null symbol
         firstSet.put("id-tail", idTail);        
         
         TNSet varTail = new TNSet();
         varTail.add(TokenType.LSQR);
-        //[TODO] add null symbol
         firstSet.put("var-tail", varTail);
                 
         TNSet relop = new TNSet();
@@ -527,25 +538,25 @@ public class Parser {
 
     /**
      * Used to check if the syntax is correct, if incorrect enter error recovery
+     * compared against ENDFILE to include ENDFILE in all synch sets
      * @param synch the set to check the lookahead.getName() against
      * @created by Emery
      */
     public void syntaxCheck(TNSet synch) {
-        if(!synch.contains(lookahead.getName()))
+        if(!synch.contains(lookahead.getName()) && lookahead.getName() != TokenType.ENDFILE)
             syntaxError(synch);
     }
     
     /**
      * Used if a syntax error is detected, enters error recovery to provide 
      * addition feedback on possible other errors.
-     * [Todo] Uncomment out panic mode when error recovery added
+     * compared against ENDFILE to include ENDFILE in all synch sets
      * @param synch the set to check the lookahead.getName() against
      * @created by Emery
      */
     public void syntaxError(TNSet synch) {
-//        printError("error");
-//        while(!synch.contains(lookahead.getName())) 
-//            lookahead.getName() = scn.getToken().getName();
+        while(!synch.contains(lookahead.getName()) && lookahead.getName() != TokenType.ENDFILE) 
+            lookahead = scn.getToken();
     }
     
     /**
@@ -553,6 +564,7 @@ public class Parser {
      * @created by Emery
      */
     public ASTNode program() { 
+        System.out.println(Thread.currentThread().getStackTrace()[1].getMethodName());
         ProgramNode root = rootNode.new ProgramNode(); 
         FuncDeclarationNode currentFunc =  null;
         VarDeclarationNode currentVarDec = null;
@@ -1350,7 +1362,7 @@ public class Parser {
      * @param line the string to print
      */
     public void print(String line) {
-        if(verbose) {  
+        if(verbose && !error) {  
             System.out.println(line);
             if(printFile)
               printWriter.print(line + "\r\n");
@@ -1362,6 +1374,7 @@ public class Parser {
      * @param line the line to print
      */
     public void printError(String line) {
+        error = true;
         System.out.println(line);
 
         if(printFile)

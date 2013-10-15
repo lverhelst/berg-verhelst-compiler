@@ -533,7 +533,7 @@ public class Parser {
             printError("Expected: " + expected + " found: " + lookahead.getName());
             syntaxError(null);
         }
-//        syntaxCheck(synch);
+        syntaxCheck(null);
     }    
 
     /**

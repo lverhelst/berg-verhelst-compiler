@@ -519,7 +519,7 @@ public class Parser {
             print("Loaded: " + lookahead.getName());
         }
         else {
-            print("Expected: " + expected + " found: " + lookahead.getName());
+            printError("Expected: " + expected + " found: " + lookahead.getName());
             syntaxError(null);
         }
 //        syntaxCheck(synch);
@@ -543,7 +543,7 @@ public class Parser {
      * @created by Emery
      */
     public void syntaxError(TNSet synch) {
-        printError("error");
+//        printError("error");
 //        while(!synch.contains(lookahead.getName())) 
 //            lookahead.getName() = scn.getToken().getName();
     }

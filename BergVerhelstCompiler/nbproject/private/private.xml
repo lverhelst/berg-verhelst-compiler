@@ -4,10 +4,8 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/C:/Users/Emery/berg-verhelst-compiler/BergVerhelstCompiler/src/UnitTests/ScannerTest.java</file>
             <file>file:/C:/Users/Emery/berg-verhelst-compiler/BergVerhelstCompiler/src/Parser/Parser.java</file>
-            <file>file:/C:/Users/Emery/berg-verhelst-compiler/BergVerhelstCompiler/src/Lexeme/Token.java</file>
-            <file>file:/C:/Users/Emery/berg-verhelst-compiler/BergVerhelstCompiler/src/Lexeme/TNSet.java</file>
+            <file>file:/C:/Users/Emery/berg-verhelst-compiler/BergVerhelstCompiler/src/Parser/ASTNode.java</file>
         </group>
     </open-files>
 </project-private>

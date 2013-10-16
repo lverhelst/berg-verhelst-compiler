@@ -43,6 +43,7 @@ public class Parser {
     private FileReader fileReader;
     private PrintWriter printWriter;
     private TNSet synch;
+    private String currentMethod;
     private boolean quite;
     public boolean verbose;
     public boolean printFile;
@@ -53,10 +54,10 @@ public class Parser {
      * @created by Leon
      */
     public Parser(Scanner scanner) {
-        synch = followSet.get("program");
         this.scn = scanner;
         genFirstSets();
         genFollowSets();
+        synch = new TNSet();
         rootNode = new ASTNode();
         depth = 0;
     }
@@ -90,6 +91,7 @@ public class Parser {
     public Object visit(String methodName) {
         depth++;
         String enter = "Entering Method: " + methodName;
+        currentMethod = methodName;
         print(String.format("%" + (depth + enter.length()) + "s", enter));
         Object temp = null;
         TNSet originalSync = synch.copy();
@@ -134,20 +136,20 @@ public class Parser {
         TNSet nonvoidSpec = new TNSet();
         nonvoidSpec.add(TokenType.INT);
         nonvoidSpec.add(TokenType.BOOL);        
-        firstSet.put("nonvoid-specifier", nonvoidSpec);
+        firstSet.put("nonvoidSpec", nonvoidSpec);
         
         TNSet decTail = new TNSet();
         decTail.add(TokenType.LSQR);
         decTail.add(TokenType.SEMI);
         decTail.add(TokenType.COMMA);
         decTail.add(TokenType.LPAREN);        
-        firstSet.put("dec-tail", decTail);
+        firstSet.put("decTail", decTail);
         
         TNSet vardecTail = new TNSet();
         vardecTail.add(TokenType.LSQR);
         vardecTail.add(TokenType.SEMI);
         vardecTail.add(TokenType.COMMA);      
-        firstSet.put("var-dec-tail", vardecTail);
+        firstSet.put("var-decTail", vardecTail);
         
         TNSet varName = new TNSet();
         varName.add(TokenType.ID);       
@@ -155,7 +157,7 @@ public class Parser {
         
         TNSet fundecTail = new TNSet();
         fundecTail.add(TokenType.LPAREN);    
-        firstSet.put("fun-dec-tail", fundecTail);
+        firstSet.put("fun-decTail", fundecTail);
         
         TNSet params = new TNSet();
         params.add(TokenType.REF);  
@@ -354,14 +356,14 @@ public class Parser {
         
         TNSet nonvoidspecifierSet = new TNSet();
         nonvoidspecifierSet.add(TokenType.ID);
-        followSet.put("nonvoid-specifer", nonvoidspecifierSet);
+        followSet.put("nonvoidSpec", nonvoidspecifierSet);
         
         TNSet dectailSet = new TNSet();
         dectailSet.add(TokenType.ID);
         dectailSet.add(TokenType.BOOL);
         dectailSet.add(TokenType.VOID);
         dectailSet.add(TokenType.ENDFILE);
-        followSet.put("dec-tail",dectailSet);
+        followSet.put("decTail",dectailSet);
         
         TNSet vardectailSet = new TNSet();
         vardectailSet.add(TokenType.INT);
@@ -377,15 +379,15 @@ public class Parser {
         vardectailSet.add(TokenType.SEMI);
         vardectailSet.add(TokenType.ID);
         vardectailSet.add(TokenType.BRANCH);
-        followSet.put("var-dec-tail", vardectailSet);
+        followSet.put("vardecTail", vardectailSet);
         
         TNSet varnameSet = new TNSet();
         varnameSet.add(TokenType.COMMA);
         varnameSet.add(TokenType.SEMI);
-        followSet.put("var-name", varnameSet);
+        followSet.put("varName", varnameSet);
         
         TNSet fundectailSet = dectailSet.copy();
-        followSet.put("fun-dec-tail", fundectailSet);
+        followSet.put("fundecTail", fundectailSet);
                 
         TNSet paramsSet = new TNSet();
         paramsSet.add(TokenType.RPAREN);
@@ -414,16 +416,16 @@ public class Parser {
         followSet.put("statement", statementSet);
         
         TNSet idstmtSet = statementSet.copy();
-        followSet.put("id-stmt", idstmtSet);
+        followSet.put("idstmt", idstmtSet);
         
         TNSet idstmttailSet = statementSet.copy();
-        followSet.put("id-stmt-tail", idstmttailSet);
+        followSet.put("idstmtTail", idstmttailSet);
         
         TNSet assignstmttailSet = statementSet.copy();
-        followSet.put("assign-stmt-tail", assignstmttailSet);
+        followSet.put("assignstmtTail", assignstmttailSet);
         
         TNSet callstmttailSet = statementSet.copy();
-        followSet.put("call-stmt-tail", callstmttailSet);
+        followSet.put("callstmtTail", callstmttailSet);
         
         TNSet calltailSet = new TNSet();
         for(TokenType tok: firstSet.get("relop").getSet()){
@@ -439,7 +441,7 @@ public class Parser {
         calltailSet.add(TokenType.RSQR);
         calltailSet.add(TokenType.SEMI);
         calltailSet.add(TokenType.COMMA);
-        followSet.put("call-tail", calltailSet);
+        followSet.put("callTail", calltailSet);
         
         TNSet argumentsSet = new TNSet();
         argumentsSet.add(TokenType.RPAREN);
@@ -449,31 +451,31 @@ public class Parser {
         for(TokenType tok: firstSet.get("declaration").getSet()){
             compoundStmtSet.add(tok);
         }
-        followSet.put("compound-stmt", compoundStmtSet);
+        followSet.put("compoundStmt", compoundStmtSet);
         
         TNSet ifstmtSet = statementSet.copy();
-        followSet.put("if-stmt", ifstmtSet);
+        followSet.put("ifStmt", ifstmtSet);
         
         TNSet loopstmtSet = statementSet.copy();
-        followSet.put("loop-stmt", loopstmtSet);
+        followSet.put("loopStmt", loopstmtSet);
         
         TNSet exitstmtSet = statementSet.copy();
-        followSet.put("exit-stmt", exitstmtSet);
+        followSet.put("exitStmt", exitstmtSet);
     
         TNSet continuestmtSet = statementSet.copy();
-        followSet.put("continue-stmt", continuestmtSet);
+        followSet.put("continueStmt", continuestmtSet);
     
         TNSet returnstmtSet = statementSet.copy();
-        followSet.put("return-stmt", returnstmtSet);
+        followSet.put("returnStmt", returnstmtSet);
     
         TNSet nullstmtSet = statementSet.copy();
-        followSet.put("null-stmt", nullstmtSet);
+        followSet.put("nullStmt", nullstmtSet);
         
         TNSet branchstmtSet = statementSet.copy();
-        followSet.put("branch-stmt", branchstmtSet);
+        followSet.put("branchStmt", branchstmtSet);
         
         TNSet caseSet = statementSet.copy();
-        followSet.put("case", caseSet);
+        followSet.put("caseStmt", caseSet);
 
         TNSet expressionSet = new TNSet();
         expressionSet.add(TokenType.RPAREN);
@@ -489,7 +491,7 @@ public class Parser {
         addexpSet.add(TokenType.RSQR);
         addexpSet.add(TokenType.SEMI);
         addexpSet.add(TokenType.COMMA);
-        followSet.put("add-exp", addexpSet);
+        followSet.put("addExp", addexpSet);
         
         TNSet termSet = addexpSet.copy();
         for(TokenType tok: firstSet.get("addop").getSet()){
@@ -504,16 +506,16 @@ public class Parser {
         followSet.put("factor", factorSet);
         
         TNSet nidfactorSet = factorSet.copy();
-        followSet.put("nid-factor", nidfactorSet);
+        followSet.put("nidFactor", nidfactorSet);
                 
         TNSet idfactorSet = factorSet.copy();
-        followSet.put("id-factor", idfactorSet);
+        followSet.put("idFactor", idfactorSet);
         
         TNSet idtailSet = factorSet.copy();
-        followSet.put("id-tail", idtailSet);
+        followSet.put("idTail", idtailSet);
         
         TNSet vartail = factorSet.copy();
-        followSet.put("var-tail", vartail);
+        followSet.put("varTail", vartail);
         
         //[TODO] Follow sets for option and repitition phrases
     }   
@@ -535,6 +537,7 @@ public class Parser {
             printError("Expected: " + expected + " found: " + lookahead.getName());
             syntaxError(synch);
         }
+        synch.union(firstSet.get(currentMethod));
         syntaxCheck(synch);
     }    
 
@@ -545,7 +548,7 @@ public class Parser {
      * @created by Emery
      */
     public void syntaxCheck(TNSet synch) {
-        if(!synch.contains(lookahead.getName()) && lookahead.getName() != TokenType.ENDFILE)
+        if(!synch.contains(lookahead.getName()))
             syntaxError(synch);
     }
     
@@ -557,7 +560,7 @@ public class Parser {
      * @created by Emery
      */
     public void syntaxError(TNSet synch) {
-        while(!synch.contains(lookahead.getName()) && lookahead.getName() != TokenType.ENDFILE) 
+        while(!synch.contains(lookahead.getName())) 
             lookahead = scn.getToken();
     }
     
@@ -621,7 +624,7 @@ public class Parser {
             declaration.ID = id;
             declaration.specifier = TokenType.VOID;
             return declaration;
-        }else if(firstSet.get("nonvoid-specifier").getSet().contains(this.lookahead.getName())){
+        }else if(firstSet.get("nonvoidSpec").getSet().contains(this.lookahead.getName())){
             TokenType functionType = (TokenType)visit("nonvoidSpec");
             id = Integer.parseInt(lookahead.getAttribute_Value());
             match(TokenType.ID);
@@ -650,7 +653,7 @@ public class Parser {
     }
     
     /**
-     * Used to deal with the nonvoid-specifier phrase (3)
+     * Used to deal with the nonvoidSpec phrase (3)
      * @created by Emery
      */
     public TokenType nonvoidSpec() {
@@ -664,22 +667,22 @@ public class Parser {
     }
     
     /**
-     * Used to deal with the dec-tail phrase (4)
+     * Used to deal with the decTail phrase (4)
      * @created by Emery
      */
     public ASTNode decTail() {
-        if(firstSet.get("var-dec-tail").contains(this.lookahead.getName())){
+        if(firstSet.get("var-decTail").contains(this.lookahead.getName())){
             return (VarDeclarationNode)visit("vardecTail");
         }
-        if(firstSet.get("fun-dec-tail").contains(this.lookahead.getName())){
+        if(firstSet.get("fun-decTail").contains(this.lookahead.getName())){
             return (FuncDeclarationNode)visit("fundecTail");
         }
         return null;
     }
     
     /**
-     * Used to deal with the var-dec-tail phrase (5)
-     * var-dec-tail -> [[ [add-exp] ]] {| , var-name |} ;
+     * Used to deal with the var-decTail phrase (5)
+     * var-decTail -> [[ [add-exp] ]] {| , var-name |} ;
      * @created by Leon
      */
     public ASTNode vardecTail() {        
@@ -721,7 +724,7 @@ public class Parser {
     }
     
     /**
-     * Used to deal with the fun-dec-tail phrase (7)
+     * Used to deal with the fun-decTail phrase (7)
      * @created by Emery
      */
     public ASTNode fundecTail() {
@@ -765,7 +768,7 @@ public class Parser {
             TokenType t = (TokenType)visit("nonvoidSpec");
             match(TokenType.ID);
             return t;
-        }else if(firstSet.get("nonvoid-specifier").contains(lookahead.getName())){
+        }else if(firstSet.get("nonvoidSpec").contains(lookahead.getName())){
             TokenType t = (TokenType)visit("nonvoidSpec");
             match(TokenType.ID);
             if(lookahead.getName() == TokenType.LSQR){
@@ -928,7 +931,7 @@ public class Parser {
     public ASTNode compoundStmt() {
         ASTNode.CompoundNode current = rootNode.new CompoundNode();
         match(TokenType.LCRLY);
-        while(firstSet.get("nonvoid-specifier").contains(lookahead.getName())){
+        while(firstSet.get("nonvoidSpec").contains(lookahead.getName())){
             VarDeclarationNode node;
             TokenType t = (TokenType)visit("nonvoidSpec");
             match(TokenType.ID);

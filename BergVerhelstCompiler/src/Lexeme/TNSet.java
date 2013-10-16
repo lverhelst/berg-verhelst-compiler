@@ -54,7 +54,7 @@ public class TNSet {
      * Used to union sets
      * @param set the set to union with
      */
-    public void union(ArrayList<TokenType> set) {
-        this.set.addAll(set);
+    public void union(TNSet set) {
+        this.set.addAll(set.getSet());
     }
 }

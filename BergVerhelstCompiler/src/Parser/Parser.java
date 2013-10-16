@@ -544,7 +544,7 @@ public class Parser{
      */
     public void syntaxCheck(TNSet synch) {
         if(!synch.contains(lookahead.getName())){
-            printError(lookahead.getName() + " not found in the synch set: " + synch);
+            printError("[Syntax Error] " + lookahead.getName() + " not found in the synch set: " + synch);
             syntaxError(synch);
         }
         

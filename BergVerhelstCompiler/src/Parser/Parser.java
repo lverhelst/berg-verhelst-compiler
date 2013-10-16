@@ -149,15 +149,15 @@ public class Parser {
         vardecTail.add(TokenType.LSQR);
         vardecTail.add(TokenType.SEMI);
         vardecTail.add(TokenType.COMMA);      
-        firstSet.put("var-decTail", vardecTail);
+        firstSet.put("vardecTail", vardecTail);
         
         TNSet varName = new TNSet();
         varName.add(TokenType.ID);       
-        firstSet.put("var-name", varName);
+        firstSet.put("varName", varName);
         
         TNSet fundecTail = new TNSet();
         fundecTail.add(TokenType.LPAREN);    
-        firstSet.put("fun-decTail", fundecTail);
+        firstSet.put("fundecTail", fundecTail);
         
         TNSet params = new TNSet();
         params.add(TokenType.REF);  
@@ -186,26 +186,26 @@ public class Parser {
         
         TNSet idStmt = new TNSet();
         idStmt.add(TokenType.ID);      
-        firstSet.put("id-stmt", idStmt);
+        firstSet.put("idstmt", idStmt);
         
         TNSet idStmtTail = new TNSet();
         idStmtTail.add(TokenType.LSQR);
         idStmtTail.add(TokenType.ASSIGN);
         idStmtTail.add(TokenType.LPAREN);        
-        firstSet.put("id-stmt-tail", idStmtTail);
+        firstSet.put("idstmtTail", idStmtTail);
         
         TNSet assignStmtTail = new TNSet();
         assignStmtTail.add(TokenType.LSQR);
         assignStmtTail.add(TokenType.ASSIGN);     
-        firstSet.put("assign-stmt-tail", assignStmtTail);
+        firstSet.put("assignstmtTail", assignStmtTail);
         
         TNSet callStmtTail = new TNSet();
         callStmtTail.add(TokenType.LPAREN);     
-        firstSet.put("call-stmt-tail", callStmtTail);
+        firstSet.put("callstmtTail", callStmtTail);
         
         TNSet callTail = new TNSet();
         callTail.add(TokenType.LPAREN);     
-        firstSet.put("call-tail", callTail);
+        firstSet.put("callTail", callTail);
         
         TNSet arguments = new TNSet();
         arguments.add(TokenType.MINUS);
@@ -218,40 +218,40 @@ public class Parser {
         
         TNSet compoundStmt = new TNSet();
         compoundStmt.add(TokenType.LCRLY); 
-        firstSet.put("compound-stmt", compoundStmt);
+        firstSet.put("compoundStmt", compoundStmt);
         
         TNSet ifStmt = new TNSet();
         ifStmt.add(TokenType.IF);     
-        firstSet.put("if-stmt", ifStmt);
+        firstSet.put("ifStmt", ifStmt);
         
         TNSet loopStmt = new TNSet();
         loopStmt.add(TokenType.LOOP);     
-        firstSet.put("loop-stmt", loopStmt);
+        firstSet.put("loopStmt", loopStmt);
         
         TNSet exitStmt = new TNSet();
         exitStmt.add(TokenType.EXIT);       
-        firstSet.put("exit-stmt", exitStmt);
+        firstSet.put("exitStmt", exitStmt);
         
         TNSet continueStmt = new TNSet();
         continueStmt.add(TokenType.CONTINUE);      
-        firstSet.put("continue-stmt", continueStmt);
+        firstSet.put("continueStmt", continueStmt);
         
         TNSet returnStmt = new TNSet();
         returnStmt.add(TokenType.RETURN);   
-        firstSet.put("return-stmt", returnStmt);
+        firstSet.put("returnStmt", returnStmt);
         
         TNSet nullStmt = new TNSet();
         nullStmt.add(TokenType.SEMI);       
-        firstSet.put("null-stmt", nullStmt);
+        firstSet.put("nullStmt", nullStmt);
         
         TNSet branchStmt = new TNSet();
         branchStmt.add(TokenType.BRANCH);      
-        firstSet.put("branch-stmt", branchStmt);
+        firstSet.put("branchStmt", branchStmt);
         
         TNSet caseStmt = new TNSet();
         caseStmt.add(TokenType.CASE);
         caseStmt.add(TokenType.DEFAULT);   
-        firstSet.put("case-stmt", caseStmt);
+        firstSet.put("caseStmt", caseStmt);
         
         TNSet experision = new TNSet();
         experision.add(TokenType.MINUS);
@@ -269,7 +269,7 @@ public class Parser {
         addExp.add(TokenType.NUM);
         addExp.add(TokenType.BLIT);
         addExp.add(TokenType.ID);         
-        firstSet.put("add-exp", addExp);
+        firstSet.put("addExp", addExp);
         
         TNSet term = new TNSet();
         term.add(TokenType.NOT);
@@ -292,20 +292,20 @@ public class Parser {
         nidFactor.add(TokenType.LPAREN); 
         nidFactor.add(TokenType.NUM);
         nidFactor.add(TokenType.BLIT);      
-        firstSet.put("nid-factor", nidFactor);
+        firstSet.put("nidFactor", nidFactor);
                
         TNSet idFactor = new TNSet();
         idFactor.add(TokenType.ID);     
-        firstSet.put("id-factor", idFactor);        
+        firstSet.put("idFactor", idFactor);        
         
         TNSet idTail = new TNSet();
         idTail.add(TokenType.LSQR);
         idTail.add(TokenType.LPAREN); 
-        firstSet.put("id-tail", idTail);        
+        firstSet.put("idTail", idTail);        
         
         TNSet varTail = new TNSet();
         varTail.add(TokenType.LSQR);
-        firstSet.put("var-tail", varTail);
+        firstSet.put("varTail", varTail);
                 
         TNSet relop = new TNSet();
         relop.add(TokenType.LTEQ);
@@ -671,18 +671,18 @@ public class Parser {
      * @created by Emery
      */
     public ASTNode decTail() {
-        if(firstSet.get("var-decTail").contains(this.lookahead.getName())){
+        if(firstSet.get("vardecTail").contains(this.lookahead.getName())){
             return (VarDeclarationNode)visit("vardecTail");
         }
-        if(firstSet.get("fun-decTail").contains(this.lookahead.getName())){
+        if(firstSet.get("fundecTail").contains(this.lookahead.getName())){
             return (FuncDeclarationNode)visit("fundecTail");
         }
         return null;
     }
     
     /**
-     * Used to deal with the var-decTail phrase (5)
-     * var-decTail -> [[ [add-exp] ]] {| , var-name |} ;
+     * Used to deal with the vardecTail phrase (5)
+     * vardecTail -> [[ [addExp] ]] {| , varName |} ;
      * @created by Leon
      */
     public ASTNode vardecTail() {        
@@ -707,7 +707,7 @@ public class Parser {
     
     /**
      * Used to deal with the war-name phrase (6)
-     * var-name -> ID [[ [add-exp] ]]
+     * varName -> ID [[ [addExp] ]]
      * @created by Leon
      */
     public VarDeclarationNode varName() {
@@ -724,7 +724,7 @@ public class Parser {
     }
     
     /**
-     * Used to deal with the fun-decTail phrase (7)
+     * Used to deal with the fundecTail phrase (7)
      * @created by Emery
      */
     public ASTNode fundecTail() {
@@ -786,7 +786,7 @@ public class Parser {
      * @revised by Leon added AST
      */
     public ASTNode statement() {
-        if(firstSet.get("id-stmt").contains(lookahead.getName())){
+        if(firstSet.get("idstmt").contains(lookahead.getName())){
             Object temp = visit("idstmt");
             
             if(temp instanceof ASTNode.AssignmentNode)
@@ -794,35 +794,35 @@ public class Parser {
             else 
                 return (ASTNode.CallNode)temp;
         }
-        if(firstSet.get("compound-stmt").contains(lookahead.getName())){
+        if(firstSet.get("compoundStmt").contains(lookahead.getName())){
             return (CompoundNode)visit("compoundStmt");
         }
-        if(firstSet.get("if-stmt").contains(lookahead.getName())){
+        if(firstSet.get("ifStmt").contains(lookahead.getName())){
             return (IfNode)visit("ifStmt");
         }
-        if(firstSet.get("loop-stmt").contains(lookahead.getName())){
+        if(firstSet.get("loopStmt").contains(lookahead.getName())){
             return (LoopNode)visit("loopStmt");
         }
-        if(firstSet.get("exit-stmt").contains(lookahead.getName())){
+        if(firstSet.get("exitStmt").contains(lookahead.getName())){
             return (MarkerNode)visit("exitStmt");
         }
-        if(firstSet.get("continue-stmt").contains(lookahead.getName())){
+        if(firstSet.get("continueStmt").contains(lookahead.getName())){
             return (MarkerNode)visit("continueStmt");
         }
-        if(firstSet.get("return-stmt").contains(lookahead.getName())){
+        if(firstSet.get("returnStmt").contains(lookahead.getName())){
             return (ReturnNode)visit("returnStmt");
         }
-        if(firstSet.get("null-stmt").contains(lookahead.getName())){
+        if(firstSet.get("nullStmt").contains(lookahead.getName())){
             return (ASTNode)visit("nullStmt");
         }
-        if(firstSet.get("branch-stmt").contains(lookahead.getName())){
+        if(firstSet.get("branchStmt").contains(lookahead.getName())){
             return (BranchNode)visit("branchStmt");
         }        
         return null;
     }
     
     /**
-     * Used to deal with the id-stmt phrase (11)
+     * Used to deal with the idstmt phrase (11)
      * @created by Leon
      */
     public ASTNode idstmt() {
@@ -849,13 +849,13 @@ public class Parser {
     }
     
     /**
-     * Used to deal with the id-stmt-tail phrase (12)
+     * Used to deal with the idstmtTail phrase (12)
      * @created by Leon
      */
     public ASTNode idstmtTail() {
-        if(firstSet.get("assign-stmt-tail").contains(lookahead.getName())){
+        if(firstSet.get("assignstmtTail").contains(lookahead.getName())){
             return (ASTNode.AssignmentNode)visit("assignstmtTail");
-        }else if(firstSet.get("call-stmt-tail").contains(lookahead.getName())){
+        }else if(firstSet.get("callstmtTail").contains(lookahead.getName())){
             CallNode node = rootNode.new CallNode();
             node.arguments = (ArrayList<Expression>)visit("callstmtTail");
             return node;
@@ -865,7 +865,7 @@ public class Parser {
     }
     
     /**
-     * Used to deal with the assign-stmt-tail phrase (13)
+     * Used to deal with the assignstmtTail phrase (13)
      * @created by Leon
      */
     public ASTNode assignstmtTail() {
@@ -886,7 +886,7 @@ public class Parser {
     }
     
     /**
-     * Used to deal with the call-stmt-tail phrase (14)
+     * Used to deal with the callstmtTail phrase (14)
      * @created by Emery
      */
     public ArrayList<Expression> callstmtTail() {
@@ -896,7 +896,7 @@ public class Parser {
     }
     
     /**
-     * Used to deal with the call-tail phrase (15)
+     * Used to deal with the callTail phrase (15)
      * @created by Emery
      */
     public CallNode callTail() {
@@ -925,7 +925,7 @@ public class Parser {
     }
     
     /**
-     * Used to deal with the compound-stmt phrase (17)
+     * Used to deal with the compoundStmt phrase (17)
      * @created by Emery
      */
     public ASTNode compoundStmt() {
@@ -954,7 +954,7 @@ public class Parser {
     }
     
     /**
-     * Used to deal with the if-stmt phrase (18)
+     * Used to deal with the ifStmt phrase (18)
      * @created by Emery
      * @Revised by Leon added AST
      */
@@ -973,7 +973,7 @@ public class Parser {
     }
     
     /**
-     * Used to deal with the loop-stmt phrase (19)
+     * Used to deal with the loopStmt phrase (19)
      * @created by Leon
      * @revised by Leon add by AST
      */
@@ -993,7 +993,7 @@ public class Parser {
     }
     
     /**
-     * Used to deal with the exit-stmt phrase (20)
+     * Used to deal with the exitStmt phrase (20)
      * @created by Leon
      * @Revised by Leon, added AST code
      */
@@ -1006,7 +1006,7 @@ public class Parser {
     }
     
     /**
-     * Used to deal with the continue-stmt phrase (21)
+     * Used to deal with the continueStmt phrase (21)
      * @created by Leon
      * @Revised by Leon, added AST
      */
@@ -1018,7 +1018,7 @@ public class Parser {
     }
     
     /**
-     * Used to deal with the return-stmt phrase (22)
+     * Used to deal with the returnStmt phrase (22)
      * @created by Emery
      * @Revised by Leon, added AST
      */
@@ -1033,7 +1033,7 @@ public class Parser {
     }
     
     /**
-     * Used to deal with the null-stmt phrase (23)
+     * Used to deal with the nullStmt phrase (23)
      * @created by Leon
      */
     public void nullStmt() {
@@ -1041,7 +1041,7 @@ public class Parser {
     }
     
     /**
-     * Used to deal with the branch-stmt phrase (24)
+     * Used to deal with the branchStmt phrase (24)
      * @Created by Leon
      * @Revised by Leon added AST
      */
@@ -1053,7 +1053,7 @@ public class Parser {
         match(TokenType.RPAREN);
         node.thisCase = (CaseNode)visit("caseStmt");
         BranchNode current = node;
-        while(firstSet.get("case-stmt").contains(lookahead.getName())){
+        while(firstSet.get("caseStmt").contains(lookahead.getName())){
             current.nextNode = rootNode.new BranchNode();
             current = current.nextNode;
             current.thisCase = (CaseNode)visit("caseStmt");
@@ -1103,7 +1103,7 @@ public class Parser {
     }
     
     /**
-     * Used to deal with the add-exp phrase (27)
+     * Used to deal with the addExp phrase (27)
      * @created by Emery
      */
     public Expression addExp() {
@@ -1152,16 +1152,16 @@ public class Parser {
      * @created by Leon
      */
     public Expression factor() {
-        if(firstSet.get("nid-factor").contains(lookahead.getName())){
+        if(firstSet.get("nidFactor").contains(lookahead.getName())){
             return (Expression) visit("nidFactor");
-        }else if(firstSet.get("id-factor").contains(lookahead.getName())){
+        }else if(firstSet.get("idFactor").contains(lookahead.getName())){
             return (Expression) visit("idFactor");
         }
         return null;
     }
     
     /**
-     * Used to deal with the nid-factor phrase (30)
+     * Used to deal with the nidFactor phrase (30)
      * @created by Leon
      */
     public ASTNode nidFactor() {
@@ -1192,7 +1192,7 @@ public class Parser {
     }
     
     /**
-     * Used to deal with the id-factor phrase (31)
+     * Used to deal with the idFactor phrase (31)
      * @created by Leon
      */
     public ASTNode idFactor() {
@@ -1218,20 +1218,20 @@ public class Parser {
     }
     
     /**
-     * Used to deal with the id-tail phrase (32)
+     * Used to deal with the idTail phrase (32)
      * @created by Leon
      */
     public ASTNode idTail() {
-        if(firstSet.get("var-tail").contains(lookahead.getName())){
+        if(firstSet.get("varTail").contains(lookahead.getName())){
             return (ASTNode)visit("varTail");
-        }else if(firstSet.get("call-tail").contains(lookahead.getName())){
+        }else if(firstSet.get("callTail").contains(lookahead.getName())){
             return (CallNode) visit("callTail");
         }
         return null;
     }
     
     /**
-     * Used to deal with the var-tail phrase (33)
+     * Used to deal with the varTail phrase (33)
      * @created by Leon
      */
     public Expression varTail() {

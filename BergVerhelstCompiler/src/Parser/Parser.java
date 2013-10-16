@@ -613,7 +613,8 @@ public class Parser{
      * @created by Leon
      */
     public ASTNode declaration(TNSet synch) {   
-        int id;
+        String ID = null;
+        
         TNSet tempSynch;
         TNSet origSynch = synch.copy();
         if(this.lookahead.getName() == TokenType.VOID){
@@ -621,17 +622,18 @@ public class Parser{
             
             FuncDeclarationNode declaration;
             match(TokenType.VOID, tempSynch);
-            id = Integer.parseInt(lookahead.getAttribute_Value());
+            ID = lookahead.getAttribute_Value();
             match(TokenType.ID, tempSynch);
             tempSynch = synch.union(followSet.get("declaration"));
             declaration = (FuncDeclarationNode)visit("fundecTail", tempSynch);
-            declaration.ID = id;
+            if(ID != null)
+                declaration.ID = Integer.parseInt(ID);
             declaration.specifier = TokenType.VOID;
             return declaration;
         }else {
             tempSynch = synch.union(firstSet.get("decTail"));
             TokenType functionType = (TokenType)visit("nonvoidSpec", tempSynch);
-            id = Integer.parseInt(lookahead.getAttribute_Value());
+            ID = lookahead.getAttribute_Value();
             match(TokenType.ID, tempSynch);
             tempSynch = origSynch;
             Object value = visit("decTail", tempSynch);
@@ -639,11 +641,13 @@ public class Parser{
             if(value instanceof FuncDeclarationNode){
                 FuncDeclarationNode node = (FuncDeclarationNode)value;
                 node.specifier = functionType;
-                node.ID = id;
+                if(ID != null)
+                    node.ID = Integer.parseInt(ID);;
                 return node;
             }else {
                 VarDeclarationNode node = (VarDeclarationNode)value;
-                node.ID = id;
+                if(ID != null)
+                    node.ID = Integer.parseInt(ID);;
                 node.specifier = functionType;
                 VarDeclarationNode current = node;
                 while(current.nextVarDec != null){
@@ -725,7 +729,8 @@ public class Parser{
         VarDeclarationNode current = rootNode.new VarDeclarationNode();
         TNSet origSynch = synch.copy();
         TNSet tempSynch = synch.union(firstSet.get("addExp"));
-        current.ID = Integer.parseInt(lookahead.getAttribute_Value());
+        if(lookahead.getAttribute_Value()!= null)
+            current.ID = Integer.parseInt(lookahead.getAttribute_Value());
         match(TokenType.ID, tempSynch);
          
         if(this.lookahead.getName() == TokenType.LSQR){
@@ -856,15 +861,16 @@ public class Parser{
      */
     public ASTNode idstmt(TNSet synch) {
         TNSet origSynch = synch.copy();
-        int id;
+        String ID = null;
         TNSet tempSynch;
         if(lookahead.getName() == TokenType.ID){
             tempSynch = synch.union(firstSet.get("idstmtTail"));
-            id = Integer.parseInt(lookahead.getAttribute_Value());
+            ID = lookahead.getAttribute_Value();
             match(TokenType.ID, tempSynch);
             tempSynch = origSynch;
             VariableNode varNode = rootNode.new VariableNode();
-            varNode.ID = id;
+            if(ID != null)
+                varNode.ID = Integer.parseInt(ID);
             varNode.specifier = TokenType.ID;
             Object temp = visit("idstmtTail", tempSynch);
             if(temp instanceof ASTNode.AssignmentNode){
@@ -872,7 +878,8 @@ public class Parser{
                 node.leftVar = varNode;
                 return node;
             }else {
-                ((ASTNode.CallNode)temp).ID = id;
+                if(ID != null)
+                    ((ASTNode.CallNode)temp).ID = Integer.parseInt(ID);
                 return (ASTNode.CallNode)temp;
             }
         }else
@@ -1301,7 +1308,8 @@ public class Parser{
         match(TokenType.ID, tempSynch);
         VariableNode node = rootNode.new VariableNode();
         node.specifier = TokenType.ID;
-        node.ID = Integer.parseInt(ID);
+        if(ID != null)
+            node.ID = Integer.parseInt(ID);
         tempSynch = origSynch;
         ASTNode e = (ASTNode)visit("idTail", tempSynch); 
         if(e != null && e.getClass() != CallNode.class){
@@ -1313,7 +1321,8 @@ public class Parser{
             //IS Call
             CallNode cnode = (CallNode)e;
             cnode.specifier = TokenType.ID;
-            cnode.ID = Integer.parseInt(ID);
+            if(ID != null)
+                cnode.ID = Integer.parseInt(ID);
             return cnode;
         }
     }
@@ -1486,7 +1495,7 @@ public class Parser{
      */
     public void printError(String line) {
         error = true;
-        System.err.println(line);
+        System.out.println("\u001B[31m" + line + "\u001B[0m");
 
         if(printFile)
           printWriter.print(line + "\r\n");

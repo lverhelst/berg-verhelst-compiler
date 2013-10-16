@@ -46,7 +46,6 @@ public class Parser{
     public boolean verbose;
     public boolean printFile;
     public boolean error;
-    public boolean inRecovery;
     
     /**
      * Empty Constructor
@@ -75,7 +74,8 @@ public class Parser{
        TNSet synch = followSet.get("program");
        rootNode = (ASTNode)visit("program", synch);
        //Print AST
-       print(((ProgramNode)rootNode).toString());
+       if(!error)
+            print(((ProgramNode)rootNode).toString());
        
        //checks if both parser and scanner ran without an error and returns value
        return !error && !scn.error;

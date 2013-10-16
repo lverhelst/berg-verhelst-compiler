@@ -42,7 +42,6 @@ public class Parser{
     
     private FileReader fileReader;
     private PrintWriter printWriter;
-    private TNSet synch;
     private String currentMethod;
     private boolean quite;
     public boolean verbose;
@@ -89,19 +88,17 @@ public class Parser{
      * @created by Emery
      */
     String lastMethod;
-    public Object visit(String methodName) {
+    public Object visit(String methodName, TNSet synch) {
         depth++;
         String enter = "Entering Method: " + methodName;
         lastMethod = currentMethod;
         currentMethod = methodName;
         print(String.format("%" + (depth + enter.length()) + "s", enter));
         Object temp = null;
-        TNSet originalSync = synch.copy();
-        synch.union(followSet.get(methodName));
         //run method and retrieve value
         try {
-            Method method = Parser.class.getMethod(methodName, null);
-            temp = method.invoke(this);
+            Method method = Parser.class.getMethod(methodName, new Class[]{TNSet.class});
+            temp = method.invoke(this, new Object[]{synch});
             if(temp instanceof ASTNode) {
                 ((ASTNode)temp).space = depth;
             }
@@ -109,7 +106,6 @@ public class Parser{
             printError("Failed to run method: " + methodName + "\n" + e.getCause());
         } 
         
-        synch = originalSync;
         depth--;
         String leaving = "Leaving Method: " + methodName;
         print(String.format("%" + (depth + enter.length()) + "s", leaving));

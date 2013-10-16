@@ -32,7 +32,7 @@ import java.util.HashMap;
  * @author Leon Verhelst and Emery Berg
  * Parser class for parsing the tokens from the Scanner
  */
-public class Parser {
+public class Parser{
     private HashMap<String, TNSet> firstSet;
     private HashMap<String, TNSet> followSet;
     private Scanner scn;
@@ -108,7 +108,7 @@ public class Parser {
         } catch(Exception e) {
             printError("Failed to run method: " + methodName + "\n" + e.getCause());
         } 
-        currentMethod = lastMethod;
+        
         synch = originalSync;
         depth--;
         String leaving = "Leaving Method: " + methodName;
@@ -659,7 +659,7 @@ public class Parser {
             }
         }else
             printError("declaration error: " + this.lookahead.getName());
-        //syntaxError(sync);
+        
         return null;
     }
     
@@ -668,6 +668,8 @@ public class Parser {
      * @created by Emery
      */
     public TokenType nonvoidSpec() {
+        synch = followSet.get("nonvoidSpec");
+        
         if(lookahead.getName() == TokenType.INT){
             match(TokenType.INT);
             return TokenType.INT;
@@ -748,10 +750,14 @@ public class Parser {
     public ASTNode fundecTail() {
         FuncDeclarationNode current = rootNode.new FuncDeclarationNode();
         
+        synch = followSet.get("fundecTail");
+        synch.union(firstSet.get("params"));
         match(TokenType.LPAREN);
         
         current.params = (ASTNode.ParameterNode)visit("params");
-        currentMethod = "compoundStmt";
+        
+        synch = followSet.get("fundecTail");
+        synch.union(firstSet.get("compoundStmt"));
         match(TokenType.RPAREN);
         current.compoundStmt = (ASTNode.CompoundNode)visit("compoundStmt");
         return current;
@@ -786,7 +792,10 @@ public class Parser {
      * @created by Emery
      */
     public TokenType param() {
-        if(lookahead.getName() == TokenType.REF){
+        synch = followSet.get("param");
+        synch.union(firstSet.get("nonvoidSpec"));
+        
+        if(lookahead.getName() == TokenType.REF){ 
             match(TokenType.REF);
             TokenType t = (TokenType)visit("nonvoidSpec");
             match(TokenType.ID);
@@ -916,7 +925,9 @@ public class Parser {
      * Used to deal with the callstmtTail phrase (14)
      * @created by Emery
      */
-    public ArrayList<Expression> callstmtTail() {
+    public ArrayList<Expression> callstmtTail() {  
+        synch = followSet.get("callstmtTail");
+        synch.union(firstSet.get("callTail"));
         ArrayList<Expression> argList = (ArrayList<Expression>)visit("callTail");
         match(TokenType.SEMI);
         return argList;
@@ -927,7 +938,9 @@ public class Parser {
      * @created by Emery
      */
     public CallNode callTail() {
-        CallNode node = rootNode.new CallNode();
+        CallNode node = rootNode.new CallNode();    
+        synch = followSet.get("callTail");
+        synch.union(firstSet.get("arguments"));
         match(TokenType.LPAREN);
         if(firstSet.get("arguments").contains(lookahead.getName())){
             node.arguments = (ArrayList<Expression>)visit("arguments");
@@ -940,7 +953,9 @@ public class Parser {
      * Used to deal with the arguments phrase (16)
      * @created by Emery
      */
-    public ArrayList<Expression> arguments() {
+    public ArrayList<Expression> arguments() {        
+        synch = followSet.get("arguments");
+        synch.union(firstSet.get("expression"));
         ArrayList<Expression> argList = new ArrayList<Expression>();
         argList.add((Expression)visit("expression"));
         while(lookahead.getName() == TokenType.COMMA){
@@ -956,11 +971,15 @@ public class Parser {
      * @created by Emery
      */
     public ASTNode compoundStmt() {
-        ASTNode.CompoundNode current = rootNode.new CompoundNode();
+        ASTNode.CompoundNode current = rootNode.new CompoundNode();        
+        synch = followSet.get("compoundStmt");
+        synch.union(firstSet.get("nonvoidSpec"));
         match(TokenType.LCRLY);
         while(firstSet.get("nonvoidSpec").contains(lookahead.getName())){
             VarDeclarationNode node;
-            TokenType t = (TokenType)visit("nonvoidSpec");
+            TokenType t = (TokenType)visit("nonvoidSpec");        
+            synch = followSet.get("compoundStmt");
+            synch.union(firstSet.get("vardecTail"));
             match(TokenType.ID);
             node = (VarDeclarationNode)visit("vardecTail");
             node.specifier = t;
@@ -971,7 +990,9 @@ public class Parser {
             }
             current.variableDeclarations.add(node);
         }
-             
+                    
+        synch = followSet.get("compoundStmt");
+        synch.union(firstSet.get("statement"));
         current.statements.add((Statement)visit("statement"));
         while(firstSet.get("statement").contains(lookahead.getName())){
              current.statements.add((Statement)visit("statement"));
@@ -986,10 +1007,16 @@ public class Parser {
      * @Revised by Leon added AST
      */
     public IfNode ifStmt() {
+        synch = followSet.get("ifStmt");
+        synch.union(firstSet.get("expression"));
+        
         IfNode node = rootNode.new IfNode();
         match(TokenType.IF);
         match(TokenType.LPAREN);
         node.exp = (Expression)visit("expression");
+        
+        synch = followSet.get("ifStmt");
+        synch.union(firstSet.get("statement"));
         match(TokenType.RPAREN);
         node.stmt = (ASTNode)visit("statement");
         if(lookahead.getName() == TokenType.ELSE){
@@ -1054,6 +1081,8 @@ public class Parser {
      * @Revised by Leon, added AST
      */
     public ASTNode returnStmt() {
+        synch = followSet.get("returnStmt");
+        synch.union(firstSet.get("expression"));
         ReturnNode node = rootNode.new ReturnNode();
         match(TokenType.RETURN);
         if(firstSet.get("expression").contains(lookahead.getName())){
@@ -1103,15 +1132,19 @@ public class Parser {
      */
     public ASTNode caseStmt() {
         CaseNode node = rootNode.new CaseNode();
+        synch = firstSet.get("statement");
+        synch.union(followSet.get("caseStmt"));
+        
         if(lookahead.getName() == TokenType.CASE){
+            synch = firstSet.get("caseStmt");
             match(TokenType.CASE);
             match(TokenType.NUM);
             match(TokenType.COLON);
             node.stmt = (Statement)visit("statement");
         }else if(lookahead.getName() == TokenType.DEFAULT){
-             match(TokenType.DEFAULT);
-             match(TokenType.COLON);
-             node.stmt = (Statement)visit("statement");
+            match(TokenType.DEFAULT);
+            match(TokenType.COLON);
+            node.stmt = (Statement)visit("statement");
         }//else
          //   printError("CaseStmt Error: " + lookahead.getName());
         return node;
@@ -1290,6 +1323,7 @@ public class Parser {
      */
     public TokenType relop() {
         TokenType type = null;
+        synch = firstSet.get("relop");
         if(lookahead.getName() == TokenType.LTEQ){
             match(TokenType.LTEQ);
             type = TokenType.LTEQ;
@@ -1323,6 +1357,8 @@ public class Parser {
      */
     public TokenType addop() {
         TokenType type = null; 
+        synch = firstSet.get("addop");
+        
         if(lookahead.getName() == TokenType.PLUS){
             match(TokenType.PLUS);
             type = TokenType.PLUS;
@@ -1379,6 +1415,7 @@ public class Parser {
     public TokenType uminus() {
         TokenType type = null;
         if(lookahead.getName() == TokenType.MINUS){
+            synch = firstSet.get("uminus");
             match(TokenType.MINUS);
             type = TokenType.MINUS;
         }

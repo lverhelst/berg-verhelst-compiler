@@ -8,6 +8,7 @@ import java.util.ArrayList;
  */
 public class TNSet {
     private ArrayList<TokenType> set;
+    
     public TNSet() {
         set = new ArrayList<TokenType>();
     }
@@ -52,11 +53,11 @@ public class TNSet {
     
     /**
      * Used to union sets
-     * @param set the set to union with
+     * @param set2 the set to union with
+     * @created by Emery
      */
-    public TNSet union(TNSet set) {
-        this.set.addAll(set.getSet());
-        for(TokenType type: set.getSet()) {
+    public TNSet union(TNSet set2) {
+        for(TokenType type: set2.getSet()) {
             if(!this.set.contains(type))
                 this.set.add(type);
         }

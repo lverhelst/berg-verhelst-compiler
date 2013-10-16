@@ -63,4 +63,19 @@ public class TNSet {
         }
         return this;
     }
+    
+    /**
+     * Used to print out the set
+     * @return the set as a string
+     */
+    @Override
+    public String toString() {
+        String temp = "";
+        
+        for(TokenType type: set) {
+            temp += type + ", ";
+        }
+        
+        return temp;
+    }
 }

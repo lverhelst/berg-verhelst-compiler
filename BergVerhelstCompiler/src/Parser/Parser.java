@@ -544,6 +544,7 @@ public class Parser{
      */
     public void syntaxCheck(TNSet synch) {
         if(!synch.contains(lookahead.getName())){
+            printError(lookahead.getName() + " not found in the synch set: " + synch);
             syntaxError(synch);
         }
         
@@ -556,7 +557,8 @@ public class Parser{
      * @param synch the set to check the lookahead.getName() against
      * @created by Emery
      */
-    public void syntaxError(TNSet synch) {        
+    public void syntaxError(TNSet synch) { 
+        error = true;       
         while(!synch.contains(lookahead.getName())) 
             lookahead = scn.getToken();
     }

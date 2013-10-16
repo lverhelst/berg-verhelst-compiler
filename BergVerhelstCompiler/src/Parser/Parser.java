@@ -556,7 +556,7 @@ public class Parser{
      * @param synch the set to check the lookahead.getName() against
      * @created by Emery
      */
-    public void syntaxError(TNSet synch) {
+    public void syntaxError(TNSet synch) {        
         while(!synch.contains(lookahead.getName())) 
             lookahead = scn.getToken();
     }
@@ -1486,7 +1486,7 @@ public class Parser{
      */
     public void printError(String line) {
         error = true;
-        System.out.println(line);
+        System.err.println(line);
 
         if(printFile)
           printWriter.print(line + "\r\n");

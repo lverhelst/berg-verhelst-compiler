@@ -4,19 +4,13 @@ Line 1: int main;
     1:  (SEMI, -) => ;
 Line 2: int main2;
     2:  (INT, -) => int
-Failed to run method: declaration
-java.lang.NullPointerException
     2:  (ID, 1) => main2
     2:  (SEMI, -) => ;
 Line 3: int main(void){
     3:  (INT, -) => int
-Failed to run method: declaration
-java.lang.NullPointerException
     3:  (ID, 0) => main
     3:  (LPAREN, -) => (
     3:  (VOID, -) => void
-Failed to run method: declaration
-java.lang.NullPointerException
     3:  (RPAREN, -) => )
     3:  (LCRLY, -) => {
 Line 4: loop
@@ -100,28 +94,18 @@ Line 24: }
     24:  (RCRLY, -) => }
 Line 25: int add(int x, int y, bool z, int abc){
     25:  (INT, -) => int
-Failed to run method: declaration
-java.lang.NumberFormatException: null
     25:  (ID, 10) => add
     25:  (LPAREN, -) => (
     25:  (INT, -) => int
-Failed to run method: declaration
-java.lang.NullPointerException
     25:  (ID, 2) => x
     25:  (COMMA, -) => ,
     25:  (INT, -) => int
-Failed to run method: declaration
-java.lang.NullPointerException
     25:  (ID, 9) => y
     25:  (COMMA, -) => ,
     25:  (BOOL, -) => bool
-Failed to run method: declaration
-java.lang.NullPointerException
     25:  (ID, 11) => z
     25:  (COMMA, -) => ,
     25:  (INT, -) => int
-Failed to run method: declaration
-java.lang.NullPointerException
     25:  (ID, 12) => abc
     25:  (RPAREN, -) => )
     25:  (LCRLY, -) => {
@@ -134,6 +118,4 @@ Line 26: return x + y;
 Line 27: }
     27:  (RCRLY, -) => }
     27:  (ENDFILE, -) => 
-Failed to run method: declaration
-java.lang.NullPointerException
-FAIL
+PASS

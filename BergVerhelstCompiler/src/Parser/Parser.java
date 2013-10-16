@@ -727,7 +727,8 @@ public class Parser{
         TNSet tempSynch = synch.union(firstSet.get("addExp"));
         current.ID = Integer.parseInt(lookahead.getAttribute_Value());
         match(TokenType.ID, tempSynch);
-         
+        
+        
         if(this.lookahead.getName() == TokenType.LSQR){
             match(TokenType.LSQR, tempSynch);
             current.offset = (Expression)visit("addExp", tempSynch);
@@ -971,7 +972,7 @@ public class Parser{
         ASTNode.CompoundNode current = rootNode.new CompoundNode(); 
         TNSet tempSynch = synch.union(followSet.get("compoundStmt"));
         tempSynch = tempSynch.union(firstSet.get("compoundStmt"));
-       // tempSynch = tempSynch.union(firstSet.get("nonvoidSpec"));
+        tempSynch = tempSynch.union(firstSet.get("nonvoidSpec"));
         tempSynch = tempSynch.union(firstSet.get("vardecTail"));
         tempSynch = tempSynch.union(firstSet.get("statement"));
         
@@ -997,7 +998,7 @@ public class Parser{
         tempSynch = tempSynch.union(firstSet.get("statement"));
         tempSynch = tempSynch.union(followSet.get("statement"));
         while(firstSet.get("statement").contains(lookahead.getName())){
-             current.statements.add((Statement)visit("statement", tempSynch));
+             current.statements.add((ASTNode)visit("statement", tempSynch));
         }
         tempSynch = origSynch;
         match(TokenType.RCRLY, tempSynch);
@@ -1042,10 +1043,10 @@ public class Parser{
         LoopNode current = node;
         match(TokenType.LOOP, tempSynch);
         tempSynch = origSynch;
-        node.stmt = (Statement)visit("statement", tempSynch);
+        node.stmt = (ASTNode)visit("statement", tempSynch);
         while(firstSet.get("statement").contains(lookahead.getName())){
             current.nextLoopNode = rootNode.new LoopNode();
-            current.nextLoopNode.stmt = (Statement)visit("statement", tempSynch);
+            current.nextLoopNode.stmt = (ASTNode)visit("statement", tempSynch);
             current = current.nextLoopNode;
         }
         match(TokenType.END, tempSynch);

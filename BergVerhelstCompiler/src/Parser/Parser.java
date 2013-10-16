@@ -657,12 +657,13 @@ public class Parser{
      * Used to deal with the nonvoidSpec phrase (3)
      * @created by Emery
      */
-    public TokenType nonvoidSpec(TNSet synch) {        
+    public TokenType nonvoidSpec(TNSet synch) {      
+        TNSet tempSynch = synch.union(followSet.get("nonvoidSpec"));
         if(lookahead.getName() == TokenType.INT){
-            match(TokenType.INT, synch);
+            match(TokenType.INT, tempSynch);
             return TokenType.INT;
         }else{
-            match(TokenType.BOOL, synch);
+            match(TokenType.BOOL, tempSynch);
             return TokenType.BOOL;
         }
     }
@@ -727,7 +728,7 @@ public class Parser{
             match(TokenType.LSQR, tempSynch);
             current.offset = (Expression)visit("addExp", tempSynch);
             tempSynch = synch;
-            match(TokenType.RSQR, synch);
+            match(TokenType.RSQR, tempSynch);
         }
         return current;
     }
@@ -758,7 +759,7 @@ public class Parser{
      * @created by Leon
      */
     public ASTNode params(TNSet synch) {
-        TNSet tempSynch = synch.union(firstSet.get("param"));
+        TNSet tempSynch = synch.union(firstSet.get("param")).union(followSet.get("params"));
         ParameterNode node = rootNode.new ParameterNode();
         ParameterNode current = node;
         if(firstSet.get("param").contains(lookahead.getName())){
@@ -960,7 +961,8 @@ public class Parser{
      */
     public ASTNode compoundStmt(TNSet synch) {
         ASTNode.CompoundNode current = rootNode.new CompoundNode(); 
-        
+        synch = synch.union(followSet.get("compoundStmt"));
+                
         TNSet tempSynch = synch;
         tempSynch = tempSynch.union(firstSet.get("nonvoidSpec"));
         tempSynch = tempSynch.union(firstSet.get("vardecTail"));
@@ -1025,7 +1027,7 @@ public class Parser{
      * @revised by Leon add by AST
      */
     public ASTNode loopStmt(TNSet synch) {
-        TNSet tempSynch = synch.union(firstSet.get("statment"));
+        TNSet tempSynch = synch.union(firstSet.get("statement"));
         LoopNode node = rootNode.new LoopNode();
         LoopNode current = node;
         match(TokenType.LOOP, tempSynch);
@@ -1168,7 +1170,7 @@ public class Parser{
      * @created by Emery
      */
     public Expression addExp(TNSet synch) {
-        Expression node = null;
+        Expression node;
         UnopNode unaryNode = rootNode.new UnopNode();
         boolean isUnary = false;
         TNSet tempSynch = synch;

@@ -1,4 +1,4 @@
-int main; int main2;
+int main int main2;
 int main(void){
 	loop 
 	 if( x > 0)

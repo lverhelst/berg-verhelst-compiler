@@ -74,7 +74,8 @@ public class Parser{
        TNSet synch = followSet.get("program");
        rootNode = (ASTNode)visit("program", synch);
        //Print AST
-       print(((ProgramNode)rootNode).toString());
+       if(!error)
+            print(((ProgramNode)rootNode).toString());
        
        //checks if both parser and scanner ran without an error and returns value
        return !error && !scn.error;
@@ -545,6 +546,7 @@ public class Parser{
         if(!synch.contains(lookahead.getName())){
             syntaxError(synch);
         }
+        
     }
     
     /**
@@ -649,9 +651,8 @@ public class Parser{
                 return node;
             }
         }else
-            printError("declaration error: " + this.lookahead.getName());
-        
-        return null;
+        printError("declaration error: " + this.lookahead.getName());
+        return program(synch);
     }
     
     /**
@@ -674,14 +675,12 @@ public class Parser{
      * @created by Emery
      */
     public ASTNode decTail(TNSet synch) {
-        if(firstSet.get("vardecTail").contains(this.lookahead.getName())){
-            return (VarDeclarationNode)visit("vardecTail", synch.union(firstSet.get("vardecTail")));
-        }
+        
         if(firstSet.get("fundecTail").contains(this.lookahead.getName())){
             return (FuncDeclarationNode)visit("fundecTail", synch.union(firstSet.get("fundecTail")));
+        }else{
+            return (VarDeclarationNode)visit("vardecTail", synch.union(firstSet.get("vardecTail")));
         }
-        syntaxCheck(synch);
-        return null;
     }
     
     /**
@@ -1474,7 +1473,7 @@ public class Parser{
      * @param line the string to print
      */
     public void print(String line) {
-        if(verbose && !error) {  
+        if(verbose) {  
             System.out.println(line);
             if(printFile)
               printWriter.print(line + "\r\n");
@@ -1491,5 +1490,6 @@ public class Parser{
 
         if(printFile)
           printWriter.print(line + "\r\n");
+        
     } 
 }

@@ -46,6 +46,7 @@ public class Parser{
     public boolean verbose;
     public boolean printFile;
     public boolean error;
+    public boolean inRecovery;
     
     /**
      * Empty Constructor
@@ -554,7 +555,7 @@ public class Parser{
      * @param synch the set to check the lookahead.getName() against
      * @created by Emery
      */
-    public void syntaxError(TNSet synch) {
+    public void syntaxError(TNSet synch) {        
         while(!synch.contains(lookahead.getName())) 
             lookahead = scn.getToken();
     }
@@ -651,7 +652,7 @@ public class Parser{
         }else
             printError("declaration error: " + this.lookahead.getName());
         
-        return null;
+        return program(synch);
     }
     
     /**
@@ -674,14 +675,12 @@ public class Parser{
      * @created by Emery
      */
     public ASTNode decTail(TNSet synch) {
-        if(firstSet.get("vardecTail").contains(this.lookahead.getName())){
-            return (VarDeclarationNode)visit("vardecTail", synch.union(firstSet.get("vardecTail")));
-        }
         if(firstSet.get("fundecTail").contains(this.lookahead.getName())){
             return (FuncDeclarationNode)visit("fundecTail", synch.union(firstSet.get("fundecTail")));
         }
-        syntaxCheck(synch);
-        return null;
+        else {
+            return (VarDeclarationNode)visit("vardecTail", synch.union(firstSet.get("vardecTail")));
+        }
     }
     
     /**
@@ -1474,7 +1473,7 @@ public class Parser{
      * @param line the string to print
      */
     public void print(String line) {
-        if(verbose && !error) {  
+        if(verbose) {  
             System.out.println(line);
             if(printFile)
               printWriter.print(line + "\r\n");
@@ -1487,7 +1486,7 @@ public class Parser{
      */
     public void printError(String line) {
         error = true;
-        System.out.println(line);
+        System.err.println(line);
 
         if(printFile)
           printWriter.print(line + "\r\n");

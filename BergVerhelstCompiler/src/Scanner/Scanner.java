@@ -643,7 +643,7 @@ public class Scanner {
      */
     public void printError(String line) {
         error = true;
-        System.out.println(line);
+        System.err.println(line);
 
         if(printFile)
           printWriter.print(line + "\r\n");

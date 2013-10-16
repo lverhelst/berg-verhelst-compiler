@@ -557,6 +557,7 @@ public class Parser{
      * @created by Emery
      */
     public void syntaxError(TNSet synch) {        
+        error = true;
         while(!synch.contains(lookahead.getName())) 
             lookahead = scn.getToken();
     }
@@ -626,7 +627,7 @@ public class Parser{
             declaration.ID = id;
             declaration.specifier = TokenType.VOID;
             return declaration;
-        }else if(firstSet.get("nonvoidSpec").getSet().contains(this.lookahead.getName())){
+        }else {
             tempSynch = synch.union(firstSet.get("decTail"));
             TokenType functionType = (TokenType)visit("nonvoidSpec", tempSynch);
             id = Integer.parseInt(lookahead.getAttribute_Value());
@@ -650,9 +651,7 @@ public class Parser{
                 }
                 return node;
             }
-        }else
-        printError("declaration error: " + this.lookahead.getName());
-        return program(synch);
+        }
     }
     
     /**

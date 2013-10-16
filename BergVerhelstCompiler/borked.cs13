@@ -1,0 +1,26 @@
+int main; int main2
+int main(void){
+	loop 
+	 if( x > 0
+		{
+		 if( x > 5)
+			{
+				x := 5;
+			}
+		 
+		 {
+			return div(s ,t);
+		 }
+		
+		else
+		{
+			return mult(a + 8 , b);
+		}
+	 x := 1902;
+	 y := 204;
+	 continue;
+	end;
+}
+int add(int x int y, bool z, int abc){
+	return x y;
+}	

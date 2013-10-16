@@ -1486,8 +1486,7 @@ public class Parser{
      */
     public void printError(String line) {
         error = true;
-        System.err.println(line);
-
+        System.out.println("\u001B[31m" + line + "\u001B[0m");
         if(printFile)
           printWriter.print(line + "\r\n");
         

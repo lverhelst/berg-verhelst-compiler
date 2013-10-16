@@ -71,11 +71,14 @@ public class TNSet {
     @Override
     public String toString() {
         String temp = "";
-        
+        int i = 0;
         for(TokenType type: set) {
-            temp += type + ", ";
+            temp += type;
+            i++;
+            if(i < set.size()){
+                temp += ", ";
+            }
         }
-        
         return temp;
     }
 }

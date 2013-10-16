@@ -99,11 +99,11 @@ public class ASTNode{
      */
     public class CompoundNode extends ASTNode{
         ArrayList<VarDeclarationNode> variableDeclarations;
-        ArrayList<Statement> statements;   
+        ArrayList<ASTNode> statements;   
         
         public CompoundNode(){
             variableDeclarations = new ArrayList<VarDeclarationNode>();
-            statements = new ArrayList<Statement>();
+            statements = new ArrayList<ASTNode>();
         }
         
         @Override
@@ -113,7 +113,7 @@ public class ASTNode{
             for(VarDeclarationNode var: variableDeclarations)
                 temp += printFormat(var);  
  
-            for(Statement stmt: statements)
+            for(ASTNode stmt: statements)
                 temp += printFormat((ASTNode)stmt);  
             
             return printFormat(temp);
@@ -172,7 +172,7 @@ public class ASTNode{
      * @Created Leon
      */
     public class LoopNode extends ASTNode implements Statement{
-        Statement stmt;
+        ASTNode stmt;
         LoopNode nextLoopNode;
         
         @Override

@@ -54,11 +54,12 @@ public class TNSet {
      * Used to union sets
      * @param set the set to union with
      */
-    public void union(TNSet set) {
+    public TNSet union(TNSet set) {
         this.set.addAll(set.getSet());
         for(TokenType type: set.getSet()) {
             if(!this.set.contains(type))
                 this.set.add(type);
         }
+        return this;
     }
 }

@@ -56,5 +56,9 @@ public class TNSet {
      */
     public void union(TNSet set) {
         this.set.addAll(set.getSet());
+        for(TokenType type: set.getSet()) {
+            if(!this.set.contains(type))
+                this.set.add(type);
+        }
     }
 }

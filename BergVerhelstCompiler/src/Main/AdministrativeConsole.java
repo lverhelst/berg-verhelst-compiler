@@ -15,11 +15,9 @@ import org.apache.commons.cli.*;
 //Command Line Parsing Libary: commons-cli-1.2
 
 /**
- *
  * @author Leon Verhelst and Emery Berg
  */
 public class AdministrativeConsole {
-   
    HashMap<String, String> arguments;
    private CommandLineParser cliparser;
    private CommandLine cmd;

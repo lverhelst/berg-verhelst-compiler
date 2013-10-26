@@ -1,4 +1,4 @@
-package Lexeme;
+package Compiler;
 
 import java.util.ArrayList;
 

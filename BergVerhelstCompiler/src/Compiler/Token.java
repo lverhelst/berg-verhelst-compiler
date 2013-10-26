@@ -1,4 +1,4 @@
-package Lexeme;
+package Compiler;
 /**
  * @author Leon Verhelst
  * Used to represent the categories of lexemes

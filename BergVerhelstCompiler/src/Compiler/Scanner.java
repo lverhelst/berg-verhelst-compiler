@@ -1,10 +1,9 @@
-package Scanner;
-import FileIO.FileReader;
-import Lexeme.Token;
+package Compiler;
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.TreeMap;
-import Lexeme.TokenType;
 import java.io.PrintWriter;
 
 /**
@@ -46,11 +45,7 @@ public class Scanner {
      */
     public Scanner(){
         reset();
-        this.generateWordTableFromFile();
-        
-        //if file fails load defaults
-        if(wordTable == null)
-            generateWordTable();
+        generateWordTable();
         
         symbolTable = new HashMap();
                             
@@ -350,30 +345,6 @@ public class Scanner {
     }
     
     /**
-     * Initializes the wordTable from "wordTable.txt"
-     */
-    private Boolean generateWordTableFromFile(){
-        //Initial size of 1000 records
-        //Default load ratio of 0.75 (75%)
-        wordTable = new TreeMap();
-        FileReader fr = new FileReader("prereq/wordTable.txt");
-        String tableString;
-        try{
-            tableString = fr.readFileToString();
-            String[] lines = tableString.split("\r\n");
-            for(String line : lines){
-                String[] arr = line.split(" ");
-                Token tok = new Token(TokenType.valueOf(arr[1]), arr[0], (arr.length == 3)? arr[2] : null);
-                addWordToken(tok);
-            }
-        }catch(IOException e){
-            printError(e.toString());
-            return false;
-        }
-        return true;
-    }
-    
-    /**
      * Initializes the word table via code 
      */
     private void generateWordTable(){
@@ -615,9 +586,13 @@ public class Scanner {
      * @created by Emery
      */
     public void setInput(FileReader fileReader) {
+        BufferedReader br = new BufferedReader(fileReader);
         try{
                 //Load the file into our string buffer
-                fileAsString =  "\n" + fileReader.readFileToString() + '\u001a';
+                String line;
+                while((line = br.readLine()) != null)
+                    fileAsString += line;
+                fileAsString += '\u001a';
                 fileByLines = fileAsString.split("\n");
         }catch(IOException e){
                printError("Administrative Console: " + e.toString());

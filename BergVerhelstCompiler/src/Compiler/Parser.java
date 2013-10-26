@@ -1,32 +1,11 @@
-package Parser;
+package Compiler;
 
-import FileIO.FileReader;
-import Lexeme.TNSet;
-import Lexeme.Token;
-import Lexeme.TokenType;
-import Parser.ASTNode.BinopNode;
-import Parser.ASTNode.BranchNode;
-import Parser.ASTNode.CallNode;
-import Parser.ASTNode.CaseNode;
-import Parser.ASTNode.CompoundNode;
-import Parser.ASTNode.Expression;
-import Parser.ASTNode.FuncDeclarationNode;
-import Parser.ASTNode.IfNode;
-import Parser.ASTNode.LiteralNode;
-import Parser.ASTNode.LoopNode;
-import Parser.ASTNode.MarkerNode;
-import Parser.ASTNode.ParameterNode;
-import Parser.ASTNode.ProgramNode;
-import Parser.ASTNode.ReturnNode;
-import Parser.ASTNode.Statement;
-import Parser.ASTNode.UnopNode;
-import Parser.ASTNode.VarDeclarationNode;
-import Parser.ASTNode.VariableNode;
-import Scanner.Scanner;
+import Compiler.ASTNode.*;
 import java.io.PrintWriter;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.io.FileReader;
 
 /**
  * @author Leon Verhelst and Emery Berg

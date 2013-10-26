@@ -1,4 +1,4 @@
-package Lexeme;
+package Compiler;
 
 /**
  * Symbolic names of token types

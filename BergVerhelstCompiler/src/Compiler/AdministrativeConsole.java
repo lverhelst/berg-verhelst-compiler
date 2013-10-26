@@ -1,13 +1,9 @@
-package Main;
-import Lexeme.Token;
-import Parser.Parser;
-import Scanner.Scanner;
-import UnitTests.UnitTester;
+package Compiler;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.PrintWriter;
 import java.util.HashMap;
-import java.util.InputMismatchException;
 import org.apache.commons.cli.*;
 
 
@@ -109,11 +105,8 @@ public class AdministrativeConsole {
        if(cmd.hasOption("h")){
            usage(opts);
        }
-        if(cmd.hasOption("ui")){
-            runUI();
-        }else{
-            runFileProcess();
-        }
+       runFileProcess();
+        
    }
    
    /**
@@ -123,13 +116,8 @@ public class AdministrativeConsole {
    private void runFileProcess(){
        didPass = true;
        for (String fileName : cmd.getArgs()){
-            reset();
-            //Verify valid file name
-            if(!fileName.endsWith("cs13")){
-                System.out.println("Administrative Console - Invalid File Name: " + fileName);
-            }else{
-                parseFile(fileName);
-            }
+            reset();   
+            parseFile(fileName);
        }
    }
    
@@ -186,81 +174,6 @@ public class AdministrativeConsole {
        characterposition = 0;
    }
    
-   /**
-    * Runs the compiler as a looped-cmd program
-    */
-   private void runUI(){     
-        java.util.Scanner kbd = new java.util.Scanner(System.in);
-        System.out.println("Enter number Corresponding to the wanted command\r\n1) Scan File \r\n2) Show Trace \r\n3) Unit Tests \r\n4) Help \r\n5) Exit");
-        String line;
-        int option;
-        boolean loop = true;
-        System.out.print(">");
-        //Get input until user quits
-        uiloop : while(loop){
-            try{
-                    option = kbd.nextInt();	
-            }catch(InputMismatchException ime){
-                    option = -1;
-            }
-            kbd.nextLine();
-            switch(option){
-                case 1:
-                    //Case 1: Scan file, no parameters
-                    reset();
-                    System.out.print("Enter File Name:");
-                    line = kbd.nextLine();   
-                    String[] args = {"-f ", line};
-                    //parameters
-                    setParameters(args);
-                    runFileProcess();
-                    break;
-                case 2:
-                    //Case 2: Scan file with trace token parameter
-                    reset();
-                    System.out.print("Enter File Name:");
-                    line = kbd.nextLine();
-                    System.out.print("Save Trace to file? (y/n)");
-                    String saveTrace = kbd.nextLine();
-                    //See if the user wants to save the trace to a file
-                    if(saveTrace.equals("y") || saveTrace.equals("Y")){
-                        System.out.print("Enter output file name:");
-                        //parameters
-                        String[] traceargs = {"-tr","token", "-f", line, "-out", kbd.nextLine()};
-                        setParameters(traceargs);
-                        runFileProcess();
-                    
-                    }else{
-                        //parameters
-                        String[] traceargs = {"-tr","token", "-f", line};
-                        setParameters(traceargs);
-                        runFileProcess();
-                    }
-                    break;
-                case 3:
-                    //Case 3: Run unit tests
-                    reset();
-                    //parameters
-                    String[] unitargs = {"-test"}; 
-                    setParameters(unitargs);
-                    System.out.println("Running Unit Tests");
-                    runUnitTests();
-                    System.out.println("Unit Tests Completed");
-                    break;
-                case 4:
-                    //Case 3: Display Help
-                    displayHelp();
-                    break;
-                case 5:
-                    break uiloop;
-                default:
-                    System.out.println("Invalid Option");
-                    break;
-            }
-            System.out.print(">");
-        }
-        System.out.println("Program Terminated");
-   }
    
    /**
     * Parse input File
@@ -271,7 +184,14 @@ public class AdministrativeConsole {
        
        //Create new Scanner
        Scanner scn = new Scanner();
-       scn.setInput(new FileIO.FileReader(filename));
+       try{
+            scn.setInput(new FileReader(filename));
+       }catch(FileNotFoundException fnfe){
+           System.out.println("File not found: " + filename + "\n" + fnfe.getLocalizedMessage());
+       }
+       
+       
+       
        PrintWriter pWriter = new PrintWriter(System.out);
        if(cmd.hasOption("o")){
            try{
@@ -366,15 +286,6 @@ public class AdministrativeConsole {
        System.out.println("BERG-VERHELST-COMPILER c*13 Language \r\n **** \r\n Command List (for running as .jar)\r\n -f <FileName.cs13> (Load File into Compiler)" 
                + "\r\n -tr token (Trace tokens from the scanner) \r\n -out <Filename> to save trace to a file\r\n -ui (Run compiler using command interface) \r\n -help (Display help) \r\n -test (Run unit tests)");     
    }
-    
-    /**
-     * Runs all the unit tests
-     */
-    private void runUnitTests(){
-        UnitTester ut = new UnitTester(this);
-        ut.runAllUnitTests();
-    }       
-   
    /**
     * Used to run all test files stored in the test folder and compare to expected output
     */

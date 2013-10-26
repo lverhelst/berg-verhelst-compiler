@@ -1,4 +1,4 @@
-package Main;
+package Compiler;
 
 /**
  * @author Emery Berg, Leon Verhelst

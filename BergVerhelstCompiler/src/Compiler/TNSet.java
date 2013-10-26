@@ -1,16 +1,22 @@
 package Compiler;
 
 import java.util.ArrayList;
-
+import java.util.Arrays;
+import Compiler.TokenType.*;
 /**
  * Holds a set of tokens
  * @author Emery
  */
 public class TNSet {
-    private ArrayList<TokenType> set;
+    private final ArrayList<TokenType> set;
     
     public TNSet() {
         set = new ArrayList<TokenType>();
+    }
+    
+    public TNSet(TokenType ... tnset){
+        set =  new ArrayList<TokenType>();
+        set.addAll(Arrays.asList(tnset));
     }
     
     /**
@@ -55,6 +61,7 @@ public class TNSet {
      * Used to union sets
      * @param set2 the set to union with
      * @created by Emery
+     * @return returns this set union with the next set
      */
     public TNSet union(TNSet set2) {
         for(TokenType type: set2.getSet()) {

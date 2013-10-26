@@ -591,7 +591,7 @@ public class Scanner {
                 //Load the file into our string buffer
                 String line;
                 while((line = br.readLine()) != null)
-                    fileAsString += line;
+                    fileAsString += "\n" + line;
                 fileAsString += '\u001a';
                 fileByLines = fileAsString.split("\n");
         }catch(IOException e){

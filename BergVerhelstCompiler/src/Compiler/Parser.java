@@ -626,7 +626,7 @@ public class Parser{
             }else {
                 VarDeclarationNode node = (VarDeclarationNode)value;
                 if(ID != null)
-                    node.ID = Integer.parseInt(ID);;
+                    node.ID = Integer.parseInt(ID);
                 node.specifier = functionType;
                 VarDeclarationNode current = node;
                 while(current.nextVarDec != null){

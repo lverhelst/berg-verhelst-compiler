@@ -1,10 +1,16 @@
 int main;
+
 int main(void)
 {
- if( x > 5) 
- { x := 5; } 
+ if(x > 5) 
+ { 
+   x := 5; 
+ } 
+ return 0;
 } 
 
 
 int add(int x, int y, bool z, int abc)
- { return x + y; }
+{ 
+	return x + y; 
+}

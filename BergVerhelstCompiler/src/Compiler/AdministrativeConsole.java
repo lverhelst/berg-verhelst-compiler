@@ -4,6 +4,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.PrintWriter;
 import java.util.HashMap;
+import java.util.List;
 import org.apache.commons.cli.*;
 
 
@@ -115,10 +116,24 @@ public class AdministrativeConsole {
     */
    private void runFileProcess(){
        didPass = true;
-       for (String fileName : cmd.getArgs()){
+       
+       PrintWriter pWriter = new PrintWriter(System.out);
+       List<String> files = cmd.getArgList();
+       String[][] results = new String[files.size()][2];
+       int i = 0;
+       for (String fileName : files){
             reset();   
-            parseFile(fileName);
+            results[i][0] = fileName;
+            results[i][1] = parseFile(fileName, pWriter);
+            i++;
        }
+       for(int j = 0; j < i; j++){
+           System.out.println("Result:" + results[j][1] + " File: " + results[j][0]);
+           if(cmd.hasOption("o")){
+                pWriter.print("Result:" + results[j][1] + " File: " + results[j][0]);
+           }
+       }
+       pWriter.close();
    }
    
    /**
@@ -178,7 +193,7 @@ public class AdministrativeConsole {
    /**
     * Parse input File
     */
-   private void parseFile(String filename){
+   private String parseFile(String filename, PrintWriter pWriter){
        //Check trace
        String line;
        
@@ -188,11 +203,9 @@ public class AdministrativeConsole {
             scn.setInput(new FileReader(filename));
        }catch(FileNotFoundException fnfe){
            System.out.println("File not found: " + filename + "\n" + fnfe.getLocalizedMessage());
+           return "File Not Found";
        }
-       
-       
-       
-       PrintWriter pWriter = new PrintWriter(System.out);
+    
        if(cmd.hasOption("o")){
            try{
                pWriter = new PrintWriter(cmd.getOptionValue("o"));
@@ -219,12 +232,7 @@ public class AdministrativeConsole {
        }
        
        didPass &= prs.parse(cmd.hasOption("v"));
-       System.out.println((didPass)? "PASS": "FAIL");
-       if(cmd.hasOption("o")){
-            pWriter.print((didPass)? "PASS": "FAIL");
-       }
-       pWriter.close();
-       System.out.println("Administrative Console - Completed Scan");
+       return (didPass)? "PASS": "FAIL";
    }  
    
    /**

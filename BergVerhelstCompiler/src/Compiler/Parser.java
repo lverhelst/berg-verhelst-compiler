@@ -801,7 +801,6 @@ public class Parser{
         if(BRANCHSTMT.firstSet().contains(lookahead.getName())){
             return (BranchNode)visit("branchStmt", synch);
         }       
-        
         syntaxCheck(synch);
         return null;
     }
@@ -863,8 +862,8 @@ public class Parser{
             match(TokenType.RSQR, synch.union((EXPRESSION.firstSet())));
         }
         match(TokenType.ASSIGN, synch.union((EXPRESSION.firstSet())));
-        current.expersion = (Expression)visit("expression", synch);
-        visit("expression", synch);
+        current.expersion = (Expression)visit("expression", synch.union(TokenType.SEMI));
+       // visit("expression", synch.union(TokenType.SEMI));
         match(TokenType.SEMI, synch);
         return current;
     }
@@ -930,10 +929,8 @@ public class Parser{
             }
             current.variableDeclarations.add(node);
         }
-                    
-        
         while(STATEMENT.firstSet().contains(lookahead.getName())){
-             current.statements.add((ASTNode)visit("statement", synch.union(TokenType.RCRLY)));
+             current.statements.add((ASTNode)visit("statement", synch.union(STATEMENT.firstSet()).union(TokenType.RCRLY)));
         }
         match(TokenType.RCRLY, synch);
         return current;

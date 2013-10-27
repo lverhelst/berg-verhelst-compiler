@@ -2,7 +2,7 @@ package Compiler;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import Compiler.TokenType.*;
+
 /**
  * Holds a set of tokens
  * @author Emery
@@ -61,14 +61,16 @@ public class TNSet {
      * Used to union sets
      * @param set2 the set to union with
      * @created by Emery
-     * @return returns this set union with the next set
+     * @return returns new TNSet
      */
     public TNSet union(TNSet set2) {
+        TNSet toRet = new TNSet();
+        toRet.set.addAll(this.set);
         for(TokenType type: set2.getSet()) {
-            if(!this.set.contains(type))
-                this.set.add(type);
+            if(!toRet.set.contains(type))
+                toRet.set.add(type);
         }
-        return this;
+        return toRet;
     }
     
     /**

@@ -72,6 +72,18 @@ public class TNSet {
         }
         return toRet;
     }
+    /**
+     * Used to union a TNSet and an element
+     * @param t Token Type to be unioned to the current TNSet
+     * @return Result of the union (new TNSet)
+     */
+    public TNSet union(TokenType t){
+        TNSet toRet = new TNSet();
+        toRet.set.addAll(this.set);
+        if(!toRet.set.contains(t))
+            toRet.set.add(t);
+        return toRet;
+    }
     
     /**
      * Used to print out the set

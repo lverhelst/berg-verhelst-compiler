@@ -915,9 +915,6 @@ public class Parser{
     public ASTNode compoundStmt(TNSet synch) {
         ASTNode.CompoundNode current = rootNode.new CompoundNode(); 
         TNSet tempSynch = synch.union(COMPOUNDSTMT.firstSet().union(COMPOUNDSTMT.followSet().union(NONVOIDSPEC.firstSet().union(VARDECTAIL.firstSet().union(STATEMENT.firstSet())))));
-        
-                
-        
         match(TokenType.LCRLY, tempSynch);
         while(NONVOIDSPEC.firstSet().contains(lookahead.getName())){
             VarDeclarationNode node;

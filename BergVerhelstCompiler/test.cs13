@@ -1,10 +1,13 @@
 int main;
+int main2;
 
 int main(void)
 {
  if(x > 5) 
  { 
    x := 5; 
+ }else{
+   x := 1 + 2;
  } 
  return 0;
 } 

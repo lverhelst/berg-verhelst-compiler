@@ -54,7 +54,7 @@ public enum FFSet {
         return this.followSet;
     }
     
-    FFSet(TNSet firstSet, TNSet followSet){
+    private FFSet(TNSet firstSet, TNSet followSet){
         this.firstSet = firstSet;
         this.followSet = followSet;
     }

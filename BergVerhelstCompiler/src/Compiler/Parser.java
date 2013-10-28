@@ -5,29 +5,36 @@ import static Compiler.FFSet.*;
 import java.io.PrintWriter;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.io.FileReader;
 
 /**
  * @author Leon Verhelst and Emery Berg
  * Parser class for parsing the tokens from the Scanner
  */
 public class Parser{
+   // private HashMap<String, TNSet> firstSet;
+   // private HashMap<String, TNSet> followSet;
     private Scanner scn;
     private Token lookahead;
     ASTNode rootNode;
-    private int depth;    
+    private int depth;
     
+    private FileReader fileReader;
     private PrintWriter printWriter;
+    private boolean quite;
     public boolean verbose;
     public boolean printFile;
     public boolean error;
     public boolean development;
-    
     /**
      * Empty Constructor
      * @created by Leon
      */
     public Parser(Scanner scanner) {
         this.scn = scanner;
+        //genFirstSets();
+        //genFollowSets();
         rootNode = new ASTNode();
         depth = 0;
     }
@@ -63,26 +70,29 @@ public class Parser{
     public Object visit(String methodName, TNSet synch) {
         depth++;
         if(development) {
-            String enter = "Entering Method: " + methodName;
-            print(String.format("%" + (depth + enter.length()) + "s", enter));
-        }
+                String enter = "Entering Method: " + methodName;
+	        print(String.format("%" + (depth + enter.length()) + "s", enter));
+	}
         Object temp = null;
         //run method and retrieve value
         try {
             Method method = Parser.class.getMethod(methodName, new Class[]{TNSet.class});
             temp = method.invoke(this, new Object[]{synch});
+//            if(temp instanceof ASTNode) {
+//                ((ASTNode)temp).space = depth;
+//            }
         } catch(Exception e) {
             printError("Failed to run method: " + methodName + "\n" + e.getCause());
         } 
         
         depth--;
         if(development) {
-            String leaving = "Leaving Method: " + methodName;
-            print(String.format("%" + (depth + leaving.length()) + "s", leaving));
-        }
+	            String leaving = "Leaving Method: " + methodName;
+	            print(String.format("%" + (depth + leaving.length()) + "s", leaving));
+	}
         return temp;
     }
-    
+  
     /**
      * Used to check if the lookahead.getName() matches the expected token, calls 
      * syntaxError() if match fails and enters error recovery
@@ -297,8 +307,8 @@ public class Parser{
      */
     public ASTNode fundecTail(TNSet synch) {
         FuncDeclarationNode current = rootNode.new FuncDeclarationNode();
-        match(TokenType.LPAREN, synch.union(PARAMS.firstSet()).union(COMPOUNDSTMT.firstSet()));        
-        current.params = (ASTNode.ParameterNode)visit("params", synch.union(PARAMS.firstSet()));
+        match(TokenType.LPAREN, synch.union(PARAMS.firstSet()).union(COMPOUNDSTMT.firstSet()).union(TokenType.RPAREN));        
+        current.params = (ASTNode.ParameterNode)visit("params", synch.union(PARAMS.firstSet()).union(TokenType.RPAREN));
         match(TokenType.RPAREN, synch.union(FUNCDECTAIL.followSet()).union(COMPOUNDSTMT.firstSet()));
         current.compoundStmt = (ASTNode.CompoundNode)visit("compoundStmt", synch.union(FUNCDECTAIL.followSet()).union(COMPOUNDSTMT.firstSet()));
         return current;
@@ -313,12 +323,12 @@ public class Parser{
         ParameterNode node = rootNode.new ParameterNode();
         ParameterNode current = node;
         if(PARAM.firstSet().contains(lookahead.getName())){
-            node.param = (TokenType)visit("param", synch.union(PARAM.firstSet()).union(PARAMS.followSet()));
+            node.param = (TokenType)visit("param", synch.union(PARAM.firstSet()).union(PARAMS.followSet()).union(TokenType.COMMA));
             while(this.lookahead.getName() == TokenType.COMMA){
                 current.nextNode = rootNode.new ParameterNode();
                 current = current.nextNode;
                 match(TokenType.COMMA, synch.union(PARAM.firstSet()).union(PARAMS.followSet()));
-                current.param = (TokenType)visit("param", synch.union(PARAM.firstSet()).union(PARAMS.followSet()));
+                current.param = (TokenType)visit("param", synch.union(PARAM.firstSet()).union(PARAMS.followSet()).union(TokenType.COMMA));
             }   
         }else{
             match(TokenType.VOID, synch.union(PARAM.firstSet()).union(PARAMS.followSet()));
@@ -388,7 +398,6 @@ public class Parser{
         if(BRANCHSTMT.firstSet().contains(lookahead.getName())){
             return (BranchNode)visit("branchStmt", synch);
         }       
-        
         syntaxCheck(synch);
         return null;
     }
@@ -450,8 +459,8 @@ public class Parser{
             match(TokenType.RSQR, synch.union((EXPRESSION.firstSet())));
         }
         match(TokenType.ASSIGN, synch.union((EXPRESSION.firstSet())));
-        current.expersion = (Expression)visit("expression", synch);
-        visit("expression", synch);
+        current.expersion = (Expression)visit("expression", synch.union(TokenType.SEMI));
+       // visit("expression", synch.union(TokenType.SEMI));
         match(TokenType.SEMI, synch);
         return current;
     }
@@ -501,12 +510,12 @@ public class Parser{
      */
     public ASTNode compoundStmt(TNSet synch) {
         ASTNode.CompoundNode current = rootNode.new CompoundNode(); 
-        TNSet tempSynch = synch.union(COMPOUNDSTMT.firstSet().union(COMPOUNDSTMT.followSet().union(NONVOIDSPEC.firstSet().union(VARDECTAIL.firstSet().union(STATEMENT.firstSet())))));
+        TNSet tempSynch = synch.union(COMPOUNDSTMT.firstSet().union(NONVOIDSPEC.firstSet().union(VARDECTAIL.firstSet().union(STATEMENT.firstSet()))).union(TokenType.RCRLY));
         match(TokenType.LCRLY, tempSynch);
         while(NONVOIDSPEC.firstSet().contains(lookahead.getName())){
             VarDeclarationNode node;
             TokenType t = (TokenType)visit("nonvoidSpec", tempSynch);        
-            tempSynch = synch.union(VARDECTAIL.firstSet().union(STATEMENT.firstSet()));
+            tempSynch = synch.union(VARDECTAIL.firstSet().union(STATEMENT.firstSet()).union(TokenType.RCRLY));
             match(TokenType.ID, tempSynch);
             node = (VarDeclarationNode)visit("vardecTail", tempSynch);
             node.specifier = t;
@@ -517,10 +526,8 @@ public class Parser{
             }
             current.variableDeclarations.add(node);
         }
-                    
-        
         while(STATEMENT.firstSet().contains(lookahead.getName())){
-             current.statements.add((ASTNode)visit("statement", synch));
+             current.statements.add((ASTNode)visit("statement", synch.union(STATEMENT.firstSet()).union(TokenType.RCRLY)));
         }
         match(TokenType.RCRLY, synch);
         return current;
@@ -533,14 +540,14 @@ public class Parser{
      */
     public IfNode ifStmt(TNSet synch) {
         IfNode node = rootNode.new IfNode();
-        match(TokenType.IF, synch.union(EXPRESSION.firstSet().union(STATEMENT.firstSet())));
-        match(TokenType.LPAREN, synch.union(EXPRESSION.firstSet().union(STATEMENT.firstSet())));
-        node.exp = (Expression)visit("expression", synch.union(EXPRESSION.firstSet().union(STATEMENT.firstSet())));
-        match(TokenType.RPAREN, synch.union(STATEMENT.firstSet()));
-        node.stmt = (ASTNode)visit("statement", synch.union(STATEMENT.firstSet()));
+        match(TokenType.IF, synch.union(EXPRESSION.firstSet().union(STATEMENT.firstSet()).union(new TNSet(TokenType.LPAREN)).union(new TNSet(TokenType.RPAREN))));
+        match(TokenType.LPAREN, synch.union(EXPRESSION.firstSet().union(STATEMENT.firstSet())).union(new TNSet(TokenType.RPAREN)));
+        node.exp = (Expression)visit("expression", synch.union(EXPRESSION.firstSet().union(STATEMENT.firstSet())).union(new TNSet(TokenType.RPAREN)));
+        match(TokenType.RPAREN, synch.union(STATEMENT.firstSet()).union(new TNSet(TokenType.ELSE)));
+        node.stmt = (ASTNode)visit("statement", synch.union(STATEMENT.firstSet().union(new TNSet(TokenType.ELSE))));
         if(lookahead.getName() == TokenType.ELSE){
             match(TokenType.ELSE, synch);
-            node.elseStmt = (ASTNode) visit("statement", synch);
+            node.elseStmt = (ASTNode) visit("statement", synch.union(new TNSet(TokenType.ELSE)));
         }
         return node;
     }
@@ -553,14 +560,14 @@ public class Parser{
     public ASTNode loopStmt(TNSet synch) {
         LoopNode node = rootNode.new LoopNode();
         LoopNode current = node;
-        match(TokenType.LOOP, synch.union(STATEMENT.firstSet()));
-        node.stmt = (ASTNode)visit("statement", synch);
+        match(TokenType.LOOP, synch.union(STATEMENT.firstSet()).union(TokenType.SEMI).union(TokenType.END));
+        node.stmt = (ASTNode)visit("statement", synch.union(TokenType.SEMI).union(TokenType.END));
         while(STATEMENT.firstSet().contains(lookahead.getName())){
             current.nextLoopNode = rootNode.new LoopNode();
-            current.nextLoopNode.stmt = (ASTNode)visit("statement", synch);
+            current.nextLoopNode.stmt = (ASTNode)visit("statement", synch.union(TokenType.SEMI).union(TokenType.END));
             current = current.nextLoopNode;
         }
-        match(TokenType.END, synch);
+        match(TokenType.END, synch.union(TokenType.SEMI));
         match(TokenType.SEMI, synch);
         return node;
     }
@@ -572,7 +579,7 @@ public class Parser{
      */
     public ASTNode exitStmt(TNSet synch) {
         MarkerNode node = rootNode.new MarkerNode();
-        match(TokenType.EXIT, synch);
+        match(TokenType.EXIT, synch.union(TokenType.SEMI));
         match(TokenType.SEMI, synch);
         node.specifier = TokenType.EXIT;
         return node;
@@ -585,7 +592,8 @@ public class Parser{
      */
     public ASTNode continueStmt(TNSet synch) {
         MarkerNode node = rootNode.new MarkerNode();
-        match(TokenType.CONTINUE, synch);
+        match(TokenType.CONTINUE, synch.union(TokenType.SEMI));
+        match(TokenType.SEMI, synch);
         node.specifier = TokenType.CONTINUE;
         return node;
     }
@@ -597,9 +605,9 @@ public class Parser{
      */
     public ASTNode returnStmt(TNSet synch) {
         ReturnNode node = rootNode.new ReturnNode();
-        match(TokenType.RETURN, synch.union(EXPRESSION.firstSet()));
+        match(TokenType.RETURN, synch.union(EXPRESSION.firstSet()).union(TokenType.SEMI));
         if(EXPRESSION.firstSet().contains(lookahead.getName())){
-            node.exp = (Expression)visit("expression", synch);
+            node.exp = (Expression)visit("expression", synch.union(TokenType.SEMI));
         }
         match(TokenType.SEMI, synch);
         return node;
@@ -620,18 +628,18 @@ public class Parser{
      */
     public ASTNode branchStmt(TNSet synch) {
         BranchNode node = rootNode.new BranchNode();
-        match(TokenType.BRANCH, synch.union(ADDEXP.firstSet().union(CASESTMT.firstSet())));
-        match(TokenType.LPAREN, synch.union(ADDEXP.firstSet().union(CASESTMT.firstSet())));
-        node.exp = (Expression)visit("addExp", synch.union(CASESTMT.firstSet()));
-        match(TokenType.RPAREN, synch);
-        node.thisCase = (CaseNode)visit("caseStmt", synch);
+        match(TokenType.BRANCH, synch.union(ADDEXP.firstSet().union(CASESTMT.firstSet())).union(TokenType.SEMI).union(TokenType.END).union(TokenType.RPAREN).union(TokenType.LPAREN));
+        match(TokenType.LPAREN, synch.union(ADDEXP.firstSet().union(CASESTMT.firstSet())).union(TokenType.SEMI).union(TokenType.END).union(TokenType.RPAREN));
+        node.exp = (Expression)visit("addExp", synch.union(CASESTMT.firstSet()).union(TokenType.SEMI).union(TokenType.END).union(TokenType.RPAREN));
+        match(TokenType.RPAREN, synch.union(TokenType.SEMI).union(TokenType.END));
+        node.thisCase = (CaseNode)visit("caseStmt", synch.union(TokenType.SEMI).union(TokenType.END));
         BranchNode current = node;
         while(CASESTMT.firstSet().contains(lookahead.getName())){
             current.nextNode = rootNode.new BranchNode();
             current = current.nextNode;
-            current.thisCase = (CaseNode)visit("caseStmt", synch);
+            current.thisCase = (CaseNode)visit("caseStmt", synch.union(TokenType.SEMI).union(TokenType.END));
         }
-        match(TokenType.END, synch);
+        match(TokenType.END, synch.union(TokenType.SEMI));
         match(TokenType.SEMI, synch);
         return node;
     }
@@ -643,15 +651,13 @@ public class Parser{
      */
     public ASTNode caseStmt(TNSet synch) {
         CaseNode node = rootNode.new CaseNode();
-        
-        
         if(lookahead.getName() == TokenType.CASE){
-            match(TokenType.CASE, synch.union(STATEMENT.firstSet()));
-            match(TokenType.NUM, synch.union(STATEMENT.firstSet()));
+            match(TokenType.CASE, synch.union(STATEMENT.firstSet()).union(TokenType.NUM).union(TokenType.COLON));
+            match(TokenType.NUM, synch.union(STATEMENT.firstSet()).union(TokenType.COLON));
             match(TokenType.COLON, synch.union(STATEMENT.firstSet()));
             node.stmt = (Statement)visit("statement", synch);
         }else if(lookahead.getName() == TokenType.DEFAULT){
-            match(TokenType.DEFAULT, synch.union(STATEMENT.firstSet()));
+            match(TokenType.DEFAULT, synch.union(STATEMENT.firstSet()).union(TokenType.COLON));
             match(TokenType.COLON, synch.union(STATEMENT.firstSet()));
             node.stmt = (Statement)visit("statement", synch);
         }//else
@@ -666,11 +672,10 @@ public class Parser{
      */
     public Expression expression(TNSet synch) {
         Expression node = (Expression)visit("addExp", synch.union(ADDEXP.firstSet().union(RELOP.firstSet())));
-        
         if(RELOP.firstSet().contains(lookahead.getName())){
             BinopNode bnode =  rootNode.new BinopNode();
             bnode.Rside = node;
-            bnode.specifier = (TokenType)visit("relop", synch.union(ADDEXP.firstSet().union(RELOP.firstSet())));
+            bnode.specifier = (TokenType)visit("relop", synch.union(ADDEXP.firstSet()));
             bnode.Lside = (Expression)visit("addExp", synch);
             node = bnode;
         }
@@ -713,11 +718,11 @@ public class Parser{
      */
     public Expression term(TNSet synch) {
         Expression node = (Expression) visit("factor",  synch.union(FACTOR.firstSet().union(MULTOP.firstSet())));
+        syntaxCheck(synch.union(FACTOR.firstSet().union(MULTOP.firstSet())));
         while(MULTOP.firstSet().contains(lookahead.getName())){ 
             BinopNode subNode = rootNode.new BinopNode();
             subNode.Lside = node;
             subNode.specifier = (TokenType)visit("multop", synch.union(FACTOR.firstSet().union(MULTOP.firstSet())));
-
             subNode.Rside = (Expression)visit("factor", synch.union(FACTOR.firstSet()));
             node = subNode;
         }
@@ -744,13 +749,12 @@ public class Parser{
     public ASTNode nidFactor(TNSet synch) {
 
         if(lookahead.getName() == TokenType.NOT){
-        
             match(TokenType.NOT, synch.union(FACTOR.firstSet()));
             return (ASTNode)visit("factor", synch);
         }else if(lookahead.getName() == TokenType.LPAREN){
             ASTNode node;
-            match(TokenType.LPAREN, synch.union(EXPRESSION.firstSet()));
-            node = (ASTNode)visit("expression", synch);
+            match(TokenType.LPAREN, synch.union(EXPRESSION.firstSet()).union(new TNSet(TokenType.RPAREN)));
+            node = (ASTNode)visit("expression", synch.union(new TNSet(TokenType.RPAREN)));
             match(TokenType.RPAREN, synch);
             return node;
         }else if(lookahead.getName() == TokenType.NUM){

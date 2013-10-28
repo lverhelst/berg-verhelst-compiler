@@ -45,9 +45,11 @@ public class ASTNode{
         @Override
         public String toString(int depth) {
             String temp = "[Function Declaration] = " + ID + " : " + specifier + "\r\n";
-            temp += format(params.toString(depth + 1), depth);   
-            temp += format(compoundStmt.toString(depth + 1), depth);  
-            return format(temp, depth) + format(nextFuncDec.toString(depth + 1), depth);
+            if(params != null)
+                temp += format(params.toString(depth + 1), depth);   
+            if(compoundStmt != null)
+                temp += format(compoundStmt.toString(depth + 1), depth);  
+            return format(temp, depth) + ((nextFuncDec == null) ? "" :  format(nextFuncDec.toString(depth + 1), depth));
         }
     }
     
@@ -69,9 +71,10 @@ public class ASTNode{
 //                nextVarDec.space = this.space;
 //            }
            // temp += printFormat(nextVarDec);
-            temp += format(offset.toString(depth + 1), depth);  
+           if(offset != null)
+             temp += format(offset.toString(depth + 1), depth);  
             
-            return format(temp, depth) + format(nextVarDec.toString(depth + 1), depth);
+            return format(temp, depth) + ((nextVarDec == null) ? "" : format(nextVarDec.toString(depth + 1), depth));
         }
     }
     
@@ -89,7 +92,7 @@ public class ASTNode{
 //            if(nextNode != null){
 //                nextNode.space = this.space;
 //            }
-            return format(temp, depth) + format(nextNode.toString(depth + 1), depth);
+            return format(temp, depth) + ((nextNode == null)?"":format(nextNode.toString(depth + 1), depth));
         }
     }
     
@@ -139,10 +142,12 @@ public class ASTNode{
 //            if(expersion != null)
 //                ((ASTNode)expersion).space = this.space;
             String temp = "[Assignment]\r\n";
-            
-            temp += format(leftVar.toString(depth + 1), depth);
-            temp += format(index.toString(depth + 1), depth);   
-            temp += format(expersion.toString(depth + 1), depth);  
+            if(leftVar != null)
+                temp += format(leftVar.toString(depth + 1), depth);
+            if(index != null)
+                temp += format(index.toString(depth + 1), depth);   
+            if(expersion != null)
+                temp += format(expersion.toString(depth + 1), depth);  
             
             return format(temp, depth);
         }

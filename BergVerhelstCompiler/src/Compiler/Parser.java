@@ -438,9 +438,7 @@ public class Parser{
         if(ASSIGNSTMTTAIL.firstSet().contains(lookahead.getName())){
             return (ASTNode.AssignmentNode)visit("assignstmtTail", synch);
         }else if(CALLSTMTTAIL.firstSet().contains(lookahead.getName())){
-            CallNode node = rootNode.new CallNode();
-            node.arguments = (ArrayList<Expression>)visit("callstmtTail", synch);
-            return node;
+            return (CallNode)visit("callstmtTail", synch);
         }else
             printError("idstmtTail error: " +  lookahead.getName());
         return null;
@@ -469,10 +467,10 @@ public class Parser{
      * Used to deal with the callstmtTail phrase (14)
      * @created by Emery
      */
-    public ArrayList<Expression> callstmtTail(TNSet synch) {  
-        ArrayList<Expression> argList = (ArrayList<Expression>)visit("callTail", synch.union(CALLTAIL.firstSet()));
+    public CallNode callstmtTail(TNSet synch) {  
+        CallNode cn = (CallNode)visit("callTail", synch.union(CALLTAIL.firstSet()));
         match(TokenType.SEMI, synch.union(CALLTAIL.firstSet()));
-        return argList;
+        return cn;
     }
     
     /**
@@ -481,9 +479,9 @@ public class Parser{
      */
     public CallNode callTail(TNSet synch) {
         CallNode node = rootNode.new CallNode();
-        match(TokenType.LPAREN, synch.union(ARGUMENTS.firstSet()));
+        match(TokenType.LPAREN, synch.union(ARGUMENTS.firstSet()).union(TokenType.RPAREN));
         if(ARGUMENTS.firstSet().contains(lookahead.getName())){
-            node.arguments = (ArrayList<Expression>)visit("arguments", synch);
+            node.arguments = (ArrayList<Expression>)visit("arguments", synch.union(TokenType.RPAREN));
         }
         match(TokenType.RPAREN, synch);
         return node;

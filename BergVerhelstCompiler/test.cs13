@@ -21,7 +21,7 @@ int readNum(int abc, ref int x) {
 void testcase(void) {
 	int x;
 	branch (x)
-		case 0:  ;
+		case 0: call();
 		case 1:  ;
 		default: ;
 	end;

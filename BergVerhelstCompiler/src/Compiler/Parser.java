@@ -675,8 +675,8 @@ public class Parser{
         if(RELOP.firstSet().contains(lookahead.getName())){
             BinopNode bnode =  rootNode.new BinopNode();
             bnode.Rside = node;
-            bnode.specifier = (TokenType)visit("relop", synch.union(ADDEXP.firstSet()));
-            bnode.Lside = (Expression)visit("addExp", synch);
+            bnode.specifier = (TokenType)visit("relop", synch.union(ADDEXP.firstSet()).union(RELOP.firstSet()));
+            bnode.Lside = (Expression)visit("addExp", synch.union(RELOP.firstSet()).union(ADDEXP.firstSet()));
             node = bnode;
         }
         return node;
@@ -723,7 +723,7 @@ public class Parser{
             BinopNode subNode = rootNode.new BinopNode();
             subNode.Lside = node;
             subNode.specifier = (TokenType)visit("multop", synch.union(FACTOR.firstSet().union(MULTOP.firstSet())));
-            subNode.Rside = (Expression)visit("factor", synch.union(FACTOR.firstSet()));
+            subNode.Rside = (Expression)visit("factor", synch.union(FACTOR.firstSet()).union(MULTOP.firstSet()));
             node = subNode;
         }
         return node;

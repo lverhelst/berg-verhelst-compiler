@@ -399,6 +399,7 @@ public class Scanner {
         addWordToken(new Token(TokenType.RCRLY, "}"));
         addWordToken(new Token(TokenType.BLIT, "true", "1"));
         addWordToken(new Token(TokenType.BLIT, "false", "0"));
+        addWordToken(new Token(TokenType.EXIT, "exit"));
     }
     
     /**

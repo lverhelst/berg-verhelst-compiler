@@ -193,7 +193,7 @@ public class Parser{
         String ID;
         if(this.lookahead.getName() == TokenType.VOID){
             FuncDeclarationNode declaration;
-            match(TokenType.VOID, synch.union(FUNCDECTAIL.firstSet().union(DECLARATION.followSet())));
+            match(TokenType.VOID, synch.union(FUNCDECTAIL.firstSet().union(DECLARATION.followSet())).union(TokenType.ID));
             ID = lookahead.getAttribute_Value();
             match(TokenType.ID, FUNCDECTAIL.firstSet().union(DECLARATION.followSet()));
             declaration = (FuncDeclarationNode)visit("fundecTail", synch.union(DECLARATION.followSet()));
@@ -266,15 +266,15 @@ public class Parser{
         VarDeclarationNode current;
         TNSet tempSynch;
         if(this.lookahead.getName() == TokenType.LSQR){
-            match(TokenType.LSQR,  synch.union(ADDEXP.firstSet().union(VARNAME.firstSet())));
-            node.offset = (Expression)visit("addExp", synch.union(VARNAME.firstSet()));
+            match(TokenType.LSQR,  synch.union(ADDEXP.firstSet().union(VARNAME.firstSet())).union(TokenType.RSQR));
+            node.offset = (Expression)visit("addExp", synch.union(VARNAME.firstSet()).union(TokenType.RSQR));
             match(TokenType.RSQR, synch.union(VARNAME.firstSet()));
         }
         current = node;
         while(this.lookahead.getName() == TokenType.COMMA){
-            match(TokenType.COMMA, synch.union(VARNAME.firstSet()));
+            match(TokenType.COMMA, synch.union(VARNAME.firstSet()).union(TokenType.COMMA));
 
-            next = (VarDeclarationNode)visit("varName", synch);
+            next = (VarDeclarationNode)visit("varName", synch.union(VARNAME.firstSet()));
             current.nextVarDec = next;
             current = next;
         }
@@ -453,10 +453,10 @@ public class Parser{
     public ASTNode assignstmtTail(TNSet synch) {
         ASTNode.AssignmentNode current = rootNode.new  AssignmentNode();
         if(lookahead.getName() == TokenType.LSQR){
-            match(TokenType.LSQR, synch.union(ADDEXP.firstSet().union(EXPRESSION.firstSet())));
-            current.index = (Expression)visit("addExp", synch.union(ADDEXP.firstSet().union(EXPRESSION.firstSet())));
-            visit("addExp", synch.union(ADDEXP.firstSet().union(EXPRESSION.firstSet())));
-            match(TokenType.RSQR, synch.union((EXPRESSION.firstSet())));
+            match(TokenType.LSQR, synch.union(ADDEXP.firstSet().union(EXPRESSION.firstSet())).union(TokenType.RSQR).union(TokenType.ASSIGN));
+            current.index = (Expression)visit("addExp", synch.union(ADDEXP.firstSet().union(EXPRESSION.firstSet())).union(TokenType.RSQR).union(TokenType.ASSIGN));
+            //visit("addExp", synch.union(ADDEXP.firstSet().union(EXPRESSION.firstSet())).union(TokenType.RSQR));
+            match(TokenType.RSQR, synch.union((EXPRESSION.firstSet())).union(TokenType.ASSIGN));
         }
         match(TokenType.ASSIGN, synch.union((EXPRESSION.firstSet())));
         current.expersion = (Expression)visit("expression", synch.union(TokenType.SEMI));
@@ -631,13 +631,13 @@ public class Parser{
         match(TokenType.BRANCH, synch.union(ADDEXP.firstSet().union(CASESTMT.firstSet())).union(TokenType.SEMI).union(TokenType.END).union(TokenType.RPAREN).union(TokenType.LPAREN));
         match(TokenType.LPAREN, synch.union(ADDEXP.firstSet().union(CASESTMT.firstSet())).union(TokenType.SEMI).union(TokenType.END).union(TokenType.RPAREN));
         node.exp = (Expression)visit("addExp", synch.union(CASESTMT.firstSet()).union(TokenType.SEMI).union(TokenType.END).union(TokenType.RPAREN));
-        match(TokenType.RPAREN, synch.union(TokenType.SEMI).union(TokenType.END));
-        node.thisCase = (CaseNode)visit("caseStmt", synch.union(TokenType.SEMI).union(TokenType.END));
+        match(TokenType.RPAREN, synch.union(TokenType.SEMI).union(TokenType.END).union(CASESTMT.firstSet()));
+        node.thisCase = (CaseNode)visit("caseStmt", synch.union(TokenType.SEMI).union(TokenType.END).union(CASESTMT.firstSet()));
         BranchNode current = node;
         while(CASESTMT.firstSet().contains(lookahead.getName())){
             current.nextNode = rootNode.new BranchNode();
             current = current.nextNode;
-            current.thisCase = (CaseNode)visit("caseStmt", synch.union(TokenType.SEMI).union(TokenType.END));
+            current.thisCase = (CaseNode)visit("caseStmt", synch.union(TokenType.SEMI).union(TokenType.END).union(CASESTMT.firstSet()));
         }
         match(TokenType.END, synch.union(TokenType.SEMI));
         match(TokenType.SEMI, synch);
@@ -823,8 +823,8 @@ public class Parser{
     public Expression varTail(TNSet synch) {
         Expression node = null;
         if(lookahead.getName() == TokenType.LSQR){
-            match(TokenType.LSQR,  synch.union(ADDEXP.firstSet()));
-            node = (Expression)visit("addExp", synch);
+            match(TokenType.LSQR,  synch.union(ADDEXP.firstSet()).union(TokenType.RSQR));
+            node = (Expression)visit("addExp", synch.union(TokenType.RSQR));
             match(TokenType.RSQR, synch);
         }
         return node;

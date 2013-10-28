@@ -23,11 +23,9 @@ public class ASTNode{
         @Override
         public String toString(int depth) {
             String temp = "[Program]\r\n";
-            if(vardeclaration != null)
-                temp += format(vardeclaration.toString(depth + 1), depth);  
-            if(funcdeclaration != null)
-                temp += format(funcdeclaration.toString(depth + 1), depth);            
-            return format(temp, depth);//+ printFormat(nextNode);
+                temp += format(vardeclaration, depth);
+                temp += format(funcdeclaration, depth);            
+            return formatChild(temp, depth);//+ printFormat(nextNode);
         }
     }
     
@@ -46,10 +44,10 @@ public class ASTNode{
         public String toString(int depth) {
             String temp = "[Function Declaration] = " + ID + " : " + specifier + "\r\n";
             if(params != null)
-                temp += format(params.toString(depth + 1), depth);   
+                temp += format(params, depth);   
             if(compoundStmt != null)
-                temp += format(compoundStmt.toString(depth + 1), depth);  
-            return format(temp, depth) + ((nextFuncDec == null) ? "" :  format(nextFuncDec.toString(depth + 1), depth));
+                temp += format(compoundStmt, depth);  
+            return formatChild(temp, depth) + ((nextFuncDec == null) ? "" :  format(nextFuncDec, depth - 1));
         }
     }
     
@@ -72,9 +70,9 @@ public class ASTNode{
 //            }
            // temp += printFormat(nextVarDec);
            if(offset != null)
-             temp += format(offset.toString(depth + 1), depth);  
+             temp += format((ASTNode)offset, depth);  
             
-            return format(temp, depth) + ((nextVarDec == null) ? "" : format(nextVarDec.toString(depth + 1), depth));
+            return formatChild(temp, depth) + ((nextVarDec == null) ? "" : format(nextVarDec, depth - 1));
         }
     }
     
@@ -92,7 +90,7 @@ public class ASTNode{
 //            if(nextNode != null){
 //                nextNode.space = this.space;
 //            }
-            return format(temp, depth) + ((nextNode == null)?"":format(nextNode.toString(depth + 1), depth));
+            return formatChild(temp, depth) + ((nextNode == null)?"":format(nextNode, depth - 1));
         }
     }
     
@@ -115,12 +113,12 @@ public class ASTNode{
             String temp = "[Compound]\r\n";
             
             for(VarDeclarationNode var: variableDeclarations)
-                temp += format(var.toString(depth + 1), depth);  
+                temp += format(var, depth);  
  
             for(ASTNode stmt: statements)
-                temp += format(stmt.toString(depth + 1), depth);  
+                temp += format(stmt, depth);  
             
-            return format(temp, depth);
+            return formatChild(temp, depth);
         }
     }
     
@@ -143,13 +141,13 @@ public class ASTNode{
 //                ((ASTNode)expersion).space = this.space;
             String temp = "[Assignment]\r\n";
             if(leftVar != null)
-                temp += format(leftVar.toString(depth + 1), depth);
+                temp += format(leftVar, depth);
             if(index != null)
-                temp += format(index.toString(depth + 1), depth);   
+                temp += format((ASTNode)index, depth);   
             if(expersion != null)
-                temp += format(expersion.toString(depth + 1), depth);  
+                temp += format((ASTNode)expersion, depth);  
             
-            return format(temp, depth);
+            return formatChild(temp, depth);
         }
     }
     
@@ -166,11 +164,11 @@ public class ASTNode{
         public String toString(int depth) {
              String temp = "[If]\r\n";
             
-            temp += format(exp.toString(depth + 1), depth);   
-            temp += format(stmt.toString(depth + 1), depth);  
-            temp += format(elseStmt.toString(depth + 1), depth); 
+            temp += format((ASTNode)exp, depth);   
+            temp += format((ASTNode)stmt, depth);  
+            temp += format((ASTNode)elseStmt, depth); 
             
-            return format(temp, depth);
+            return formatChild(temp, depth);
         }
     }
     /**
@@ -184,14 +182,14 @@ public class ASTNode{
         @Override
         public String toString(int depth) {
             String temp = "[Loop]\r\n";
-            temp += format(stmt.toString(depth + 1), depth); 
+            temp += formatChild(stmt.toString(depth), depth); 
             LoopNode current = this;            
             while(current.nextLoopNode != null){
 //                current.nextLoopNode.space = this.space;
-                temp += format((current.nextLoopNode).stmt.toString(depth + 1), depth);
+                temp += format((current.nextLoopNode).stmt, depth - 1);
                 current = current.nextLoopNode;
             }
-            return format(temp, depth);
+            return formatChild(temp, depth);
         }
     }
      /**
@@ -209,7 +207,7 @@ public class ASTNode{
             if(specifier != null)
                 temp += String.format("%"+ (depth + specifier.toString().length()) + "s", specifier); 
             
-            return format(temp, depth) + "\r\n";
+            return formatChild(temp, depth) + "\r\n";
         }
     }
     /**
@@ -224,9 +222,9 @@ public class ASTNode{
         public String toString(int depth) {
              String temp = "[Return]\r\n";
             
-            temp += format(exp.toString(depth + 1), depth); 
+            temp += format((ASTNode)exp, depth); 
             
-            return format(temp, depth);
+            return formatChild(temp, depth);
         }
     }
     /**
@@ -242,13 +240,10 @@ public class ASTNode{
         public String toString(int depth) {
              String temp = "[Branch]\r\n";
             
-            temp += format(exp.toString(depth + 1), depth); 
-            temp += format(thisCase.toString(depth + 1), depth);
-            
-//            if(nextNode != null)
-//                nextNode.space = this.space;
-            
-            return format(temp, depth) + format(nextNode.toString(depth + 1), depth);
+            temp += format((ASTNode)exp, depth); 
+            temp += format(thisCase, depth);
+                        
+            return formatChild(temp, depth) + format(nextNode, depth - 1);
         }
     }
     
@@ -263,9 +258,9 @@ public class ASTNode{
         public String toString(int depth) {
              String temp = "[Case]\r\n";
             
-            temp += format(stmt.toString(depth + 1), depth); 
+            temp += format((ASTNode)stmt, depth); 
             
-            return format(temp, depth);
+            return formatChild(temp, depth);
         }
     }
     /**
@@ -286,9 +281,9 @@ public class ASTNode{
         public String toString(int depth) {
             String temp = "[Call] " + ID + " : " + specifier + "\r\n";
             for(Expression e: arguments){
-                temp += format(e.toString(depth + 1), depth); 
+                temp += format((ASTNode)e, depth); 
             }
-            return format(temp, depth);
+            return formatChild(temp, depth);
         }
     }
     /**
@@ -302,7 +297,7 @@ public class ASTNode{
         
          @Override
         public String toString(int depth) {
-            return format("[Variable] " + specifier + " :" + ID + (offset == null? "" : "[" + offset.toString() + "]") + "\r\n", depth);
+            return formatChild("[Variable] " + specifier + " :" + ID + (offset == null? "" : "[" + offset + "]") + "\r\n", depth);
         }
     }
     /**
@@ -315,7 +310,7 @@ public class ASTNode{
         
          @Override
         public String toString(int depth) {
-            return format("[Literal] " + specifier + (lexeme != null? " lexeme: " + lexeme: "") + "\r\n", depth);
+            return formatChild("[Literal] " + specifier + (lexeme != null? " lexeme: " + lexeme: "") + "\r\n", depth);
                     
         }
     }
@@ -330,9 +325,9 @@ public class ASTNode{
          @Override
         public String toString(int depth) {
             String temp = "[Unary Operator] " + specifier + "\r\n";
-            temp += format(Rside.toString(depth + 1), depth);
+            temp += format((ASTNode)Rside, depth);
             
-            return format(temp, depth);
+            return formatChild(temp, depth);
         }
     }
     /**
@@ -347,28 +342,28 @@ public class ASTNode{
          @Override
         public String toString(int depth) {
             String temp = "[Binary Operator] " + specifier + "\r\n";
-            temp += format(Lside.toString(depth + 1), depth);
-            temp += format(Rside.toString(depth + 1), depth);
+            temp += format((ASTNode)Lside, depth);
+            temp += format((ASTNode)Rside, depth);
             
-            return format(temp, depth);
+            return formatChild(temp, depth);
         }
     }
     
-//    /**
-//     * Used to print nodes pretty and indented
-//     * @param node the node to print
-//     * @return the node in String form
-//     * @created by Emery
-//     */
-//    public String printFormat(ASTNode node) {
-//        String temp = "";
-//        
-//        if(node != null) {
-//            temp = printFormat(node.toString()); //used for formatting of strings
-//        }
-//        
-//        return temp;
-//    }
+    /**
+     * Used to print nodes pretty and indented
+     * @param node the node to print
+     * @return the node in String form
+     * @created by Emery
+     */
+    public String format(ASTNode node, int depth) {
+        String temp = "";
+        
+        if(node != null) {
+            temp = formatChild(node.toString(depth + 1), depth); //used for formatting of strings
+        }
+        
+        return temp;
+    }
     
      /**
      * Used to print strings pretty and indented
@@ -377,8 +372,8 @@ public class ASTNode{
      * @return the String to print formatted
      * @created by Emery
      */
-    public String format(String string, int depth) {
-        return String.format("%"+ (depth + string.length()) + "s", string);
+    public String formatChild(String string, int depth) {
+        return String.format("%"+ ((depth) + string.length()) + "s", string);
     }
     
     /**

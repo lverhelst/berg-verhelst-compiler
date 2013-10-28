@@ -22,7 +22,7 @@ void testcase(void) {
 	int x;
 	branch (x)
 		case 0: call();
-		case 1:  ;
+		case 1: call2(a, x) ;
 		default: ;
 	end;
 }

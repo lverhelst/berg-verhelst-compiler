@@ -493,10 +493,10 @@ public class Parser{
      */
     public ArrayList<Expression> arguments(TNSet synch) {  
         ArrayList<Expression> argList = new ArrayList<Expression>();
-        argList.add((Expression)visit("expression", synch.union(EXPRESSION.firstSet())));
+        argList.add((Expression)visit("expression", synch.union(EXPRESSION.firstSet().union(TokenType.COMMA))));
         while(lookahead.getName() == TokenType.COMMA){
-            match(TokenType.COMMA, synch.union(EXPRESSION.firstSet()));
-            Expression e = (Expression)visit("expression", synch.union(EXPRESSION.firstSet()));
+            match(TokenType.COMMA, synch.union(EXPRESSION.firstSet()).union(TokenType.COMMA));
+            Expression e = (Expression)visit("expression", synch.union(EXPRESSION.firstSet()).union(TokenType.COMMA));
             argList.add(e);
         }
         return argList;

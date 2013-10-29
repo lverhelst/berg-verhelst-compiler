@@ -159,9 +159,11 @@ public class AdministrativeConsole {
        if(cmd.hasOption("o")){
                prs.printFile = true;
        }
-       
-       prs.parse(cmd.hasOption("v"));
+
+       ASTNode node = prs.parse(cmd.hasOption("v"));
        didPass &= prs.didPass();
+       SemAnalyzer semAnalyzer = new SemAnalyzer((ASTNode.ProgramNode)node);
+       System.out.println("Semantic Analyzer: " + semAnalyzer.toString());
        return (didPass)? "PASS": "FAIL";
    }  
    /**

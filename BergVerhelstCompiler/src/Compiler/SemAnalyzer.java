@@ -57,17 +57,17 @@ public class SemAnalyzer {
         ASTNode.FuncDeclarationNode func = program.funcdeclaration;
         ASTNode.VarDeclarationNode var = program.vardeclaration;
         
-        //process all function declarations
-        while(func != null) {
-            FuncDeclarationNode(func);
-            func = func.nextFuncDec;
-        }
-        
         //process all global variable declarations
         while(var != null) {
             VarDeclarationNode(var);
             var = var.nextVarDec;
         } 
+        
+        //process all function declarations
+        while(func != null) {
+            FuncDeclarationNode(func);
+            func = func.nextFuncDec;
+        }
         
         System.out.println("Program Node");
     }
@@ -80,6 +80,12 @@ public class SemAnalyzer {
         scope.push(new ArrayList<listRecord>());
         ASTNode.ParameterNode param = func.params;
         
+        ASTNode temp = searchScope(func.ID);
+        
+        if(temp == null) {
+            scope.peek().add(new listRecord(func, func.ID));
+        }
+        
         //search all params
         while(param != null) {
             ParameterNode(func.params);
@@ -88,14 +94,16 @@ public class SemAnalyzer {
         
         //func.specifier; to make sure return is of this value or uni
         CompoundNode(func.compoundStmt);
+        scope.pop();
     }
     
     /**
      * Class to view VarDeclarationNode
      * @Class Emery
      */
-    public void VarDeclarationNode(ASTNode.VarDeclarationNode var) {        
-        if(searchScope(var.ID) == null)
+    public void VarDeclarationNode(ASTNode.VarDeclarationNode var) { 
+        ASTNode temp = searchScope(var.ID);
+        if(temp == null)
             scope.peek().add(new listRecord(var, var.ID));
         if(var.offset != null)
             expression(var.offset);
@@ -120,13 +128,15 @@ public class SemAnalyzer {
     public void CompoundNode(ASTNode.CompoundNode compound) {
         scope.push(new ArrayList<listRecord>());
         
+        for(ASTNode.VarDeclarationNode var: compound.variableDeclarations) {
+            VarDeclarationNode(var);
+        }
+        
         for(ASTNode stmt: compound.statements) {
             if(stmt != null)
                 statement(stmt);
         }
-        for(ASTNode.VarDeclarationNode var: compound.variableDeclarations) {
-            VarDeclarationNode(var);
-        }
+        scope.pop();
     }
     
     /**
@@ -234,7 +244,7 @@ public class SemAnalyzer {
         ASTNode node = this.searchScope(call.ID);
         if(node == null){
             //throw functionNotDeclaredError()
-            System.out.println("Function Not Declared");
+            printError("Function Not Declared: " + call.alexeme);
         }
         //check arguments against the functions parameters
         for(ASTNode.Expression e: call.arguments){
@@ -252,7 +262,7 @@ public class SemAnalyzer {
         //check if var has been declared add to scope if not
         ASTNode node = this.searchScope(var.ID);
         if(node == null){
-            System.out.println("Undeclared Identifier: " + ((var.alexeme == null)?"":var.alexeme));
+            printError("Undeclared Identifier: " + ((var.alexeme == null)?"":var.alexeme));
         }
         if(var.offset != null)
             expression(var.offset);

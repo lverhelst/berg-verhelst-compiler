@@ -299,16 +299,18 @@ public class Parser{
     }
     
     /**
-     * Used to deal with the war-name phrase (6)
+     * Used to deal with the var-name phrase (6)
      * varName -> ID [[ [addExp] ]]
      * @created by Leon
      */
     public VarDeclarationNode varName(TNSet synch) {
-        
         VarDeclarationNode current = rootNode.new VarDeclarationNode();
-        if(lookahead.getAttribute_Value()!= null){
+        if(lookahead.getAttribute_Value() != null){
             current.ID = Integer.parseInt(lookahead.getAttribute_Value());
+            System.out.println(lookahead.getAttribute_Value() + " " + lookahead.getLexeme());
             current.alexeme = lookahead.getLexeme();
+        }else{
+            current.alexeme = "What what";
         }
         match(TokenType.ID, synch.union(ADDEXP.firstSet()));
         if(this.lookahead.getName() == TokenType.LSQR){
@@ -543,11 +545,13 @@ public class Parser{
             VarDeclarationNode node;
             TokenType t = (TokenType)visit("nonvoidSpec", tempSynch);        
             tempSynch = synch.union(VARDECTAIL.firstSet().union(STATEMENT.firstSet()).union(TokenType.RCRLY));
+            String ID = lookahead.getAttribute_Value();
             String lex = lookahead.getLexeme();
             match(TokenType.ID, tempSynch);
             node = (VarDeclarationNode)visit("vardecTail", tempSynch);
             node.specifier = t;
             node.alexeme = lex;
+            node.ID = Integer.parseInt(ID);
             VarDeclarationNode temp = node;
             while(temp.nextVarDec != null){
                 temp = temp.nextVarDec;

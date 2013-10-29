@@ -56,7 +56,7 @@ public class SemAnalyzer {
     public void ProgramNode(ASTNode.ProgramNode program) {
         ASTNode.FuncDeclarationNode func = program.funcdeclaration;
         ASTNode.VarDeclarationNode var = program.vardeclaration;
-        
+
         //process all global variable declarations
         while(var != null) {
             VarDeclarationNode(var);
@@ -105,6 +105,7 @@ public class SemAnalyzer {
         ASTNode temp = searchScope(var.ID);
         if(temp == null)
             scope.peek().add(new listRecord(var, var.ID));
+        
         if(var.offset != null)
             expression(var.offset);
     }
@@ -352,10 +353,17 @@ public class SemAnalyzer {
         //Is either a varDecNode or a FuncDecNode
         public ASTNode declarationNode;
         public TokenType Type;
+        public String lex;
         
         public listRecord(ASTNode dec, int id){
             this.id_num = id;
             this.declarationNode = dec;
+        }
+        
+         public listRecord(ASTNode dec, int id, String lexeme){
+            this.id_num = id;
+            this.declarationNode = dec;
+            this.lex = lexeme;
         }
         
     }
@@ -392,4 +400,14 @@ public class SemAnalyzer {
         if(printFile)
           printWriter.print(line + "\r\n");
     }     
+    
+    
+    public void printStack(){
+        for (int i = scope.size() - 1; i >= 0; i--) {
+            System.out.println("Scope: " + i);
+            for (int j = scope.get(i).size() - 1; j >= 0; j--) {
+                  System.out.println(scope.get(i).get(j).id_num + ": " + scope.get(i).get(j).lex);
+            }
+        }
+    }
 }

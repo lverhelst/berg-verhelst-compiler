@@ -74,18 +74,21 @@ public class SemAnalyzer {
      * Class to view FuncDeclarationNode
      * @Class Emery
      */
-    public void FuncDeclarationNode(ASTNode.FuncDeclarationNode func) {
-        //Loop params to check them
-        //check to ensure return matches the return type
-        //check contained compount statement
+    public void FuncDeclarationNode(ASTNode.FuncDeclarationNode func) {      
+        scope.push(new ArrayList<listRecord>());
+        ParameterNode(func.params);
+        //func.specifier; to make sure return is of this value or uni
+        CompoundNode(func.compoundStmt);
     }
     
     /**
      * Class to view VarDeclarationNode
      * @Class Emery
      */
-    public void VarDeclarationNode(ASTNode.VarDeclarationNode var) {
-        //check offset against type
+    public void VarDeclarationNode(ASTNode.VarDeclarationNode var) {        
+        if(searchScope(var.ID) == null)
+            scope.peek().add(new listRecord(var, var.ID));
+        //check expersion node
     }
     
     /**
@@ -93,6 +96,7 @@ public class SemAnalyzer {
      * @Class Emery
      */
     public void ParameterNode(ASTNode.ParameterNode param) {
+        
         //check for redeclartion errors
     }
     

@@ -80,12 +80,22 @@ public class ASTNode{
      * @Class Emery
      */
     public class ParameterNode extends ASTNode{
+        int ID;
         TokenType param;
         ParameterNode nextNode; 
         
+        /**
+         * Used to convert an ID into a param object
+         * @param ID the ID to convert
+         */
+        public void setParam(Token ID) {
+            this.ID = Integer.parseInt(ID.getAttribute_Value());
+            param = ID.getName();
+        }
+        
         @Override
         public String toString(int depth) {
-            String temp = "[Parameter] " + param + "\r\n";
+            String temp = "[Parameter] " + ID + " : " + param + "\r\n";
             
             return formatChild(temp, depth) + ((nextNode == null)?"":format(nextNode, depth - 1));
         }

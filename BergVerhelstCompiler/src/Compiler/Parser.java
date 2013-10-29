@@ -325,17 +325,16 @@ public class Parser{
      * Used to deal with the params phrase (8)
      * @created by Leon
      */
-    public ASTNode params(TNSet synch) {
-        
+    public ASTNode params(TNSet synch) {        
         ParameterNode node = rootNode.new ParameterNode();
         ParameterNode current = node;
         if(PARAM.firstSet().contains(lookahead.getName())){
-            node.param = (TokenType)visit("param", synch.union(PARAM.firstSet()).union(PARAMS.followSet()).union(TokenType.COMMA));
+            node.setParam((Token)visit("param", synch.union(PARAM.firstSet()).union(PARAMS.followSet()).union(TokenType.COMMA)));
             while(this.lookahead.getName() == TokenType.COMMA){
                 current.nextNode = rootNode.new ParameterNode();
                 current = current.nextNode;
                 match(TokenType.COMMA, synch.union(PARAM.firstSet()).union(PARAMS.followSet()));
-                current.param = (TokenType)visit("param", synch.union(PARAM.firstSet()).union(PARAMS.followSet()).union(TokenType.COMMA));
+                current.setParam((Token)visit("param", synch.union(PARAM.firstSet()).union(PARAMS.followSet()).union(TokenType.COMMA)));
             }   
         }else{
             match(TokenType.VOID, synch.union(PARAM.firstSet()).union(PARAMS.followSet()));
@@ -348,20 +347,24 @@ public class Parser{
      * Used to deal with the param phrase (9)
      * @created by Emery
      */
-    public TokenType param(TNSet synch) {
+    public Token param(TNSet synch) {
+        String ID;
+        
         if(lookahead.getName() == TokenType.REF){ 
             match(TokenType.REF, synch.union(NONVOIDSPEC.firstSet()));
             TokenType t = (TokenType)visit("nonvoidSpec", synch);
+            ID = lookahead.getAttribute_Value();
             match(TokenType.ID,synch);
-            return t;
+            return new Token(t, "", ID);
         }else if(NONVOIDSPEC.firstSet().contains(lookahead.getName())){
             TokenType t = (TokenType)visit("nonvoidSpec", synch);
+            ID = lookahead.getAttribute_Value();
             match(TokenType.ID, synch);
             if(lookahead.getName() == TokenType.LSQR){
                 match(TokenType.LSQR, synch);
                 match(TokenType.RSQR, synch);
             }
-            return t;
+            return new Token(t, "", ID);
         }
         return null;
     }

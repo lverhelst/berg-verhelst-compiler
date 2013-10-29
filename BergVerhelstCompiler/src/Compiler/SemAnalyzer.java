@@ -28,23 +28,19 @@ public class SemAnalyzer {
      */
     private void init(ASTNode.ProgramNode program) {        
         scope.add(new ArrayList<listRecord>());
-        
         ASTNode.FuncDeclarationNode func = program.funcdeclaration;
         ASTNode.VarDeclarationNode var = program.vardeclaration;
         
         //pulls all function names for scope
         while(func != null) {
-          //  scope.peek().add(func.ID);
-            
+            scope.peek().add(new listRecord(func, func.ID));
             func = func.nextFuncDec;
         }
-        
         //pulls all variable names for scope
         while(var != null) {
-           // scope.peek().add(var.ID);
+            scope.peek().add(new listRecord(var, var.ID));
             var = var.nextVarDec;
-        }        
-        
+        }
     }
     
     /**
@@ -228,6 +224,12 @@ public class SemAnalyzer {
         //Is either a varDecNode or a FuncDecNode
         public ASTNode declarationNode;
         public TokenType Type;
+        
+        public listRecord(ASTNode dec, int id){
+            this.id_num = id;
+            this.declarationNode = dec;
+        }
+        
     }
     
     

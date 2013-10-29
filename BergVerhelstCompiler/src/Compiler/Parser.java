@@ -32,8 +32,6 @@ public class Parser{
      */
     public Parser(Scanner scanner) {
         this.scn = scanner;
-        //genFirstSets();
-        //genFollowSets();
         rootNode = new ASTNode();
         depth = 0;
     }
@@ -44,7 +42,7 @@ public class Parser{
      * @return boolean value representing pass(true) or fail (false)
      * @created by Leon, Modified by Emery
      */
-    public boolean parse(Boolean showTrace){
+    public ASTNode parse(Boolean showTrace){
        error = false; //ensure error value is reset for all runs
        Token currentToken;
        currentToken = scn.getToken();
@@ -56,8 +54,18 @@ public class Parser{
        if(!error)
             print(((ProgramNode)rootNode).toString());
        
-       //checks if both parser and scanner ran without an error and returns value
-       return !error && !scn.error;
+       error |= scn.error;
+       
+       return rootNode;
+    }
+    
+    /**
+     * 
+     * @return boolean value representing pass(true) or fail (false)
+     * @created by Emery
+     */
+    public boolean didPass() {
+        return !error;
     }
     
     /**

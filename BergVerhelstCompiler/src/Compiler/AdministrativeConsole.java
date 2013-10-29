@@ -164,7 +164,7 @@ public class AdministrativeConsole {
        didPass &= prs.didPass();
        SemAnalyzer semAnalyzer = new SemAnalyzer((ASTNode.ProgramNode)node);
        semAnalyzer.ProgramNode((ASTNode.ProgramNode)node);
-       System.out.println("Semantic Analyzer: " + semAnalyzer.toString());
+       System.out.println("Semantic Analyzer: " + node.toString(0));
        return (didPass)? "PASS": "FAIL";
    }  
    /**

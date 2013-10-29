@@ -97,7 +97,8 @@ public class SemAnalyzer {
     public void VarDeclarationNode(ASTNode.VarDeclarationNode var) {        
         if(searchScope(var.ID) == null)
             scope.peek().add(new listRecord(var, var.ID));
-        expression(var.offset);
+        if(var.offset != null)
+            expression(var.offset);
     }
     
     /**
@@ -120,7 +121,8 @@ public class SemAnalyzer {
         scope.push(new ArrayList<listRecord>());
         
         for(ASTNode stmt: compound.statements) {
-            statement(stmt);
+            if(stmt != null)
+                statement(stmt);
         }
         for(ASTNode.VarDeclarationNode var: compound.variableDeclarations) {
             VarDeclarationNode(var);
@@ -204,7 +206,8 @@ public class SemAnalyzer {
      */
     public void BranchNode(ASTNode.BranchNode branch) {
         //check result of expersion type and the case statements to ensure they match
-        expression(branch.exp);
+        if(branch.exp != null)
+            expression(branch.exp);
         CaseNode(branch.thisCase);
         if(branch.nextNode != null)
             BranchNode(branch.nextNode);
@@ -217,7 +220,6 @@ public class SemAnalyzer {
     public void CaseNode(ASTNode.CaseNode caseNode) {
         //new scope???
         //check statement
-
         statement((ASTNode) caseNode.stmt);
 
     }

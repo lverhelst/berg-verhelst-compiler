@@ -625,8 +625,9 @@ public class Parser{
      * Used to deal with the nullStmt phrase (23)
      * @created by Leon
      */
-    public void nullStmt(TNSet synch) {
+    public ASTNode.NullNode nullStmt(TNSet synch) {
         match(TokenType.SEMI, synch.union(NULLSTMT.firstSet()));
+        return rootNode.new NullNode();
     }
     
     /**

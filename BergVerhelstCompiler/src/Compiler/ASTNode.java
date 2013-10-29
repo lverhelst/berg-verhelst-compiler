@@ -249,6 +249,17 @@ public class ASTNode{
     }
     
     /**
+     * @Created Leon
+     */
+    public class NullNode extends ASTNode implements Statement{
+        @Override
+        public String toString(int depth) {
+            return "";
+        }
+    }
+    
+    
+    /**
      * Case Node for case statements
      * @Created Leon
      */

@@ -377,11 +377,13 @@ public class SemAnalyzer {
     private boolean checkTypes(TokenType a, TokenType b){
         if(a == b)
             return true;
-        if((a == TokenType.NUM & b == TokenType.INT) || (b == TokenType.NUM & a == TokenType.INT))
+        if(a == TokenType.UNI || b == TokenType.UNI)
             return true;
-        if((a == TokenType.BOOL & b == TokenType.BLIT) || (b == TokenType.BLIT & a == TokenType.BOOL))
+        if((a == TokenType.NUM && b == TokenType.INT) || (a == TokenType.INT && b == TokenType.NUM))
             return true;
-        else return false;
+        if((a == TokenType.BOOL && b == TokenType.BLIT) || (a == TokenType.BLIT && b == TokenType.BOOL))
+            return true;
+        return false;
     }
     
     protected class listRecord {

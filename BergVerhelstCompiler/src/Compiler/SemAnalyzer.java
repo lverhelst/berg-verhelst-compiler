@@ -1,5 +1,6 @@
 package Compiler;
 
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Stack;
 
@@ -9,6 +10,11 @@ import java.util.Stack;
  */
 public class SemAnalyzer {
     private Stack<ArrayList<listRecord>> scope;
+        
+    private PrintWriter printWriter;
+    public boolean verbose;
+    public boolean printFile;
+    public boolean error;
     
     /**
      * Used to analysis a AST against the semantic rules of the language
@@ -232,5 +238,36 @@ public class SemAnalyzer {
         
     }
     
+    /**
+     * Used to set the output device
+     * @param printWriter the output device 
+     * @created by Emery
+     */
+    public void setTrace(PrintWriter printWriter) {
+        this.printWriter = printWriter;
+        
+    }
     
+    /**
+     * Used to print messages to the console or file if set to
+     * @param line the string to print
+     */
+    public void print(String line) {
+        if(verbose) {  
+            System.out.println(line);
+            if(printFile)
+              printWriter.print(line + "\r\n");
+        }
+    }
+    
+    /**
+     * Used to print error messages to the console or file if set to
+     * @param line the line to print
+     */
+    public void printError(String line) {
+        error = true;
+        System.out.println("\u001B[31m" + line + "\u001B[0m");
+        if(printFile)
+          printWriter.print(line + "\r\n");
+    }     
 }

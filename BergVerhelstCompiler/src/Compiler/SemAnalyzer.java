@@ -78,7 +78,14 @@ public class SemAnalyzer {
      */
     public void FuncDeclarationNode(ASTNode.FuncDeclarationNode func) {      
         scope.push(new ArrayList<listRecord>());
-        ParameterNode(func.params);
+        ASTNode.ParameterNode param = func.params;
+        
+        //search all params
+        while(param != null) {
+            ParameterNode(func.params);
+            param = param.nextNode;
+        }
+        
         //func.specifier; to make sure return is of this value or uni
         CompoundNode(func.compoundStmt);
     }
@@ -90,7 +97,7 @@ public class SemAnalyzer {
     public void VarDeclarationNode(ASTNode.VarDeclarationNode var) {        
         if(searchScope(var.ID) == null)
             scope.peek().add(new listRecord(var, var.ID));
-        //check expersion node
+        expression(var.offset);
     }
     
     /**
@@ -99,6 +106,9 @@ public class SemAnalyzer {
      */
     public void ParameterNode(ASTNode.ParameterNode param) {
         //check for redeclaration errors
+        if(searchScope(param.ID) == null) {
+            scope.peek().add(new listRecord(param, param.ID));
+        }
     }
     
     /**
@@ -107,9 +117,14 @@ public class SemAnalyzer {
      * @Class Emery
      */
     public void CompoundNode(ASTNode.CompoundNode compound) {
-        //new scope???
-        //check varable declarations and add to scope if needed, or link to global
-        //check statements
+        scope.push(new ArrayList<listRecord>());
+        
+        for(ASTNode stmt: compound.statements) {
+            statement(stmt);
+        }
+        for(ASTNode.VarDeclarationNode var: compound.variableDeclarations) {
+            VarDeclarationNode(var);
+        }
     }
     
     /**
@@ -140,6 +155,7 @@ public class SemAnalyzer {
             Consult an oracle to ensure it is actually an ASTNode.Statement
         */
         statement(ifNode.stmt);
+
         if(ifNode.elseStmt != null)
             statement(ifNode.elseStmt);
     }
@@ -156,8 +172,10 @@ public class SemAnalyzer {
             Consult an oracle to ensure it is actually an ASTNode.Statement
         */
         statement(loop.stmt);
+
         if(loop.nextLoopNode != null)
             LoopNode(loop.nextLoopNode);        
+
         //check for exit?
     }
     
@@ -199,7 +217,9 @@ public class SemAnalyzer {
     public void CaseNode(ASTNode.CaseNode caseNode) {
         //new scope???
         //check statement
+
         statement((ASTNode) caseNode.stmt);
+
     }
     
     /**
@@ -283,6 +303,7 @@ public class SemAnalyzer {
         else if (exp.getClass() == ASTNode.CallNode.class)
             CallNode((ASTNode.CallNode) exp);
     }
+
     /**
      * Routing Method for Statements
      * @param stmt 

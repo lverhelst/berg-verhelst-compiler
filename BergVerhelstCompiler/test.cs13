@@ -1,8 +1,8 @@
---bool readBool(void){;}
---int readNum(void){;}
---void writeBool(bool x){;}
---void writeNum(int x){;}
-
+/*bool readBool(void){;}
+int readNum(void){;}
+void writeBool(bool x){;}
+void writeNum(int x){;}
+*/
 --always true
 bool readBool(void) {
 	int arr[20];
@@ -40,7 +40,7 @@ int main(void) {
 	--test the loop function
 	loop
 		--test the if function
-		if((x < y) && (x > 0) || (y > 0)) {
+		if((x < y) && (readNum() > 0) || (y > 0)) {
 			y := y - 1;
 		} else {
 			--test exit

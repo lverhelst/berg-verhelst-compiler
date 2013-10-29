@@ -12,6 +12,11 @@ public class ASTNode{
     public interface Expression{
         public String toString(int depth);
     }
+    public interface Declaration{
+        public TokenType getSpecifier();
+        public String toString(int depth);
+    }
+    
 
     
     public void accept(SemAnalyzer semAnalyzer){}
@@ -38,12 +43,17 @@ public class ASTNode{
      * Class to view FuncDeclarationNode
      * @Class Emery
      */
-    public class FuncDeclarationNode extends ASTNode{
+    public class FuncDeclarationNode extends ASTNode implements Declaration{
         int ID;
         TokenType specifier;       
         ParameterNode params; 
         CompoundNode compoundStmt;  
         FuncDeclarationNode nextFuncDec;
+       
+        @Override
+        public TokenType getSpecifier(){
+             return specifier;
+        }
         
         @Override
         public String toString(int depth) {
@@ -60,12 +70,16 @@ public class ASTNode{
      * Class to view VarDeclarationNode
      * @Class Emery
      */
-    public class VarDeclarationNode extends ASTNode{
+    public class VarDeclarationNode extends ASTNode implements Declaration{
         int ID;
         TokenType specifier;
         Expression offset;
         VarDeclarationNode nextVarDec;
-                
+        
+        @Override
+        public TokenType getSpecifier(){
+             return specifier;
+        }        
          @Override
         public String toString(int depth) {
             String temp = "[Variable Declaration] = " + ID + " : " + specifier + " " + "\r\n";
@@ -81,7 +95,7 @@ public class ASTNode{
      * Class to view ParameterNode
      * @Class Emery
      */
-    public class ParameterNode extends ASTNode{
+    public class ParameterNode extends ASTNode implements Declaration{
         int ID;
         TokenType param;
         ParameterNode nextNode; 
@@ -95,6 +109,10 @@ public class ASTNode{
             param = ID.getName();
             this.alexeme = ID.getLexeme();
         }
+        @Override
+        public TokenType getSpecifier(){
+             return param;
+        }  
         
         @Override
         public String toString(int depth) {

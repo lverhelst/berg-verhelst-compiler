@@ -316,7 +316,7 @@ public class SemAnalyzer {
         //ensure both left and right sides result in the same type
         TokenType l = expression(binop.Lside);
         TokenType r = expression(binop.Rside);
-       if(l == r){
+       if(checkTypes(l,r)){
           return r;
        }else{
            printError("Incompatible Types: " + l + ", " + r);
@@ -377,8 +377,11 @@ public class SemAnalyzer {
     private boolean checkTypes(TokenType a, TokenType b){
         if(a == b)
             return true;
-        
-        return false;
+        if((a == TokenType.NUM & b == TokenType.INT) || (b == TokenType.NUM & a == TokenType.INT))
+            return true;
+        if((a == TokenType.BOOL & b == TokenType.BLIT) || (b == TokenType.BLIT & a == TokenType.BOOL))
+            return true;
+        else return false;
     }
     
     protected class listRecord {

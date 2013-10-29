@@ -218,6 +218,8 @@ public class SemAnalyzer {
      */
     public TokenType ReturnNode(ASTNode.ReturnNode returnNode) {
        //check result of expresions and maybe return it to parent??
+       if(returnNode.exp == null)
+           return null;
        return expression(returnNode.exp);
     }
     
@@ -370,6 +372,13 @@ public class SemAnalyzer {
             }
         }
         return null;
+    }
+    
+    private boolean checkTypes(TokenType a, TokenType b){
+        if(a == b)
+            return true;
+        
+        return false;
     }
     
     protected class listRecord {

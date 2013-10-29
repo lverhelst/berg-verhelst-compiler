@@ -26,6 +26,7 @@ void testcase(void) {
 		case 1: readNum(a, x) ;
 		default: ;
 	end;
+	return;
 }
 
 --main program to run
@@ -48,4 +49,5 @@ int main(void) {
 		}
 	continue;
 	end;
+	return 0;
 }

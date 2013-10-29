@@ -5,7 +5,6 @@ import static Compiler.FFSet.*;
 import java.io.PrintWriter;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.io.FileReader;
 
 /**
@@ -967,9 +966,7 @@ public class Parser{
     public void printError(String line) {
         error = true;
         System.out.println("\u001B[31m" + line + "\u001B[0m");
-        
         if(printFile)
           printWriter.print(line + "\r\n");
-        
     } 
 }

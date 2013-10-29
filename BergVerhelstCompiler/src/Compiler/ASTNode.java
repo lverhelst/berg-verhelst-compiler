@@ -11,6 +11,10 @@ public class ASTNode{
         public String toString(int depth);
     }
     
+    public void accept(SemAnalyzer visitor){
+        
+    }
+       
     /**
      * Class to view ProgramNode
      * @Class Emery
@@ -27,6 +31,8 @@ public class ASTNode{
                 temp += format(funcdeclaration, depth);            
             return formatChild(temp, depth);//+ printFormat(nextNode);
         }
+        
+        
     }
     
     /**

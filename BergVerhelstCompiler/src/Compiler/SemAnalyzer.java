@@ -43,6 +43,7 @@ public class SemAnalyzer {
             scope.peek().add(var.ID);
             var = var.nextVarDec;
         }        
+        
     }
     
     /**

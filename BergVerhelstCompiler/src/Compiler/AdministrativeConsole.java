@@ -1,9 +1,7 @@
 package Compiler;
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.PrintWriter;
-import java.util.HashMap;
 import java.util.List;
 import org.apache.commons.cli.*;
 
@@ -162,7 +160,8 @@ public class AdministrativeConsole {
                prs.printFile = true;
        }
        
-       didPass &= prs.parse(cmd.hasOption("v"));
+       prs.parse(cmd.hasOption("v"));
+       didPass &= prs.didPass();
        return (didPass)? "PASS": "FAIL";
    }  
    /**

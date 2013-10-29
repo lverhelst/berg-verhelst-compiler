@@ -10,9 +10,7 @@ public class ASTNode{
     public interface Expression{
         public String toString(int depth);
     }
-    
-    public void accept(SemAnalyzer semAnalyzer){}
-    
+        
     /**
      * Class to view ProgramNode
      * @Class Emery
@@ -28,11 +26,6 @@ public class ASTNode{
                 temp += format(vardeclaration, depth);
                 temp += format(funcdeclaration, depth);            
             return formatChild(temp, depth);//+ printFormat(nextNode);
-        }
-
-        @Override
-        public void accept(SemAnalyzer semAnalyzer) {
-            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
         }
     }
     
@@ -55,11 +48,6 @@ public class ASTNode{
             if(compoundStmt != null)
                 temp += format(compoundStmt, depth);  
             return formatChild(temp, depth) + ((nextFuncDec == null) ? "" :  format(nextFuncDec, depth - 1));
-        }
-
-        @Override
-        public void accept(SemAnalyzer semAnalyzer) {
-            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
         }
     }
     
@@ -86,11 +74,6 @@ public class ASTNode{
             
             return formatChild(temp, depth) + ((nextVarDec == null) ? "" : format(nextVarDec, depth - 1));
         }
-
-        @Override
-        public void accept(SemAnalyzer semAnalyzer) {
-            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-        }
     }
     
     /**
@@ -108,11 +91,6 @@ public class ASTNode{
 //                nextNode.space = this.space;
 //            }
             return formatChild(temp, depth) + ((nextNode == null)?"":format(nextNode, depth - 1));
-        }
-
-        @Override
-        public void accept(SemAnalyzer semAnalyzer) {
-            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
         }
     }
     
@@ -141,11 +119,6 @@ public class ASTNode{
                 temp += format(stmt, depth);  
             
             return formatChild(temp, depth);
-        }
-
-        @Override
-        public void accept(SemAnalyzer semAnalyzer) {
-            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
         }
     }
     
@@ -176,11 +149,6 @@ public class ASTNode{
             
             return formatChild(temp, depth);
         }
-
-        @Override
-        public void accept(SemAnalyzer semAnalyzer) {
-            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-        }
     }
     
     /**
@@ -201,11 +169,6 @@ public class ASTNode{
             temp += format((ASTNode)elseStmt, depth); 
             
             return formatChild(temp, depth);
-        }
-
-        @Override
-        public void accept(SemAnalyzer semAnalyzer) {
-            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
         }
     }
     /**
@@ -228,11 +191,6 @@ public class ASTNode{
             }
             return formatChild(temp, depth);
         }
-
-        @Override
-        public void accept(SemAnalyzer semAnalyzer) {
-            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-        }
     }
      /**
       * The Marker Node class
@@ -251,11 +209,6 @@ public class ASTNode{
             
             return formatChild(temp, depth) + "\r\n";
         }
-
-        @Override
-        public void accept(SemAnalyzer semAnalyzer) {
-            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-        }
     }
     /**
      * A Return Node has an optional expression
@@ -272,11 +225,6 @@ public class ASTNode{
             temp += format((ASTNode)exp, depth); 
             
             return formatChild(temp, depth);
-        }
-
-        @Override
-        public void accept(SemAnalyzer semAnalyzer) {
-            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
         }
     }
     /**
@@ -297,11 +245,6 @@ public class ASTNode{
                         
             return formatChild(temp, depth) + format(nextNode, depth - 1);
         }
-
-        @Override
-        public void accept(SemAnalyzer semAnalyzer) {
-            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-        }
     }
     
     /**
@@ -318,11 +261,6 @@ public class ASTNode{
             temp += format((ASTNode)stmt, depth); 
             
             return formatChild(temp, depth);
-        }
-
-        @Override
-        public void accept(SemAnalyzer semAnalyzer) {
-            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
         }
     }
     /**
@@ -347,11 +285,6 @@ public class ASTNode{
             }
             return formatChild(temp, depth);
         }
-
-        @Override
-        public void accept(SemAnalyzer semAnalyzer) {
-            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-        }
     }
     /**
      * This stores a variable ex: INT x;
@@ -366,11 +299,6 @@ public class ASTNode{
         public String toString(int depth) {
             return formatChild("[Variable] " + specifier + " :" + ID + (offset == null? "" : "[" + offset + "]") + "\r\n", depth);
         }
-
-        @Override
-        public void accept(SemAnalyzer semAnalyzer) {
-            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-        }
     }
     /**
      * Literals can be NUM, BLIT
@@ -384,11 +312,6 @@ public class ASTNode{
         public String toString(int depth) {
             return formatChild("[Literal] " + specifier + (lexeme != null? " lexeme: " + lexeme: "") + "\r\n", depth);
                     
-        }
-
-        @Override
-        public void accept(SemAnalyzer semAnalyzer) {
-            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
         }
     }
     /**
@@ -405,11 +328,6 @@ public class ASTNode{
             temp += format((ASTNode)Rside, depth);
             
             return formatChild(temp, depth);
-        }
-
-        @Override
-        public void accept(SemAnalyzer semAnalyzer) {
-            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
         }
     }
     /**
@@ -428,11 +346,6 @@ public class ASTNode{
             temp += format((ASTNode)Rside, depth);
             
             return formatChild(temp, depth);
-        }
-
-        @Override
-        public void accept(SemAnalyzer semAnalyzer) {
-            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
         }
     }
     

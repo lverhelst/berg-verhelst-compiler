@@ -94,7 +94,7 @@ public class SemAnalyzer {
         
         TokenType type = CompoundNode(func.compoundStmt);
         //func.specifier; to make sure return is of this value or uni
-        if(type != func.specifier) {
+        if(!checkTypes(type,func.specifier)) {
             printError(func.alexeme + ": return type of " + type + " does not match the expected " + func.specifier);
         }
         
@@ -139,10 +139,10 @@ public class SemAnalyzer {
         }
         
         for(ASTNode stmt: compound.statements) {
-            if(stmt != null)
-                statement(stmt);
-            else if(stmt instanceof ASTNode.ReturnNode) {
+            if(stmt instanceof ASTNode.ReturnNode)
                 type = statement(stmt);
+            else if (stmt != null){
+                statement(stmt);
             }
         }
         scope.pop();
@@ -219,7 +219,7 @@ public class SemAnalyzer {
     public TokenType ReturnNode(ASTNode.ReturnNode returnNode) {
        //check result of expresions and maybe return it to parent??
        if(returnNode.exp == null)
-           return null;
+           return TokenType.VOID;
        return expression(returnNode.exp);
     }
     

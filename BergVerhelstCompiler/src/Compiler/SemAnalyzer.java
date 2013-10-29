@@ -96,7 +96,6 @@ public class SemAnalyzer {
      * @Class Emery
      */
     public void ParameterNode(ASTNode.ParameterNode param) {
-        
         //check for redeclartion errors
     }
     
@@ -117,8 +116,12 @@ public class SemAnalyzer {
      */
     public void AssignmentNode(ASTNode.AssignmentNode assignment) {
         //check var to ensure it has been declared
+        VariableNode(assignment.leftVar);        
         //check expressions for what type it is
+        if(assignment.index != null)
+            expression(assignment.index);
         //check expression result against id type
+        expression(assignment.expersion);
     }
     
     /**
@@ -128,7 +131,14 @@ public class SemAnalyzer {
     public void IfNode(ASTNode.IfNode ifNode) {
         //new scope??
         //check expersion to ensure it returns correct type
+        expression(ifNode.exp);
         //check statement and else statements
+        /*
+            We have the Loop Node's stmt as a ASTNode
+            Consult an oracle to ensure it is actually an ASTNode.Statement
+        */
+        statement((ASTNode.Statement)ifNode.stmt);
+        statement((ASTNode.Statement)ifNode.elseStmt);
     }
     
     /**
@@ -138,6 +148,12 @@ public class SemAnalyzer {
     public void LoopNode(ASTNode.LoopNode loop) {
         //new scope???
         //check statement
+        /*
+            We have the Loop Node's stmt as a ASTNode
+            Consult an oracle to ensure it is actually an ASTNode.Statement
+        */
+        statement((ASTNode.Statement)loop.stmt);
+        LoopNode(loop.nextLoopNode);        
         //check for exit?
     }
     
@@ -146,8 +162,9 @@ public class SemAnalyzer {
       * Markers can be the following specifiers: CONTINUE | EXIT | ENDFILE
       * @Created Leon
      */
-    public void MarkerNode(ASTNode.MarkerNode marker) {
+    public TokenType MarkerNode(ASTNode.MarkerNode marker) {
         //probably not needed
+        return marker.specifier;
     }
     
     /**
@@ -156,6 +173,7 @@ public class SemAnalyzer {
      */
     public void ReturnNode(ASTNode.ReturnNode returnNode) {
        //check result of expresions and maybe return it to parent??
+       expression(returnNode.exp);
     }
     
     /**
@@ -164,6 +182,10 @@ public class SemAnalyzer {
      */
     public void BranchNode(ASTNode.BranchNode branch) {
         //check result of expersion type and the case statements to ensure they match
+        expression(branch.exp);
+        CaseNode(branch.thisCase);
+        if(branch.nextNode != null)
+            BranchNode(branch.nextNode);
     }
     
     /**
@@ -173,6 +195,7 @@ public class SemAnalyzer {
     public void CaseNode(ASTNode.CaseNode caseNode) {
         //new scope???
         //check statement
+        statement(caseNode.stmt);
     }
     
     /**
@@ -180,27 +203,45 @@ public class SemAnalyzer {
      * EX. INT FOO(BAR foobar);
      * @Created Leon
      */
-    public void CallNode(ASTNode.CallNode call) {
+    public TokenType CallNode(ASTNode.CallNode call) {
         //ensure function has been declared
-        //check arguments agains the functions parameters
+        ASTNode node = this.searchScope(call.ID);
+        if(node == null){
+            //throw functionNotDeclaredError()
+            System.out.println("Function Not Declared");
+        }
+        //check arguments against the functions parameters
+        for(ASTNode.Expression e: call.arguments){
+            expression(e);
+        }
         //check if return type is used and valid
+        return call.specifier;
     }
     
     /**
      * This stores a variable ex: INT x;
      * @Created Leon
      */
-    public void VariableNode(ASTNode.VariableNode var) {
+    public TokenType VariableNode(ASTNode.VariableNode var) {
         //check if var has been declared add to scope if not
+        ASTNode node = this.searchScope(var.ID);
+        if(node == null){
+            System.out.println("Undeclared Identifier");
+        }
+        if(var.offset != null)
+            expression(var.offset);
         //return the type???
+        return var.specifier;
     }
     
     /**
      * Literals can be NUM, BLIT
      * @Created Leon
+     * @return Type of the literal (NUM, BLIT)
      */
-    public void LiteralNode(ASTNode.LiteralNode lit) {
+    public TokenType LiteralNode(ASTNode.LiteralNode lit) {
         //return the type???
+        return lit.specifier;
     }
     
     /**
@@ -209,6 +250,7 @@ public class SemAnalyzer {
      */
     public void UnopNode(ASTNode.UnopNode unop) {
         //ensure the result matches the specifier?
+        expression(unop.Rside);
     }
     
     /**
@@ -217,6 +259,42 @@ public class SemAnalyzer {
      */
     public void BinopNode(ASTNode.BinopNode binop) {
         //ensure both left and right sides result in the same type
+        expression(binop.Lside);
+        expression(binop.Rside);
+    }
+    
+    /**
+     * 
+     * @param exp 
+     */
+    private void expression(ASTNode.Expression exp){
+        if(exp.getClass() == ASTNode.BinopNode.class)
+            BinopNode((ASTNode.BinopNode)exp);  
+        else if (exp.getClass() == ASTNode.UnopNode.class)
+            UnopNode((ASTNode.UnopNode) exp);
+        else if (exp.getClass() == ASTNode.LiteralNode.class)
+            LiteralNode((ASTNode.LiteralNode) exp);
+        else if (exp.getClass() == ASTNode.VariableNode.class)
+            VariableNode((ASTNode.VariableNode) exp);
+        else if (exp.getClass() == ASTNode.CallNode.class)
+            CallNode((ASTNode.CallNode) exp);
+    }
+    
+    private void statement(ASTNode.Statement stmt){
+        if(stmt.getClass() == ASTNode.AssignmentNode.class)
+            AssignmentNode((ASTNode.AssignmentNode)stmt);  
+        else if (stmt.getClass() == ASTNode.IfNode.class)
+            IfNode((ASTNode.IfNode) stmt);
+        else if (stmt.getClass() == ASTNode.LoopNode.class)
+            LoopNode((ASTNode.LoopNode) stmt);
+        else if (stmt.getClass() == ASTNode.MarkerNode.class)
+            MarkerNode((ASTNode.MarkerNode) stmt);
+        else if (stmt.getClass() == ASTNode.ReturnNode.class)
+            ReturnNode((ASTNode.ReturnNode) stmt);
+        else if (stmt.getClass() == ASTNode.BranchNode.class)
+            BranchNode((ASTNode.BranchNode) stmt);
+        else if (stmt.getClass() == ASTNode.CallNode.class)
+            CallNode((ASTNode.CallNode) stmt);
     }
     
     private ASTNode searchScope(int ID) {

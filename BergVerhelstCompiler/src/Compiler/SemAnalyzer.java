@@ -252,7 +252,7 @@ public class SemAnalyzer {
         //check if var has been declared add to scope if not
         ASTNode node = this.searchScope(var.ID);
         if(node == null){
-            System.out.println("Undeclared Identifier");
+            System.out.println("Undeclared Identifier: " + ((var.alexeme == null)?"":var.alexeme));
         }
         if(var.offset != null)
             expression(var.offset);

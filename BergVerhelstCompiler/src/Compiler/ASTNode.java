@@ -4,6 +4,8 @@ import java.util.ArrayList;
  *
  */
 public class ASTNode{    
+    public String alexeme;
+    
     public interface Statement{
         public String toString(int depth);
     }    
@@ -91,11 +93,12 @@ public class ASTNode{
         public void setParam(Token ID) {
             this.ID = Integer.parseInt(ID.getAttribute_Value());
             param = ID.getName();
+            this.alexeme = ID.getLexeme();
         }
         
         @Override
         public String toString(int depth) {
-            String temp = "[Parameter] " + ID + " : " + param + "\r\n";
+            String temp = "[Parameter] " + ID + " : " + this.alexeme + " " + param + "\r\n";
             
             return formatChild(temp, depth) + ((nextNode == null)?"":format(nextNode, depth - 1));
         }

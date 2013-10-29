@@ -20,9 +20,10 @@ int readNum(int abc, ref int x) {
 --used to test the case statement
 void testcase(void) {
 	int x;
+	int a;
 	branch (x)
-		case 0: call();
-		case 1: call2(a, x) ;
+		case 0: testcase();
+		case 1: readNum(a, x) ;
 		default: ;
 	end;
 }

@@ -198,33 +198,42 @@ public class Parser{
      */
     public ASTNode declaration(TNSet synch) {   
         String ID;
+        String lex;
         if(this.lookahead.getName() == TokenType.VOID){
             FuncDeclarationNode declaration;
             match(TokenType.VOID, synch.union(FUNCDECTAIL.firstSet().union(DECLARATION.followSet())).union(TokenType.ID));
             ID = lookahead.getAttribute_Value();
+            lex = lookahead.getLexeme();
             match(TokenType.ID, FUNCDECTAIL.firstSet().union(DECLARATION.followSet()));
             declaration = (FuncDeclarationNode)visit("fundecTail", synch.union(DECLARATION.followSet()));
-            if(ID != null)
+            if(ID != null){
                 declaration.ID = Integer.parseInt(ID);
+                declaration.alexeme = lex;
+            }
             declaration.specifier = TokenType.VOID;
             return declaration;
         }else {
 
             TokenType functionType = (TokenType)visit("nonvoidSpec", synch.union(DECTAIL.firstSet()));
             ID = lookahead.getAttribute_Value();
+            lex = lookahead.getLexeme();
             match(TokenType.ID, synch.union(DECTAIL.firstSet()));
             Object value = visit("decTail", synch);
             
             if(value instanceof FuncDeclarationNode){
                 FuncDeclarationNode node = (FuncDeclarationNode)value;
                 node.specifier = functionType;
-                if(ID != null)
-                    node.ID = Integer.parseInt(ID);;
+                if(ID != null){
+                    node.ID = Integer.parseInt(ID);
+                    node.alexeme = lex;
+                }
                 return node;
             }else {
                 VarDeclarationNode node = (VarDeclarationNode)value;
-                if(ID != null)
+                if(ID != null){
                     node.ID = Integer.parseInt(ID);
+                    node.alexeme = lex;
+                }
                 node.specifier = functionType;
                 VarDeclarationNode current = node;
                 while(current.nextVarDec != null){
@@ -297,8 +306,10 @@ public class Parser{
     public VarDeclarationNode varName(TNSet synch) {
         
         VarDeclarationNode current = rootNode.new VarDeclarationNode();
-        if(lookahead.getAttribute_Value()!= null)
+        if(lookahead.getAttribute_Value()!= null){
             current.ID = Integer.parseInt(lookahead.getAttribute_Value());
+            current.alexeme = lookahead.getLexeme();
+        }
         match(TokenType.ID, synch.union(ADDEXP.firstSet()));
         if(this.lookahead.getName() == TokenType.LSQR){
             match(TokenType.LSQR, synch.union(ADDEXP.firstSet()));
@@ -349,22 +360,24 @@ public class Parser{
      */
     public Token param(TNSet synch) {
         String ID;
-        
+        String lexeme;
         if(lookahead.getName() == TokenType.REF){ 
             match(TokenType.REF, synch.union(NONVOIDSPEC.firstSet()));
             TokenType t = (TokenType)visit("nonvoidSpec", synch);
             ID = lookahead.getAttribute_Value();
+            lexeme = lookahead.getLexeme();
             match(TokenType.ID,synch);
-            return new Token(t, "", ID);
+            return new Token(t, lexeme, ID);
         }else if(NONVOIDSPEC.firstSet().contains(lookahead.getName())){
             TokenType t = (TokenType)visit("nonvoidSpec", synch);
             ID = lookahead.getAttribute_Value();
+            lexeme = lookahead.getLexeme();
             match(TokenType.ID, synch);
             if(lookahead.getName() == TokenType.LSQR){
                 match(TokenType.LSQR, synch);
                 match(TokenType.RSQR, synch);
             }
-            return new Token(t, "", ID);
+            return new Token(t, lexeme, ID);
         }
         return null;
     }
@@ -418,12 +431,16 @@ public class Parser{
      */
     public ASTNode idstmt(TNSet synch) {
         String ID;
+        String lex;
         if(lookahead.getName() == TokenType.ID){
             ID = lookahead.getAttribute_Value();
+            lex = lookahead.getLexeme();
             match(TokenType.ID, synch.union(IDSTMTTAIL.firstSet()));
             VariableNode varNode = rootNode.new VariableNode();
-            if(ID != null)
+            if(ID != null){
                 varNode.ID = Integer.parseInt(ID);
+                varNode.alexeme = lex;
+            }
             varNode.specifier = TokenType.ID;
             Object temp = visit("idstmtTail", synch);
             if(temp instanceof ASTNode.AssignmentNode){
@@ -431,8 +448,10 @@ public class Parser{
                 node.leftVar = varNode;
                 return node;
             }else {
-                if(ID != null)
+                if(ID != null){
                     ((ASTNode.CallNode)temp).ID = Integer.parseInt(ID);
+                    ((ASTNode.CallNode)temp).alexeme = lex;
+                }
                 return (ASTNode.CallNode)temp;
             }
         }else
@@ -524,9 +543,11 @@ public class Parser{
             VarDeclarationNode node;
             TokenType t = (TokenType)visit("nonvoidSpec", tempSynch);        
             tempSynch = synch.union(VARDECTAIL.firstSet().union(STATEMENT.firstSet()).union(TokenType.RCRLY));
+            String lex = lookahead.getLexeme();
             match(TokenType.ID, tempSynch);
             node = (VarDeclarationNode)visit("vardecTail", tempSynch);
             node.specifier = t;
+            node.alexeme = lex;
             VarDeclarationNode temp = node;
             while(temp.nextVarDec != null){
                 temp = temp.nextVarDec;
@@ -791,11 +812,14 @@ public class Parser{
      */
     public ASTNode idFactor(TNSet synch) { 
         String ID = lookahead.getAttribute_Value();
+        String lex = lookahead.getLexeme();
         match(TokenType.ID, synch.union(IDTAIL.firstSet()));
         VariableNode node = rootNode.new VariableNode();
         node.specifier = TokenType.ID;
         if(ID != null)
             node.ID = Integer.parseInt(ID);
+        node.alexeme = lex;
+        
         ASTNode e = (ASTNode)visit("idTail", synch); 
         if(e != null && e.getClass() != CallNode.class){
             node.offset = (Expression)e;
@@ -808,6 +832,8 @@ public class Parser{
             cnode.specifier = TokenType.ID;
             if(ID != null)
                 cnode.ID = Integer.parseInt(ID);
+            cnode.alexeme = lex;
+            
             return cnode;
         }
     }

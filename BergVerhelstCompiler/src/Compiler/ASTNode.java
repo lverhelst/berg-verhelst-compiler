@@ -13,9 +13,6 @@ public class ASTNode{
         public String toString(int depth);
     }
 
-    
-    public void accept(SemAnalyzer semAnalyzer){}
-
     /**
      * Class to view ProgramNode
      * @Class Emery

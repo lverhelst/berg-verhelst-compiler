@@ -9,6 +9,7 @@ import java.util.Stack;
  */
 public class SemAnalyzer {
     private Stack<ArrayList<Integer>> scope;
+    private ArrayList<ArrayList<listRecord>> list;
     
     /**
      * Used to analysis a AST against the semantic rules of the language
@@ -17,6 +18,7 @@ public class SemAnalyzer {
      */
     public SemAnalyzer(ASTNode.ProgramNode root) {
         scope = new Stack();
+        list = new ArrayList<ArrayList<listRecord>>();
         init(root);
     }
     
@@ -211,4 +213,23 @@ public class SemAnalyzer {
     public void BinopNode(ASTNode.BinopNode binop) {
         //ensure both left and right sides result in the same type
     }
+    
+    private ASTNode searchScope(int ID) {
+        for (int i = list.size() - 1; i >= 0; i--) {
+            for (int j = list.get(i).size() - 1; j >= 0; j--) {
+                if (list.get(i).get(j).id_num == ID) 
+                    return list.get(i).get(j).declarationNode;
+            }
+        }
+        return null;
+    }
+
+    protected class listRecord {
+        public int id_num;
+        //Is either a varDecNode or a FuncDecNode
+        public ASTNode declarationNode;
+        public TokenType Type;
+    }
+    
+    
 }

@@ -68,10 +68,6 @@ public class ASTNode{
         public String toString(int depth) {
             String temp = "[Variable Declaration] = " + ID + " : " + specifier + " " + "\r\n";
                     
-//            if(nextVarDec != null){
-//                nextVarDec.space = this.space;
-//            }
-           // temp += printFormat(nextVarDec);
            if(offset != null)
              temp += format((ASTNode)offset, depth);  
             
@@ -90,9 +86,7 @@ public class ASTNode{
         @Override
         public String toString(int depth) {
             String temp = "[Parameter] " + param + "\r\n";
-//            if(nextNode != null){
-//                nextNode.space = this.space;
-//            }
+            
             return formatChild(temp, depth) + ((nextNode == null)?"":format(nextNode, depth - 1));
         }
     }
@@ -136,12 +130,6 @@ public class ASTNode{
         
         @Override
         public String toString(int depth) {
-//            if(leftVar != null)
-//                leftVar.space = this.space;
-//            if(index != null)
-//                ((ASTNode)index).space = this.space;
-//            if(expersion != null)
-//                ((ASTNode)expersion).space = this.space;
             String temp = "[Assignment]\r\n";
             if(leftVar != null)
                 temp += format(leftVar, depth);

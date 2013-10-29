@@ -8,8 +8,7 @@ import java.util.Stack;
  * @author Emery
  */
 public class SemAnalyzer {
-    private Stack<ArrayList<Integer>> scope;
-    private ArrayList<ArrayList<listRecord>> list;
+    private Stack<ArrayList<listRecord>> scope;
     
     /**
      * Used to analysis a AST against the semantic rules of the language
@@ -18,31 +17,31 @@ public class SemAnalyzer {
      */
     public SemAnalyzer(ASTNode.ProgramNode root) {
         scope = new Stack();
-        list = new ArrayList<ArrayList<listRecord>>();
         init(root);
     }
     
     /**
-     * Used to get all the function names and global vairables of the program
+     * Used to get all the function names and global variables of the program
      * for use in scope
      * @param program the program node
      * @created by Emery
      */
     private void init(ASTNode.ProgramNode program) {        
-        scope.add(new ArrayList<Integer>());
+        scope.add(new ArrayList<listRecord>());
         
         ASTNode.FuncDeclarationNode func = program.funcdeclaration;
         ASTNode.VarDeclarationNode var = program.vardeclaration;
         
         //pulls all function names for scope
         while(func != null) {
-            scope.peek().add(func.ID);
+          //  scope.peek().add(func.ID);
+            
             func = func.nextFuncDec;
         }
         
         //pulls all variable names for scope
         while(var != null) {
-            scope.peek().add(var.ID);
+           // scope.peek().add(var.ID);
             var = var.nextVarDec;
         }        
         
@@ -215,10 +214,10 @@ public class SemAnalyzer {
     }
     
     private ASTNode searchScope(int ID) {
-        for (int i = list.size() - 1; i >= 0; i--) {
-            for (int j = list.get(i).size() - 1; j >= 0; j--) {
-                if (list.get(i).get(j).id_num == ID) 
-                    return list.get(i).get(j).declarationNode;
+        for (int i = scope.size() - 1; i >= 0; i--) {
+            for (int j = scope.get(i).size() - 1; j >= 0; j--) {
+                if (scope.get(i).get(j).id_num == ID) 
+                    return scope.get(i).get(j).declarationNode;
             }
         }
         return null;

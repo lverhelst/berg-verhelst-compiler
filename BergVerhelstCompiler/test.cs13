@@ -1,8 +1,8 @@
-bool readBool(void){;}
+/*bool readBool(void){;}
 int readNum(void){;}
 void writeBool(bool x){;}
 void writeNum(int x){;}
-
+*/
 --always true
 bool readBool(void) {
 	int arr[20];

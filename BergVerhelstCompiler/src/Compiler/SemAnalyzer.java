@@ -57,17 +57,19 @@ public class SemAnalyzer {
         ASTNode.FuncDeclarationNode func = program.funcdeclaration;
         ASTNode.VarDeclarationNode var = program.vardeclaration;
         
+     
+        //process all global variable declarations
+        while(var != null) {
+            VarDeclarationNode(var);
+            var = var.nextVarDec;
+        } 
+        
         //process all function declarations
         while(func != null) {
             FuncDeclarationNode(func);
             func = func.nextFuncDec;
         }
         
-        //process all global variable declarations
-        while(var != null) {
-            VarDeclarationNode(var);
-            var = var.nextVarDec;
-        } 
         
         System.out.println("Program Node");
     }
@@ -88,15 +90,20 @@ public class SemAnalyzer {
         
         //func.specifier; to make sure return is of this value or uni
         CompoundNode(func.compoundStmt);
+        scope.pop();
     }
     
     /**
      * Class to view VarDeclarationNode
      * @Class Emery
      */
-    public void VarDeclarationNode(ASTNode.VarDeclarationNode var) {        
-        if(searchScope(var.ID) == null)
-            scope.peek().add(new listRecord(var, var.ID));
+    public void VarDeclarationNode(ASTNode.VarDeclarationNode var) {    
+        ASTNode node = null;
+        int i = var.ID;
+        System.out.println(var.ID + ": " + var.alexeme);
+        node = this.searchScope(i);
+        if(node == null)
+            scope.peek().add(new listRecord(var, var.ID, var.alexeme));
         if(var.offset != null)
             expression(var.offset);
     }
@@ -119,14 +126,14 @@ public class SemAnalyzer {
      */
     public void CompoundNode(ASTNode.CompoundNode compound) {
         scope.push(new ArrayList<listRecord>());
-        
+        for(ASTNode.VarDeclarationNode var: compound.variableDeclarations) {
+            VarDeclarationNode(var);
+        }
         for(ASTNode stmt: compound.statements) {
             if(stmt != null)
                 statement(stmt);
         }
-        for(ASTNode.VarDeclarationNode var: compound.variableDeclarations) {
-            VarDeclarationNode(var);
-        }
+        scope.pop();
     }
     
     /**
@@ -234,7 +241,7 @@ public class SemAnalyzer {
         ASTNode node = this.searchScope(call.ID);
         if(node == null){
             //throw functionNotDeclaredError()
-            System.out.println("Function Not Declared");
+            printError("Function Not Declared: " + call.alexeme);
         }
         //check arguments against the functions parameters
         for(ASTNode.Expression e: call.arguments){
@@ -252,7 +259,7 @@ public class SemAnalyzer {
         //check if var has been declared add to scope if not
         ASTNode node = this.searchScope(var.ID);
         if(node == null){
-            System.out.println("Undeclared Identifier: " + ((var.alexeme == null)?"":var.alexeme));
+            printError("Undeclared Identifier: " + ((var.alexeme == null)?"":var.alexeme));
         }
         if(var.offset != null)
             expression(var.offset);
@@ -342,10 +349,17 @@ public class SemAnalyzer {
         //Is either a varDecNode or a FuncDecNode
         public ASTNode declarationNode;
         public TokenType Type;
+        public String lex;
         
         public listRecord(ASTNode dec, int id){
             this.id_num = id;
             this.declarationNode = dec;
+        }
+        
+         public listRecord(ASTNode dec, int id, String lexeme){
+            this.id_num = id;
+            this.declarationNode = dec;
+            this.lex = lexeme;
         }
         
     }
@@ -382,4 +396,14 @@ public class SemAnalyzer {
         if(printFile)
           printWriter.print(line + "\r\n");
     }     
+    
+    
+    public void printStack(){
+        for (int i = scope.size() - 1; i >= 0; i--) {
+            System.out.println("Scope: " + i);
+            for (int j = scope.get(i).size() - 1; j >= 0; j--) {
+                  System.out.println(scope.get(i).get(j).id_num + ": " + scope.get(i).get(j).lex);
+            }
+        }
+    }
 }

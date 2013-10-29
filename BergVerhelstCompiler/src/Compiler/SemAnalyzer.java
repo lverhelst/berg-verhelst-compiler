@@ -139,10 +139,10 @@ public class SemAnalyzer {
         }
         
         for(ASTNode stmt: compound.statements) {
-            if(stmt != null)
-                statement(stmt);
-            else if(stmt instanceof ASTNode.ReturnNode) {
+            if(stmt instanceof ASTNode.ReturnNode)
                 type = statement(stmt);
+            else if (stmt != null){
+                statement(stmt);
             }
         }
         scope.pop();

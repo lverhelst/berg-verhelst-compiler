@@ -18,9 +18,6 @@ public class ASTNode{
     }
     
 
-    
-    public void accept(SemAnalyzer semAnalyzer){}
-
     /**
      * Class to view ProgramNode
      * @Class Emery

@@ -92,8 +92,12 @@ public class SemAnalyzer {
             param = param.nextNode;
         }
         
+        TokenType type = CompoundNode(func.compoundStmt);
         //func.specifier; to make sure return is of this value or uni
-        CompoundNode(func.compoundStmt);
+        if(type != func.specifier) {
+            printError(func.alexeme + ": return type of " + type + " does not match the expected " + func.specifier);
+        }
+        
         scope.pop();
     }
     
@@ -126,7 +130,8 @@ public class SemAnalyzer {
      * Statements has to happen at least once
      * @Class Emery
      */
-    public void CompoundNode(ASTNode.CompoundNode compound) {
+    public TokenType CompoundNode(ASTNode.CompoundNode compound) {
+        TokenType type = TokenType.VOID;
         scope.push(new ArrayList<listRecord>());
         
         for(ASTNode.VarDeclarationNode var: compound.variableDeclarations) {
@@ -136,8 +141,13 @@ public class SemAnalyzer {
         for(ASTNode stmt: compound.statements) {
             if(stmt != null)
                 statement(stmt);
+            else if(stmt instanceof ASTNode.ReturnNode) {
+                type = statement(stmt);
+            }
         }
         scope.pop();
+        
+        return type;
     }
     
     /**
@@ -206,9 +216,9 @@ public class SemAnalyzer {
      * A Return Node has an optional expression
      * @Created Leon
      */
-    public void ReturnNode(ASTNode.ReturnNode returnNode) {
+    public TokenType ReturnNode(ASTNode.ReturnNode returnNode) {
        //check result of expresions and maybe return it to parent??
-       expression(returnNode.exp);
+       return expression(returnNode.exp);
     }
     
     /**
@@ -334,7 +344,7 @@ public class SemAnalyzer {
      * Routing Method for Statements
      * @param stmt 
      */
-    private void statement(ASTNode stmt){
+    private TokenType statement(ASTNode stmt){
         if(stmt.getClass() == ASTNode.AssignmentNode.class)
             AssignmentNode((ASTNode.AssignmentNode)stmt);  
         else if (stmt.getClass() == ASTNode.IfNode.class)
@@ -344,11 +354,12 @@ public class SemAnalyzer {
         else if (stmt.getClass() == ASTNode.MarkerNode.class)
             MarkerNode((ASTNode.MarkerNode) stmt);
         else if (stmt.getClass() == ASTNode.ReturnNode.class)
-            ReturnNode((ASTNode.ReturnNode) stmt);
+            return ReturnNode((ASTNode.ReturnNode) stmt);
         else if (stmt.getClass() == ASTNode.BranchNode.class)
             BranchNode((ASTNode.BranchNode) stmt);
         else if (stmt.getClass() == ASTNode.CallNode.class)
             CallNode((ASTNode.CallNode) stmt);
+        return null;
     }
     
     private ASTNode.Declaration searchScope(int ID) {

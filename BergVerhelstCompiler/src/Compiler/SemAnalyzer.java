@@ -68,6 +68,8 @@ public class SemAnalyzer {
             VarDeclarationNode(var);
             var = var.nextVarDec;
         } 
+        
+        System.out.println("Program Node");
     }
     
     /**
@@ -96,7 +98,7 @@ public class SemAnalyzer {
      * @Class Emery
      */
     public void ParameterNode(ASTNode.ParameterNode param) {
-        //check for redeclartion errors
+        //check for redeclaration errors
     }
     
     /**
@@ -137,8 +139,9 @@ public class SemAnalyzer {
             We have the Loop Node's stmt as a ASTNode
             Consult an oracle to ensure it is actually an ASTNode.Statement
         */
-        statement((ASTNode.Statement)ifNode.stmt);
-        statement((ASTNode.Statement)ifNode.elseStmt);
+        statement(ifNode.stmt);
+        if(ifNode.elseStmt != null)
+            statement(ifNode.elseStmt);
     }
     
     /**
@@ -152,8 +155,9 @@ public class SemAnalyzer {
             We have the Loop Node's stmt as a ASTNode
             Consult an oracle to ensure it is actually an ASTNode.Statement
         */
-        statement((ASTNode.Statement)loop.stmt);
-        LoopNode(loop.nextLoopNode);        
+        statement(loop.stmt);
+        if(loop.nextLoopNode != null)
+            LoopNode(loop.nextLoopNode);        
         //check for exit?
     }
     
@@ -195,7 +199,7 @@ public class SemAnalyzer {
     public void CaseNode(ASTNode.CaseNode caseNode) {
         //new scope???
         //check statement
-        statement(caseNode.stmt);
+        statement((ASTNode) caseNode.stmt);
     }
     
     /**
@@ -264,7 +268,7 @@ public class SemAnalyzer {
     }
     
     /**
-     * 
+     * Routing Method for Expressions
      * @param exp 
      */
     private void expression(ASTNode.Expression exp){
@@ -279,8 +283,11 @@ public class SemAnalyzer {
         else if (exp.getClass() == ASTNode.CallNode.class)
             CallNode((ASTNode.CallNode) exp);
     }
-    
-    private void statement(ASTNode.Statement stmt){
+    /**
+     * Routing Method for Statements
+     * @param stmt 
+     */
+    private void statement(ASTNode stmt){
         if(stmt.getClass() == ASTNode.AssignmentNode.class)
             AssignmentNode((ASTNode.AssignmentNode)stmt);  
         else if (stmt.getClass() == ASTNode.IfNode.class)

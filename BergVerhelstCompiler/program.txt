@@ -1,0 +1,44 @@
+bool readBool(void){;}
+int readNum(void){;}
+void writeBool(bool x){;}
+void writeNum(int x){;}
+
+--always true
+bool readBool(void) {
+	return true;
+}
+
+--outputs a random preset number so its not really random at all
+int readNum(void) {
+	return 42;
+}
+
+--used to test the case statement
+void testcase(void) {
+	int x;
+	branch (x)
+		case 0:  ;
+		case 1:  ;
+		default: ;
+	end;
+}
+
+--main program to run
+int main(void) {
+	int x;
+	int y;
+	x := 0;
+	y := 5;
+	
+	--test the loop function
+	loop
+		--test the if function
+		if(x < y) {
+			y := y - 1;
+		} else {
+			--test exit
+			exit;
+		}
+		continue;
+	end;
+}

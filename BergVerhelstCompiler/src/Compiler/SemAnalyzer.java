@@ -94,7 +94,7 @@ public class SemAnalyzer {
         
         TokenType type = CompoundNode(func.compoundStmt);
         //func.specifier; to make sure return is of this value or uni
-        if(type != func.specifier) {
+        if(!checkTypes(type,func.specifier)) {
             printError(func.alexeme + ": return type of " + type + " does not match the expected " + func.specifier);
         }
         

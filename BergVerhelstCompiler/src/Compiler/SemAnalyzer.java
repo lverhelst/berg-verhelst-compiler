@@ -219,7 +219,7 @@ public class SemAnalyzer {
     public TokenType ReturnNode(ASTNode.ReturnNode returnNode) {
        //check result of expresions and maybe return it to parent??
        if(returnNode.exp == null)
-           return null;
+           return TokenType.VOID;
        return expression(returnNode.exp);
     }
     

@@ -1,5 +1,6 @@
 package Compiler;
 
+import Compiler.ASTNode.*;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Stack;
@@ -21,7 +22,7 @@ public class SemAnalyzer {
      * @param root as ProgramNode to use as the root of the program 
      * @created by Emery
      */
-    public SemAnalyzer(ASTNode.ProgramNode root) {
+    public SemAnalyzer(ProgramNode root) {
         scope = new Stack();
         init(root);
         error = false;
@@ -33,10 +34,10 @@ public class SemAnalyzer {
      * @param program the program node
      * @created by Emery
      */
-    private void init(ASTNode.ProgramNode program) {        
-        scope.add(new ArrayList<listRecord>());
-        ASTNode.FuncDeclarationNode func = program.funcdeclaration;
-        ASTNode.VarDeclarationNode var = program.vardeclaration;
+    private void init(ProgramNode program) {        
+        scope.add(new ArrayList<listRecord>());        
+        FuncDeclarationNode func = program.funcdeclaration;
+        VarDeclarationNode var = program.vardeclaration;
         
         //pulls all function names for scope
         while(func != null) {
@@ -54,13 +55,18 @@ public class SemAnalyzer {
     * Class to view ProgramNode
     * @Class Emery
     */
-    public void ProgramNode(ASTNode.ProgramNode program) {
-        ASTNode.FuncDeclarationNode func = program.funcdeclaration;
-        ASTNode.VarDeclarationNode var = program.vardeclaration;
+    public void ProgramNode(ProgramNode program) {
+        FuncDeclarationNode func = program.funcdeclaration;
+        VarDeclarationNode var = program.vardeclaration;
 
+        if(func == null && var == null) {
+            printError("Program must have one or more declarations");
+        }
+        
         //process all global variable declarations
         while(var != null) {
             VarDeclarationNode(var);
+                        
             var = var.nextVarDec;
         } 
         
@@ -70,6 +76,9 @@ public class SemAnalyzer {
             func = func.nextFuncDec;
         }
         
+//        if(!func.alexeme.equals("main") && func.specifier == TokenType.INT && func.params == TokenType.VOID)
+//            printError("Final function declaration must be of form int main(void)");
+        
         System.out.println("Program Node");
     }
     
@@ -77,11 +86,11 @@ public class SemAnalyzer {
      * Class to view FuncDeclarationNode
      * @Class Emery
      */
-    public void FuncDeclarationNode(ASTNode.FuncDeclarationNode func) {      
+    public void FuncDeclarationNode(FuncDeclarationNode func) {      
         scope.push(new ArrayList<listRecord>());
-        ASTNode.ParameterNode param = func.params;
+        ParameterNode param = func.params;
         
-        ASTNode.Declaration  temp = searchScope(func.ID);
+        Declaration  temp = searchScope(func.ID);
         
         if(temp == null) {
             scope.peek().add(new listRecord(func, func.ID));
@@ -106,8 +115,8 @@ public class SemAnalyzer {
      * Class to view VarDeclarationNode
      * @Class Emery
      */
-    public void VarDeclarationNode(ASTNode.VarDeclarationNode var) { 
-        ASTNode.Declaration  temp = searchScope(var.ID);
+    public void VarDeclarationNode(VarDeclarationNode var) { 
+        Declaration  temp = searchScope(var.ID);
         if(temp == null)
             scope.peek().add(new listRecord(var, var.ID));
         
@@ -119,7 +128,7 @@ public class SemAnalyzer {
      * Class to view ParameterNode
      * @Class Emery
      */
-    public void ParameterNode(ASTNode.ParameterNode param) {
+    public void ParameterNode(ParameterNode param) {
         //check for redeclaration errors
         if(searchScope(param.ID) == null) {
             scope.peek().add(new listRecord(param, param.ID));
@@ -131,17 +140,17 @@ public class SemAnalyzer {
      * Statements has to happen at least once
      * @Class Emery
      */
-    public TokenType CompoundNode(ASTNode.CompoundNode compound) {
+    public TokenType CompoundNode(CompoundNode compound) {
         TokenType type = null;
         scope.push(new ArrayList<listRecord>());
         
-        for(ASTNode.VarDeclarationNode var: compound.variableDeclarations) {
+        for(VarDeclarationNode var: compound.variableDeclarations) {
             VarDeclarationNode(var);
         }
         
         //check child stmts and their returns
         for(ASTNode stmt: compound.statements) {
-            if(stmt instanceof ASTNode.ReturnNode) { //check return types of the compound statment
+            if(stmt instanceof ReturnNode) { //check return types of the compound statment
                 TokenType temp = statement(stmt);
                 
                 if(type == null) //if not set, set 
@@ -162,7 +171,7 @@ public class SemAnalyzer {
      * Class to view AssignmentNode
      * @Class Emery
      */
-    public void AssignmentNode(ASTNode.AssignmentNode assignment) {
+    public void AssignmentNode(AssignmentNode assignment) {
         //check var to ensure it has been declared
         VariableNode(assignment.leftVar);        
         //check expressions for what type it is
@@ -176,14 +185,14 @@ public class SemAnalyzer {
      * Class to view ifNode
      * @Class Leon
      */
-    public void IfNode(ASTNode.IfNode ifNode) {
+    public void IfNode(IfNode ifNode) {
         //new scope??
         //check expersion to ensure it returns correct type
         expression(ifNode.exp);
         //check statement and else statements
         /*
             We have the Loop Node's stmt as a ASTNode
-            Consult an oracle to ensure it is actually an ASTNode.Statement
+            Consult an oracle to ensure it is actually an Statement
         */
         statement(ifNode.stmt);
 
@@ -195,12 +204,12 @@ public class SemAnalyzer {
      * Class to view loop syntax
      * @Created Leon
      */
-    public void LoopNode(ASTNode.LoopNode loop) {
+    public void LoopNode(LoopNode loop) {
         //new scope???
         //check statement
         /*
             We have the Loop Node's stmt as a ASTNode
-            Consult an oracle to ensure it is actually an ASTNode.Statement
+            Consult an oracle to ensure it is actually an Statement
         */
         statement(loop.stmt);
         if(loop.nextLoopNode != null)
@@ -214,7 +223,7 @@ public class SemAnalyzer {
       * Markers can be the following specifiers: CONTINUE | EXIT | ENDFILE
       * @Created Leon
      */
-    public TokenType MarkerNode(ASTNode.MarkerNode marker) {
+    public TokenType MarkerNode(MarkerNode marker) {
         //probably not needed
         return marker.specifier;
     }
@@ -223,7 +232,7 @@ public class SemAnalyzer {
      * A Return Node has an optional expression
      * @Created Leon
      */
-    public TokenType ReturnNode(ASTNode.ReturnNode returnNode) {
+    public TokenType ReturnNode(ReturnNode returnNode) {
        //check result of expresions and maybe return it to parent??
        if(returnNode.exp == null)
            return TokenType.VOID;
@@ -234,7 +243,7 @@ public class SemAnalyzer {
      * Branch node for branch nodes
      * @Created Emery
      */
-    public void BranchNode(ASTNode.BranchNode branch) {
+    public void BranchNode(BranchNode branch) {
         //check result of expersion type and the case statements to ensure they match
         if(branch.exp != null)
             expression(branch.exp);
@@ -247,7 +256,7 @@ public class SemAnalyzer {
      * Case Node for case statements
      * @Created Leon
      */
-    public void CaseNode(ASTNode.CaseNode caseNode) {
+    public void CaseNode(CaseNode caseNode) {
         //new scope???
         //check statement
         statement((ASTNode) caseNode.stmt);
@@ -259,9 +268,9 @@ public class SemAnalyzer {
      * EX. INT FOO(BAR foobar);
      * @Created Leon
      */
-    public TokenType CallNode(ASTNode.CallNode call) {
+    public TokenType CallNode(CallNode call) {
         //ensure function has been declared
-        ASTNode.Declaration node = this.searchScope(call.ID);
+        Declaration node = this.searchScope(call.ID);
         if(node == null){
             //throw functionNotDeclaredError()
             printError("Function Not Declared: " + call.alexeme);
@@ -269,7 +278,7 @@ public class SemAnalyzer {
             call.declaration = node;
         }
         //check arguments against the functions parameters
-        for(ASTNode.Expression e: call.arguments){
+        for(Expression e: call.arguments){
             expression(e);
         }
         //check if return type is used and valid
@@ -283,9 +292,9 @@ public class SemAnalyzer {
      * This stores a variable ex: INT x;
      * @Created Leon
      */
-    public TokenType VariableNode(ASTNode.VariableNode var) {
+    public TokenType VariableNode(VariableNode var) {
         //check if var has been declared add to scope if not
-        ASTNode.Declaration node = this.searchScope(var.ID);
+        Declaration node = this.searchScope(var.ID);
         if(node == null){
             printError("Undeclared Identifier: " + ((var.alexeme == null)?"":var.alexeme));
         } else {
@@ -305,7 +314,7 @@ public class SemAnalyzer {
      * @Created Leon
      * @return Type of the literal (NUM, BLIT)
      */
-    public TokenType LiteralNode(ASTNode.LiteralNode lit) {
+    public TokenType LiteralNode(LiteralNode lit) {
         //return the type???
         return lit.specifier;
     }
@@ -314,7 +323,7 @@ public class SemAnalyzer {
      * Unary Operation Node
      * @Created Leon
      */
-    public TokenType UnopNode(ASTNode.UnopNode unop) {
+    public TokenType UnopNode(UnopNode unop) {
         //ensure the result matches the specifier?
         return expression(unop.Rside);
     }
@@ -323,7 +332,7 @@ public class SemAnalyzer {
      * Binary Operation Node
      * @Created Leon
      */
-    public TokenType BinopNode(ASTNode.BinopNode binop) {
+    public TokenType BinopNode(BinopNode binop) {
         //ensure both left and right sides result in the same type
         TokenType l = expression(binop.Lside);
         TokenType r = expression(binop.Rside);
@@ -339,17 +348,17 @@ public class SemAnalyzer {
      * Routing Method for Expressions
      * @param exp 
      */
-    private TokenType expression(ASTNode.Expression exp){
-        if(exp.getClass() == ASTNode.BinopNode.class)
-           return BinopNode((ASTNode.BinopNode)exp);  
-        else if (exp.getClass() == ASTNode.UnopNode.class)
-           return UnopNode((ASTNode.UnopNode) exp);
-        else if (exp.getClass() == ASTNode.LiteralNode.class)
-            return LiteralNode((ASTNode.LiteralNode) exp);
-        else if (exp.getClass() == ASTNode.VariableNode.class)
-            return VariableNode((ASTNode.VariableNode) exp);
-        else if (exp.getClass() == ASTNode.CallNode.class)
-            return CallNode((ASTNode.CallNode) exp);
+    private TokenType expression(Expression exp){
+        if(exp.getClass() == BinopNode.class)
+           return BinopNode((BinopNode)exp);  
+        else if (exp.getClass() == UnopNode.class)
+           return UnopNode((UnopNode) exp);
+        else if (exp.getClass() == LiteralNode.class)
+            return LiteralNode((LiteralNode) exp);
+        else if (exp.getClass() == VariableNode.class)
+            return VariableNode((VariableNode) exp);
+        else if (exp.getClass() == CallNode.class)
+            return CallNode((CallNode) exp);
         return null;
     }
 
@@ -358,24 +367,24 @@ public class SemAnalyzer {
      * @param stmt 
      */
     private TokenType statement(ASTNode stmt){
-        if(stmt.getClass() == ASTNode.AssignmentNode.class)
-            AssignmentNode((ASTNode.AssignmentNode)stmt);  
-        else if (stmt.getClass() == ASTNode.IfNode.class)
-            IfNode((ASTNode.IfNode) stmt);
-        else if (stmt.getClass() == ASTNode.LoopNode.class)
-            LoopNode((ASTNode.LoopNode) stmt);
-        else if (stmt.getClass() == ASTNode.MarkerNode.class)
-            MarkerNode((ASTNode.MarkerNode) stmt);
-        else if (stmt.getClass() == ASTNode.ReturnNode.class)
-            return ReturnNode((ASTNode.ReturnNode) stmt);
-        else if (stmt.getClass() == ASTNode.BranchNode.class)
-            BranchNode((ASTNode.BranchNode) stmt);
-        else if (stmt.getClass() == ASTNode.CallNode.class)
-            CallNode((ASTNode.CallNode) stmt);
+        if(stmt.getClass() == AssignmentNode.class)
+            AssignmentNode((AssignmentNode)stmt);  
+        else if (stmt.getClass() == IfNode.class)
+            IfNode((IfNode) stmt);
+        else if (stmt.getClass() == LoopNode.class)
+            LoopNode((LoopNode) stmt);
+        else if (stmt.getClass() == MarkerNode.class)
+            MarkerNode((MarkerNode) stmt);
+        else if (stmt.getClass() == ReturnNode.class)
+            return ReturnNode((ReturnNode) stmt);
+        else if (stmt.getClass() == BranchNode.class)
+            BranchNode((BranchNode) stmt);
+        else if (stmt.getClass() == CallNode.class)
+            CallNode((CallNode) stmt);
         return null;
     }
     
-    private ASTNode.Declaration searchScope(int ID) {
+    private Declaration searchScope(int ID) {
         for (int i = scope.size() - 1; i >= 0; i--) {
             for (int j = scope.get(i).size() - 1; j >= 0; j--) {
                 if (scope.get(i).get(j).id_num == ID) 
@@ -400,16 +409,16 @@ public class SemAnalyzer {
     protected class listRecord {
         public int id_num;
         //Is either a varDecNode or a FuncDecNode
-        public ASTNode.Declaration declarationNode;
+        public Declaration declarationNode;
         public TokenType Type;
         public String lex;
         
-        public listRecord(ASTNode.Declaration dec, int id){
+        public listRecord(Declaration dec, int id){
             this.id_num = id;
             this.declarationNode = dec;
         }
         
-         public listRecord(ASTNode.Declaration dec, int id, String lexeme){
+         public listRecord(Declaration dec, int id, String lexeme){
             this.id_num = id;
             this.declarationNode = dec;
             this.lex = lexeme;

@@ -26,6 +26,13 @@ public class ASTNode{
         FuncDeclarationNode funcdeclaration;
         VarDeclarationNode vardeclaration;
         //ProgramNode nextNode;
+    
+        public ProgramNode() {
+            FuncDeclarationNode readint = new FuncDeclarationNode();
+            FuncDeclarationNode writeint = new FuncDeclarationNode();
+            FuncDeclarationNode readbool = new FuncDeclarationNode();
+            FuncDeclarationNode writebool = new FuncDeclarationNode();
+        }
         
         @Override
         public String toString(int depth) {

@@ -24,6 +24,7 @@ public class SemAnalyzer {
     public SemAnalyzer(ASTNode.ProgramNode root) {
         scope = new Stack();
         init(root);
+        error = false;
     }
     
     /**
@@ -131,17 +132,24 @@ public class SemAnalyzer {
      * @Class Emery
      */
     public TokenType CompoundNode(ASTNode.CompoundNode compound) {
-        TokenType type = TokenType.VOID;
+        TokenType type = null;
         scope.push(new ArrayList<listRecord>());
         
         for(ASTNode.VarDeclarationNode var: compound.variableDeclarations) {
             VarDeclarationNode(var);
         }
         
+        //check child stmts and their returns
         for(ASTNode stmt: compound.statements) {
-            if(stmt instanceof ASTNode.ReturnNode)
-                type = statement(stmt);
-            else if (stmt != null){
+            if(stmt instanceof ASTNode.ReturnNode) { //check return types of the compound statment
+                TokenType temp = statement(stmt);
+                
+                if(type == null) //if not set, set 
+                    type = temp;
+                
+                if(temp != null && temp != type) //if set but does not match error
+                    printError("Return types do not match: " + type + " != " + temp);
+            } else if (stmt != null){
                 statement(stmt);
             }
         }

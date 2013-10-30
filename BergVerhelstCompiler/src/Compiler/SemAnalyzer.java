@@ -38,17 +38,29 @@ public class SemAnalyzer {
         scope.add(new ArrayList<listRecord>());        
         FuncDeclarationNode func = program.funcdeclaration;
         VarDeclarationNode var = program.vardeclaration;
-        Declaration dec = null;
+        Declaration dec;
         
         //pulls all function names for scope
-        while(func != null) {
-            dec = searchScope(func.ID);
-            scope.peek().add(new listRecord(func, func.ID));
+        while(func != null) {            
+            dec = searchCurrentScope(func.ID);
+            
+            if(dec == null)
+                scope.peek().add(new listRecord(func, func.ID));
+            else
+                printError(func.alexeme + " already has been declared within the current scope");
+            
             func = func.nextFuncDec;
         }
+        
         //pulls all variable names for scope
         while(var != null) {
-            scope.peek().add(new listRecord(var, var.ID));
+            dec = searchCurrentScope(var.ID);
+            
+            if(dec == null)
+                scope.peek().add(new listRecord(var, var.ID));
+            else
+                printError(var.alexeme + " has already been defined within the current scope");
+            
             var = var.nextVarDec;
         }
     }
@@ -89,14 +101,8 @@ public class SemAnalyzer {
      */
     public void FuncDeclarationNode(FuncDeclarationNode func) {      
         scope.push(new ArrayList<listRecord>());
-        ParameterNode param = func.params;
-        
-        Declaration temp = searchScope(func.ID);
-        
-        if(temp == null) {
-            scope.peek().add(new listRecord(func, func.ID));
-        } 
-        
+        ParameterNode param = func.params;        
+               
         //search all params
         while(param != null) {
             ParameterNode(func.params);
@@ -117,11 +123,16 @@ public class SemAnalyzer {
      * @Class Emery
      */
     public void VarDeclarationNode(VarDeclarationNode var) { 
-        Declaration  temp = searchCurrentScope(var.ID);
+
+        Declaration global = searchScope(var.ID);
+        Declaration current = searchCurrentScope(var.ID);
         
-        if(temp == null) {
-            scope.peek().add(new listRecord(var, var.ID));
-        } 
+        if(current == null) {        
+            if(global == null) 
+                scope.peek().add(new listRecord(var, var.ID));
+        } else {
+            printError(var.alexeme + " has already been declared within the current scope");
+        }
         
         if(var.offset != null){
             if(!expressionIsInt(var.offset)){

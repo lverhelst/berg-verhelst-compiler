@@ -266,6 +266,8 @@ public class SemAnalyzer {
         if(node == null){
             //throw functionNotDeclaredError()
             printError("Function Not Declared: " + call.alexeme);
+        } else {
+            call.declaration = node;
         }
         //check arguments against the functions parameters
         for(ASTNode.Expression e: call.arguments){
@@ -287,6 +289,8 @@ public class SemAnalyzer {
         ASTNode.Declaration node = this.searchScope(var.ID);
         if(node == null){
             printError("Undeclared Identifier: " + ((var.alexeme == null)?"":var.alexeme));
+        } else {
+            var.declaration = node;
         }
         if(var.offset != null)
             expression(var.offset);

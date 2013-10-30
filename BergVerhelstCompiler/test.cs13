@@ -1,3 +1,10 @@
+/*
+bool readBool(void){;}
+int readNum(void){;}
+void writeBool(bool x){;}
+void writeNum(int x){;}
+*/
+
 int x;
 
 --always true
@@ -46,6 +53,5 @@ int main(void) {
 		}
 	continue;
 	end;
-
 	return 0;
 }

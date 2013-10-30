@@ -433,7 +433,7 @@ public class SemAnalyzer {
             IfNode((IfNode) stmt);
         else if (stmt.getClass() == LoopNode.class){
             if(!LoopNode((LoopNode) stmt))
-                print("WARNING: Loop without EXIT");
+                printError("Loop without EXIT");
         }
         else if (stmt.getClass() == MarkerNode.class)
             MarkerNode((MarkerNode) stmt);

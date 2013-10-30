@@ -14,7 +14,7 @@ int readNum(int abc, ref int x) {
 }
 
 --used to test the case statement
-void testcase() {
+void testcase(void) {
 	int x;
 	int a;
 	branch (x)

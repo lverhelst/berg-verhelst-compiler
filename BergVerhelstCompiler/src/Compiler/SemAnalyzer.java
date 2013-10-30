@@ -108,7 +108,7 @@ public class SemAnalyzer {
         }
         
         TokenType type = CompoundNode(func.compoundStmt);
-        //func.specifier; to make sure return is of this value or uni
+        
         if(!checkTypes(type,func.specifier)) {
             printError(func.alexeme + ": return type of " + type + " does not match the expected " + func.specifier);
         }
@@ -339,6 +339,11 @@ public class SemAnalyzer {
         //check if var has been declared add to scope if not
         Declaration node = this.searchScope(var.ID);
         if(node == null){
+            VarDeclarationNode temp = var.new VarDeclarationNode();
+            temp.ID = var.ID;
+            temp.specifier = TokenType.UNI;
+            scope.peek().add(new listRecord(temp, temp.ID));
+            
             printError("Undeclared Identifier: " + ((var.alexeme == null)?"":var.alexeme));
         } else {
             var.declaration = node;

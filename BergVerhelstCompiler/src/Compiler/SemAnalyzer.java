@@ -290,7 +290,9 @@ public class SemAnalyzer {
      */
     public TokenType CallNode(CallNode call) {
         //ensure function has been declared
-        Declaration node = this.searchScope(call.ID);
+        FuncDeclarationNode node = (FuncDeclarationNode)this.searchScope(call.ID);
+        ParameterNode param = node.params;
+        
         if(node == null){
             //throw functionNotDeclaredError()
             printError("Function Not Declared: " + call.alexeme);
@@ -299,8 +301,22 @@ public class SemAnalyzer {
         }
         //check arguments against the functions parameters
         for(Expression e: call.arguments){
-            expression(e);
+            TokenType temp = expression(e);
+            
+            if(param == null) {
+                printError(node.alexeme + " number of parameters do not match");
+            } else {
+                if(!checkTypes(param.param,temp))
+                    printError(node.alexeme + " parameter mismatch " + param.param + " expected " + temp + " found");
+                
+                param = param.nextNode;
+            }
         }
+        
+        if(param != null) {
+            printError(node.alexeme + " number of parameters do not match");
+        }
+        
         //check if return type is used and valid
         if(node != null)
             return node.getSpecifier();

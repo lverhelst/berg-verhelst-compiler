@@ -27,11 +27,41 @@ public class ASTNode{
         VarDeclarationNode vardeclaration;
         //ProgramNode nextNode;
     
+        /**
+         * Default constructor which adds the required method stubs to the code
+         */
         public ProgramNode() {
             FuncDeclarationNode readint = new FuncDeclarationNode();
             FuncDeclarationNode writeint = new FuncDeclarationNode();
             FuncDeclarationNode readbool = new FuncDeclarationNode();
             FuncDeclarationNode writebool = new FuncDeclarationNode();
+            CompoundNode nullstmt = new CompoundNode();
+            nullstmt.statements.add(new NullNode());
+            
+            readint.ID = -4;
+            readint.alexeme = "readint";
+//            readint.specifier = TokenType.INT;            
+            readint.nextFuncDec = writeint;
+            readint.compoundStmt = nullstmt;
+            
+            writeint.ID = -3;
+            writeint.alexeme = "writeints";
+//            writeint.specifier = TokenType.VOID;          
+            writeint.nextFuncDec = readbool;
+            writeint.compoundStmt = nullstmt;
+            
+            readbool.ID = -2;
+            readbool.alexeme = "readbool";
+//            readbool.specifier = TokenType.BOOL;          
+            readbool.nextFuncDec = writebool;
+            readbool.compoundStmt = nullstmt;
+            
+            writebool.ID = -1;
+            writebool.alexeme = "writebool";
+//            writebool.specifier = TokenType.VOID;
+            writebool.compoundStmt = nullstmt;
+            
+            funcdeclaration = readint;
         }
         
         @Override

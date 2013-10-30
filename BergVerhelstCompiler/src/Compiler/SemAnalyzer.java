@@ -38,9 +38,11 @@ public class SemAnalyzer {
         scope.add(new ArrayList<listRecord>());        
         FuncDeclarationNode func = program.funcdeclaration;
         VarDeclarationNode var = program.vardeclaration;
+        Declaration dec = null;
         
         //pulls all function names for scope
         while(func != null) {
+            dec = searchScope(func.ID);
             scope.peek().add(new listRecord(func, func.ID));
             func = func.nextFuncDec;
         }
@@ -65,8 +67,7 @@ public class SemAnalyzer {
         
         //process all global variable declarations
         while(var != null) {
-            VarDeclarationNode(var);
-                        
+            VarDeclarationNode(var);                        
             var = var.nextVarDec;
         } 
         
@@ -90,11 +91,11 @@ public class SemAnalyzer {
         scope.push(new ArrayList<listRecord>());
         ParameterNode param = func.params;
         
-        Declaration  temp = searchScope(func.ID);
+        Declaration temp = searchScope(func.ID);
         
         if(temp == null) {
             scope.peek().add(new listRecord(func, func.ID));
-        }
+        } 
         
         //search all params
         while(param != null) {
@@ -117,8 +118,10 @@ public class SemAnalyzer {
      */
     public void VarDeclarationNode(VarDeclarationNode var) { 
         Declaration  temp = searchScope(var.ID);
-        if(temp == null)
+        
+        if(temp == null) {
             scope.peek().add(new listRecord(var, var.ID));
+        } 
         
         if(var.offset != null)
             expression(var.offset);

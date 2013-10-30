@@ -19,7 +19,6 @@ public class Parser{
     ASTNode rootNode;
     private int depth;
     
-    private FileReader fileReader;
     private PrintWriter printWriter;
     private boolean quite;
     public boolean verbose;
@@ -159,8 +158,8 @@ public class Parser{
        
         Object declaration = visit("declaration", synch.union(DECLARATION.firstSet()));
         if(declaration instanceof FuncDeclarationNode){
-            root.funcdeclaration = (FuncDeclarationNode)declaration;
-            currentFunc = root.funcdeclaration;
+            root.funcdeclaration.nextFuncDec = (FuncDeclarationNode)declaration;
+            currentFunc = root.funcdeclaration.nextFuncDec;
         }
         else{       
             root.vardeclaration = (VarDeclarationNode)declaration;

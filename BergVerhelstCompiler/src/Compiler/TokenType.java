@@ -7,7 +7,7 @@ package Compiler;
 public enum TokenType {
         ID,         //Identifier
         NUM,        //Numeral
-        BLIT,       //Boolean literal
+        BLIT,       //Boolean literal ("true", "false")
         ENDFILE,    //End of source text (this is added by the Scanner)
         ERROR,      //Erroneous token
         AND,        //and

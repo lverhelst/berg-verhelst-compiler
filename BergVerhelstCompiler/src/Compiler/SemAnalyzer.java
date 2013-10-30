@@ -163,22 +163,23 @@ public class SemAnalyzer {
             }
         }
         scope.pop();
-        
         return type;
     }
-    
     /**
      * Class to view AssignmentNode
      * @Class Emery
      */
     public void AssignmentNode(AssignmentNode assignment) {
         //check var to ensure it has been declared
-        VariableNode(assignment.leftVar);        
+        TokenType leftSide = VariableNode(assignment.leftVar);        
         //check expressions for what type it is
         if(assignment.index != null)
             expression(assignment.index);
         //check expression result against id type
-        expression(assignment.expersion);
+        TokenType rightSide = expression(assignment.expersion);
+        if(!checkTypes(leftSide, rightSide)){
+            printError("Type mismatch, assigning:" + rightSide + " to: " + leftSide);
+        }
     }
     
     /**
@@ -188,7 +189,13 @@ public class SemAnalyzer {
     public void IfNode(IfNode ifNode) {
         //new scope??
         //check expersion to ensure it returns correct type
-        expression(ifNode.exp);
+        TokenType t = expression(ifNode.exp);
+        if(t == TokenType.BLIT || t == TokenType.BOOL){
+            
+        }else{
+            printError("If Statement expression is not Boolean");
+        }
+            
         //check statement and else statements
         /*
             We have the Loop Node's stmt as a ASTNode
@@ -334,10 +341,14 @@ public class SemAnalyzer {
      */
     public TokenType BinopNode(BinopNode binop) {
         //ensure both left and right sides result in the same type
+        //eval left side first as spec the Semantics Doc
         TokenType l = expression(binop.Lside);
+        //eval right side second
         TokenType r = expression(binop.Rside);
+        binop.LsideType = l;
+        binop.RsideType = r;
        if(checkTypes(l,r)){
-          return r;
+          return getOpType(binop.specifier);
        }else{
            printError("Incompatible Types: " + l + ", " + r);
            return null;
@@ -394,6 +405,15 @@ public class SemAnalyzer {
         return null;
     }
     
+    private Declaration searchCurrentScope(int ID) {
+        int i = scope.size() - 1;
+            for (int j = scope.get(i).size() - 1; j >= 0; j--) {
+                if (scope.get(i).get(j).id_num == ID) 
+                    return scope.get(i).get(j).declarationNode;
+            }
+        return null;
+    }
+    
     private boolean checkTypes(TokenType a, TokenType b){
         if(a == b)
             return true;
@@ -404,6 +424,15 @@ public class SemAnalyzer {
         if((a == TokenType.BOOL && b == TokenType.BLIT) || (a == TokenType.BLIT && b == TokenType.BOOL))
             return true;
         return false;
+    }
+    
+    private TokenType getOpType(TokenType t){
+        if(t == TokenType.AND || t == TokenType.ANDTHEN ||t == TokenType.OR ||t == TokenType.ORELSE || t == TokenType.EQ || t == TokenType.NOT || t == TokenType.NEQ ||
+              t == TokenType.GT  ||  t == TokenType.GTEQ  ||t == TokenType.LT || t == TokenType.LTEQ )
+            return TokenType.BOOL;
+         if(t == TokenType.PLUS || t == TokenType.MINUS ||t == TokenType.MULT ||t == TokenType.DIV || t == TokenType.MOD || t == TokenType.NOT || t == TokenType.NEQ)
+             return TokenType.NUM;
+        return TokenType.UNI;
     }
     
     protected class listRecord {

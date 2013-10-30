@@ -336,7 +336,7 @@ public class ASTNode{
         
          @Override
         public String toString(int depth) {
-            return formatChild("[Variable] " + specifier + " :" + ID + (offset == null? "" : "[" + offset + "]") + "\r\n", depth);
+            return formatChild("[Variable] " + specifier + " :" + ID + (offset == null? "" : "\r\n" + format((ASTNode)offset, depth) + "") + "\r\n", depth);
         }
     }
     /**
@@ -376,14 +376,15 @@ public class ASTNode{
     public class BinopNode extends ASTNode implements Expression{
         TokenType specifier;
         Expression Lside;
+        TokenType LsideType;
         Expression Rside;
+        TokenType RsideType;
         
          @Override
         public String toString(int depth) {
             String temp = "[Binary Operator] " + specifier + "\r\n";
             temp += format((ASTNode)Lside, depth);
             temp += format((ASTNode)Rside, depth);
-            
             return formatChild(temp, depth);
         }
     }

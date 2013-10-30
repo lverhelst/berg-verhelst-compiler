@@ -290,7 +290,6 @@ public class SemAnalyzer {
         //new scope???
         //check statement
         statement((ASTNode) caseNode.stmt);
-
     }
     
     /**

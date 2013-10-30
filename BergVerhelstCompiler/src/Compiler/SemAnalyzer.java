@@ -195,7 +195,6 @@ public class SemAnalyzer {
             Consult an oracle to ensure it is actually an ASTNode.Statement
         */
         statement(loop.stmt);
-
         if(loop.nextLoopNode != null)
             LoopNode(loop.nextLoopNode);        
 

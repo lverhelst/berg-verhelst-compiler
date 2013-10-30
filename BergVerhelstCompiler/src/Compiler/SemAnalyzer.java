@@ -225,8 +225,9 @@ public class SemAnalyzer {
      * Class to view loop syntax
      * @Created Leon
      */
-    public void LoopNode(LoopNode loop) {
+    public boolean LoopNode(LoopNode loop) {
         inLoop = true;
+        Boolean hasExit;
         //new scope???
         //check statement
         /*
@@ -234,10 +235,13 @@ public class SemAnalyzer {
             Consult an oracle to ensure it is actually an Statement
         */
         statement(loop.stmt);
-        if(loop.nextLoopNode != null)
-            LoopNode(loop.nextLoopNode);        
+        hasExit = checkHasExit(loop.stmt);        
+        if(loop.nextLoopNode != null){
+            hasExit |= LoopNode(loop.nextLoopNode);
+        }
         inLoop = false;
         //check for exit?
+        return hasExit;
     }
     
      /**
@@ -404,8 +408,10 @@ public class SemAnalyzer {
             AssignmentNode((AssignmentNode)stmt);  
         else if (stmt.getClass() == IfNode.class)
             IfNode((IfNode) stmt);
-        else if (stmt.getClass() == LoopNode.class)
-            LoopNode((LoopNode) stmt);
+        else if (stmt.getClass() == LoopNode.class){
+            if(!LoopNode((LoopNode) stmt))
+                print("WARNING: Loop without EXIT");
+        }
         else if (stmt.getClass() == MarkerNode.class)
             MarkerNode((MarkerNode) stmt);
         else if (stmt.getClass() == ReturnNode.class)
@@ -455,6 +461,35 @@ public class SemAnalyzer {
             return false;
         else if (exp.getClass() == CallNode.class)
             return false;
+        return false;
+    }
+    
+    private boolean checkHasExit(ASTNode stmt){
+        if(stmt == null)
+            return false;
+        
+        if(stmt.getClass() == AssignmentNode.class)
+            return false;  
+        else if (stmt.getClass() == IfNode.class)
+            return checkHasExit(((IfNode) stmt).stmt) || checkHasExit(((IfNode) stmt).elseStmt);
+        else if (stmt.getClass() == LoopNode.class){
+            return checkHasExit(((LoopNode)stmt).stmt);
+        }
+        else if (stmt.getClass() == MarkerNode.class)
+            return ((MarkerNode)stmt).specifier == TokenType.EXIT;
+        else if (stmt.getClass() == ReturnNode.class)
+            return false;
+        else if (stmt.getClass() == BranchNode.class)
+            return false;
+        else if (stmt.getClass() == CallNode.class)
+            return false;
+        else if (stmt.getClass() == CompoundNode.class){
+            Boolean b = false; 
+            for(ASTNode s : ((CompoundNode)stmt).statements){
+                b |= checkHasExit(s);
+            }
+            return b;
+        }  
         return false;
     }
         

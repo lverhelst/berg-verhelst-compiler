@@ -1,7 +1,7 @@
 /*bool readBool(void){;}
 int readNum(void){;}
 void writeBool(bool x){;}
-void writeNum(int x){;}
+void writeNum(int x){;}*/
 
 
 int x;
@@ -23,6 +23,7 @@ int readNum(int abc, ref int x) {
 --used to test the case statement
 void testcase(void) {
 	int x;
+	int x;
 	int a;
 	branch (x)
 		case 0: testcase();
@@ -31,13 +32,12 @@ void testcase(void) {
 	end;
 	return;
 }
-*/
 
-int x;
+
 --main program to run
 int main(void) {
 	bool x;
-	--int y;
+	int y;
 	x := 0;
 	y := -5 * 1/2;
 	y := 5 mod 6;

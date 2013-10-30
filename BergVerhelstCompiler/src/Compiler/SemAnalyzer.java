@@ -51,18 +51,6 @@ public class SemAnalyzer {
             
             func = func.nextFuncDec;
         }
-        
-        //pulls all variable names for scope
-        while(var != null) {
-            dec = searchCurrentScope(var.ID);
-            
-            if(dec == null)
-                scope.peek().add(new listRecord(var, var.ID, var.alexeme));
-            else
-                printError(var.alexeme + " has already been defined within the current scope");
-            
-            var = var.nextVarDec;
-        }
     }
     
     /**
@@ -86,11 +74,18 @@ public class SemAnalyzer {
         //process all function declarations
         while(func != null) {
             FuncDeclarationNode(func);
+            
+            //check if main is last
+            if(func.nextFuncDec == null) {
+                TokenType param = func.params.param;
+                TokenType specifier = func.specifier;
+                
+                if(!func.alexeme.equals("main") || specifier != TokenType.INT || param != TokenType.VOID)
+                    printError("Final function declaration must be of form int main(void)");
+            }
+            
             func = func.nextFuncDec;
         }
-        
-//        if(!func.alexeme.equals("main") && func.specifier == TokenType.INT && func.params == TokenType.VOID)
-//            printError("Final function declaration must be of form int main(void)");
         
         System.out.println("Program Node");
     }
@@ -123,11 +118,11 @@ public class SemAnalyzer {
      * @Class Emery
      */
     public void VarDeclarationNode(VarDeclarationNode var) { 
-
         Declaration current = searchCurrentScope(var.ID);
         
-        if(current == null) {        
-            scope.peek().add(new listRecord(var, var.ID, var.alexeme));
+        if(current == null) {      
+            scope.peek().add(new listRecord(var, var.ID));
+
         } else {
             printError(var.alexeme + " has already been declared within the current scope");
         }

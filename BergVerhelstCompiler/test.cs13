@@ -31,8 +31,6 @@ void testcase(void) {
 	return;
 }
 
-
-
 --main program to run
 int main(void) {
 	bool x;
@@ -54,5 +52,6 @@ int main(void) {
 		}
 	continue;
 	end;
+
 	return 0;
 }

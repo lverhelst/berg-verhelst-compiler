@@ -117,14 +117,17 @@ public class SemAnalyzer {
      * @Class Emery
      */
     public void VarDeclarationNode(VarDeclarationNode var) { 
-        Declaration  temp = searchScope(var.ID);
+        Declaration  temp = searchCurrentScope(var.ID);
         
         if(temp == null) {
             scope.peek().add(new listRecord(var, var.ID));
         } 
         
-        if(var.offset != null)
-            expression(var.offset);
+        if(var.offset != null){
+            if(!expressionIsInt(var.offset)){
+                printError("Invalid Array Index: Array Indices -> NUM {[ op NUM ]} ");
+            }
+        }
     }
     
     /**
@@ -176,8 +179,11 @@ public class SemAnalyzer {
         //check var to ensure it has been declared
         TokenType leftSide = VariableNode(assignment.leftVar);        
         //check expressions for what type it is
-        if(assignment.index != null)
-            expression(assignment.index);
+        if(assignment.index != null){
+            if(!expressionIsInt(assignment.index)){
+                printError("Invalid Array Index: Array Indices -> NUM {[ op NUM ]} ");
+            }
+        }
         //check expression result against id type
         TokenType rightSide = expression(assignment.expersion);
         if(!checkTypes(leftSide, rightSide)){
@@ -310,8 +316,11 @@ public class SemAnalyzer {
         } else {
             var.declaration = node;
         }
-        if(var.offset != null)
-            expression(var.offset);
+        if(var.offset != null){
+         if(!expressionIsInt(var.offset)){
+                printError("Invalid Array Index: Array Indices -> NUM {[ op NUM ]} ");
+          }
+        }
         //return the type???
         if(node != null)
             return node.getSpecifier();
@@ -397,7 +406,11 @@ public class SemAnalyzer {
             CallNode((CallNode) stmt);
         return null;
     }
-    
+    /**
+     * Searches all scopes for the identifier
+     * @param ID
+     * @return the declaration if it exists in the top scope, otherwise it returns null 
+     */
     private Declaration searchScope(int ID) {
         for (int i = scope.size() - 1; i >= 0; i--) {
             for (int j = scope.get(i).size() - 1; j >= 0; j--) {
@@ -407,7 +420,11 @@ public class SemAnalyzer {
         }
         return null;
     }
-    
+    /**
+     * Searches the current scope for the identifier
+     * @param ID 
+     * @return the declaration if it exists in the top scope, otherwise it returns null
+     */
     private Declaration searchCurrentScope(int ID) {
         int i = scope.size() - 1;
             for (int j = scope.get(i).size() - 1; j >= 0; j--) {
@@ -417,6 +434,20 @@ public class SemAnalyzer {
         return null;
     }
     
+    private boolean expressionIsInt(Expression exp){
+        if(exp.getClass() == BinopNode.class)
+           return expressionIsInt(((BinopNode)exp).Lside) && expressionIsInt(((BinopNode)exp).Rside);  
+        else if (exp.getClass() == UnopNode.class)
+           return expressionIsInt(((UnopNode)exp).Rside);
+        else if (exp.getClass() == LiteralNode.class)
+            return ((LiteralNode) exp).specifier == TokenType.NUM || ((LiteralNode) exp).specifier == TokenType.INT;
+        else if (exp.getClass() == VariableNode.class)
+            return false;
+        else if (exp.getClass() == CallNode.class)
+            return false;
+        return false;
+    }
+        
     private boolean checkTypes(TokenType a, TokenType b){
         if(a == b)
             return true;
@@ -426,6 +457,7 @@ public class SemAnalyzer {
             return true;
         if((a == TokenType.BOOL && b == TokenType.BLIT) || (a == TokenType.BLIT && b == TokenType.BOOL))
             return true;
+        //is not any of these
         return false;
     }
     

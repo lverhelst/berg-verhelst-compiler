@@ -2,16 +2,16 @@
 int readNum(void){;}
 void writeBool(bool x){;}
 void writeNum(int x){;}
-
+*/
 
 int x;
-
+int x;
 
 --always true
 bool readBool(void) {
-	int arr[20];
-	arr[1 + 2] := 2;
-	x := arr[3*x];
+	int arr[1 * 2];
+	arr[3] := 2;
+	x := arr[1 + 4 mod 2 / 120239821];
 	return true;
 }
 
@@ -31,14 +31,14 @@ void testcase(void) {
 	end;
 	return;
 }
-*/
 
-int x;
+
+
 --main program to run
 int main(void) {
 	bool x;
-	--int y;
-	x := 0;
+	int y;
+	x := true;
 	y := -5 * 1/2;
 	y := 5 mod 6;
 

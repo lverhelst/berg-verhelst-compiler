@@ -133,6 +133,7 @@ public class ASTNode{
         int ID;
         TokenType param;
         ParameterNode nextNode; 
+        boolean ref;
         
         /**
          * Used to convert an ID into a param object
@@ -150,7 +151,7 @@ public class ASTNode{
         
         @Override
         public String toString(int depth) {
-            String temp = "[Parameter] " + ID + " : " + this.alexeme + " " + param + "\r\n";
+            String temp = "[Parameter] " + ID + " : " + (ref?"ref ":"") +  this.alexeme + " " + param + "\r\n";
             
             return formatChild(temp, depth) + ((nextNode == null)?"":format(nextNode, depth - 1));
         }

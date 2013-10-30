@@ -167,7 +167,7 @@ public class AdministrativeConsole {
        semAnalyzer.verbose = cmd.hasOption("v");
        semAnalyzer.ProgramNode((ASTNode.ProgramNode)node);
        didPass &= !semAnalyzer.error;
-       System.out.println("Semantic Analyzer: " + node.toString(0));
+       //System.out.println("Semantic Analyzer: " + node.toString(0));
        return (didPass)? "PASS": "FAIL";
    }  
    /**

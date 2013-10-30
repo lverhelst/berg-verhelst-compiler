@@ -341,11 +341,15 @@ public class Parser{
         ParameterNode node = rootNode.new ParameterNode();
         ParameterNode current = node;
         if(PARAM.firstSet().contains(lookahead.getName())){
+            if(lookahead.getName() == TokenType.REF)
+                    current.ref = true;
             node.setParam((Token)visit("param", synch.union(PARAM.firstSet()).union(PARAMS.followSet()).union(TokenType.COMMA)));
             while(this.lookahead.getName() == TokenType.COMMA){
                 current.nextNode = rootNode.new ParameterNode();
                 current = current.nextNode;
                 match(TokenType.COMMA, synch.union(PARAM.firstSet()).union(PARAMS.followSet()));
+                if(lookahead.getName() == TokenType.REF)
+                    current.ref = true;
                 current.setParam((Token)visit("param", synch.union(PARAM.firstSet()).union(PARAMS.followSet()).union(TokenType.COMMA)));
             }   
         }else{

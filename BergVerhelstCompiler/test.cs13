@@ -3,7 +3,7 @@ bool readBool(void){;}
 int readNum(void){;}
 void writeBool(bool x){;}
 void writeNum(int x){;}
-/**/*/
+*/
 int x;
 
 --always true
@@ -25,7 +25,7 @@ void testcase(void) {
 	int a;
 	branch (x)
 		case 0: testcase();
-		case 1: readNum(a, x) ;
+		case 1: readNum(1, x) ;
 		default: ;
 	end;
 	return;
@@ -54,3 +54,4 @@ int main(void) {
 	end;
 	return 0;
 }
+

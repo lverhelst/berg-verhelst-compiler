@@ -86,11 +86,18 @@ public class SemAnalyzer {
         //process all function declarations
         while(func != null) {
             FuncDeclarationNode(func);
+            
+            //check if main is last
+            if(func.nextFuncDec == null) {
+                TokenType param = func.params.param;
+                TokenType specifier = func.specifier;
+                
+                if(!func.alexeme.equals("main") || specifier != TokenType.INT || param != TokenType.VOID)
+                    printError("Final function declaration must be of form int main(void)");
+            }
+            
             func = func.nextFuncDec;
         }
-        
-//        if(!func.alexeme.equals("main") && func.specifier == TokenType.INT && func.params == TokenType.VOID)
-//            printError("Final function declaration must be of form int main(void)");
         
         System.out.println("Program Node");
     }

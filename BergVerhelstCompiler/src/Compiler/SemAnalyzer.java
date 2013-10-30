@@ -24,6 +24,7 @@ public class SemAnalyzer {
     public SemAnalyzer(ASTNode.ProgramNode root) {
         scope = new Stack();
         init(root);
+        error = false;
     }
     
     /**
@@ -131,17 +132,24 @@ public class SemAnalyzer {
      * @Class Emery
      */
     public TokenType CompoundNode(ASTNode.CompoundNode compound) {
-        TokenType type = TokenType.VOID;
+        TokenType type = null;
         scope.push(new ArrayList<listRecord>());
         
         for(ASTNode.VarDeclarationNode var: compound.variableDeclarations) {
             VarDeclarationNode(var);
         }
         
+        //check child stmts and their returns
         for(ASTNode stmt: compound.statements) {
-            if(stmt instanceof ASTNode.ReturnNode)
-                type = statement(stmt);
-            else if (stmt != null){
+            if(stmt instanceof ASTNode.ReturnNode) { //check return types of the compound statment
+                TokenType temp = statement(stmt);
+                
+                if(type == null) //if not set, set 
+                    type = temp;
+                
+                if(temp != null && temp != type) //if set but does not match error
+                    printError("Return types do not match: " + type + " != " + temp);
+            } else if (stmt != null){
                 statement(stmt);
             }
         }
@@ -257,6 +265,8 @@ public class SemAnalyzer {
         if(node == null){
             //throw functionNotDeclaredError()
             printError("Function Not Declared: " + call.alexeme);
+        } else {
+            call.declaration = node;
         }
         //check arguments against the functions parameters
         for(ASTNode.Expression e: call.arguments){
@@ -278,6 +288,8 @@ public class SemAnalyzer {
         ASTNode.Declaration node = this.searchScope(var.ID);
         if(node == null){
             printError("Undeclared Identifier: " + ((var.alexeme == null)?"":var.alexeme));
+        } else {
+            var.declaration = node;
         }
         if(var.offset != null)
             expression(var.offset);

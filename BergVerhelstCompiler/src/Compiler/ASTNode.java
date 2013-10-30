@@ -302,6 +302,7 @@ public class ASTNode{
         TokenType specifier;
         int ID;
         ArrayList<Expression> arguments;
+        Declaration declaration;
         
         public CallNode(){
             arguments = new ArrayList<Expression>();
@@ -324,6 +325,7 @@ public class ASTNode{
         TokenType specifier;
         Expression offset;
         int ID;
+        Declaration declaration;
         
          @Override
         public String toString(int depth) {

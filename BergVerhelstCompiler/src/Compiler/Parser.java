@@ -362,7 +362,7 @@ public class Parser{
     public Token param(TNSet synch) {
         String ID;
         String lexeme;
-        if(lookahead.getName() == TokenType.REF){ 
+        if(lookahead.getName() == TokenType.REF){
             match(TokenType.REF, synch.union(NONVOIDSPEC.firstSet()));
             TokenType t = (TokenType)visit("nonvoidSpec", synch);
             ID = lookahead.getAttribute_Value();

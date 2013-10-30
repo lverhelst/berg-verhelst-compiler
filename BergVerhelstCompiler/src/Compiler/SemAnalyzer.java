@@ -305,6 +305,7 @@ public class SemAnalyzer {
         if(node == null){
             printError("Function Not Declared: " + call.alexeme);
         } else {
+            //Add reference to declaration to the AST
             call.declaration = node;
         }
         //check arguments against the functions parameters
@@ -315,7 +316,7 @@ public class SemAnalyzer {
                 printError(node.alexeme + " call number of parameters do not match");
             } else if(!checkTypes(param.param,temp))
                 printError(node.alexeme + " call parameter mismatch " + param.param + " expected " + temp + " found");
-                
+            
             param = param.nextNode;
         }
         
@@ -341,10 +342,13 @@ public class SemAnalyzer {
             VarDeclarationNode temp = var.new VarDeclarationNode();
             temp.ID = var.ID;
             temp.specifier = TokenType.UNI;
+            //Adjust the AST to reflect the attempt change
+            var.specifier = TokenType.UNI;
             scope.peek().add(new listRecord(temp, temp.ID));
             
             printError("Undeclared Identifier: " + ((var.alexeme == null)?"":var.alexeme));
         } else {
+            //Add reference to declaration to AST
             var.declaration = node;
         }
         if(var.offset != null){

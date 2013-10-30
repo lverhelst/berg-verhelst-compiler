@@ -366,7 +366,10 @@ public class ASTNode{
         
          @Override
         public String toString(int depth) {
-            return formatChild("[Variable] " + specifier + " :" + ID + (offset == null? "" : "\r\n" + format((ASTNode)offset, depth) + "") + "\r\n", depth);
+            //if(declaration == null)
+                return formatChild("[Variable] " + specifier + " :" + ID + (offset == null? "" : "\r\n" + format((ASTNode)offset, depth) + "") + "\r\n", depth);
+           // else
+            //     return formatChild("[Reference] " + declaration, depth);
         }
     }
     /**

@@ -161,10 +161,13 @@ public class AdministrativeConsole {
        }
 
        ASTNode node = prs.parse(cmd.hasOption("v"));
+       
        didPass &= prs.didPass();
        SemAnalyzer semAnalyzer = new SemAnalyzer((ASTNode.ProgramNode)node);
+       semAnalyzer.verbose = cmd.hasOption("v");
        semAnalyzer.ProgramNode((ASTNode.ProgramNode)node);
-       System.out.println("Semantic Analyzer: " + node.toString(0));
+       didPass &= !semAnalyzer.error;
+       //System.out.println("Semantic Analyzer: " + node.toString(0));
        return (didPass)? "PASS": "FAIL";
    }  
    /**

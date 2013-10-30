@@ -346,6 +346,8 @@ public class Parser{
                 current.nextNode = rootNode.new ParameterNode();
                 current = current.nextNode;
                 match(TokenType.COMMA, synch.union(PARAM.firstSet()).union(PARAMS.followSet()));
+                if(lookahead.getName() == TokenType.REF)
+                    node.ref = true;
                 current.setParam((Token)visit("param", synch.union(PARAM.firstSet()).union(PARAMS.followSet()).union(TokenType.COMMA)));
             }   
         }else{

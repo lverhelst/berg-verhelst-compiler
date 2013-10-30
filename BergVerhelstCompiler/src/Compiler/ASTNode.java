@@ -133,6 +133,7 @@ public class ASTNode{
         int ID;
         TokenType param;
         ParameterNode nextNode; 
+        boolean ref;
         
         /**
          * Used to convert an ID into a param object

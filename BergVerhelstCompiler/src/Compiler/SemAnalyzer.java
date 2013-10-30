@@ -314,9 +314,12 @@ public class SemAnalyzer {
             
             if(param == null) {
                 printError(node.alexeme + " call number of parameters do not match");
-            } else if(!checkTypes(param.param,temp))
+            } else if(param.ref && !(e instanceof VariableNode)) {
+                printError(node.alexeme + " reference must be to a variable");
+            } else if(!checkTypes(param.param,temp)) {
                 printError(node.alexeme + " call parameter mismatch " + param.param + " expected " + temp + " found");
-                
+            }                
+            
             param = param.nextNode;
         }
         

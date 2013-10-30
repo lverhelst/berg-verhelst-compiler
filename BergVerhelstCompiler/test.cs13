@@ -20,7 +20,7 @@ void testcase(void) {
 
 	branch (x)
 		case 0: testcase();
-		case 1: readNum(a, x) ;
+		case 1: readNum(a, 2) ;
 		default: ;
 	end;
 	return;

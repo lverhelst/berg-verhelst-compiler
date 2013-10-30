@@ -51,18 +51,6 @@ public class SemAnalyzer {
             
             func = func.nextFuncDec;
         }
-        
-        //pulls all variable names for scope
-        while(var != null) {
-            dec = searchCurrentScope(var.ID);
-            
-            if(dec == null)
-                scope.peek().add(new listRecord(var, var.ID));
-            else
-                printError(var.alexeme + " has already been defined within the current scope");
-            
-            var = var.nextVarDec;
-        }
     }
     
     /**
@@ -130,13 +118,10 @@ public class SemAnalyzer {
      * @Class Emery
      */
     public void VarDeclarationNode(VarDeclarationNode var) { 
-
-        Declaration global = searchScope(var.ID);
         Declaration current = searchCurrentScope(var.ID);
         
-        if(current == null) {        
-            if(global == null) 
-                scope.peek().add(new listRecord(var, var.ID));
+        if(current == null) {      
+            scope.peek().add(new listRecord(var, var.ID));
         } else {
             printError(var.alexeme + " has already been declared within the current scope");
         }

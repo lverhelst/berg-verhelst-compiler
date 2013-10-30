@@ -5,7 +5,6 @@ void writeNum(int x){;}
 */
 
 int x;
-int x;
 
 --always true
 bool readBool(void) {

@@ -45,7 +45,7 @@ public class SemAnalyzer {
             dec = searchCurrentScope(func.ID);
             
             if(dec == null)
-                scope.peek().add(new listRecord(func, func.ID));
+                scope.peek().add(new listRecord(func, func.ID, func.alexeme));
             else
                 printError(func.alexeme + " already has been declared within the current scope");
             
@@ -57,7 +57,7 @@ public class SemAnalyzer {
             dec = searchCurrentScope(var.ID);
             
             if(dec == null)
-                scope.peek().add(new listRecord(var, var.ID));
+                scope.peek().add(new listRecord(var, var.ID, var.alexeme));
             else
                 printError(var.alexeme + " has already been defined within the current scope");
             
@@ -124,12 +124,10 @@ public class SemAnalyzer {
      */
     public void VarDeclarationNode(VarDeclarationNode var) { 
 
-        Declaration global = searchScope(var.ID);
         Declaration current = searchCurrentScope(var.ID);
         
         if(current == null) {        
-            if(global == null) 
-                scope.peek().add(new listRecord(var, var.ID));
+            scope.peek().add(new listRecord(var, var.ID, var.alexeme));
         } else {
             printError(var.alexeme + " has already been declared within the current scope");
         }
@@ -148,7 +146,7 @@ public class SemAnalyzer {
     public void ParameterNode(ParameterNode param) {
         //check for redeclaration errors
         if(searchScope(param.ID) == null) {
-            scope.peek().add(new listRecord(param, param.ID));
+            scope.peek().add(new listRecord(param, param.ID, param.alexeme));
         }
     }
     
@@ -192,7 +190,7 @@ public class SemAnalyzer {
         //check expressions for what type it is
         if(assignment.index != null){
             if(!expressionIsInt(assignment.index)){
-                printError("Invalid Array Index: Array Indices -> NUM {[ op NUM ]} ");
+                printError("Invalid Array Index: Array Indices -> NUM {[ op NUM ]}");
             }
         }
         //check expression result against id type

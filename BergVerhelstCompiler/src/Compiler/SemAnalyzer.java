@@ -16,6 +16,7 @@ public class SemAnalyzer {
     public boolean verbose;
     public boolean printFile;
     public boolean error;
+    private boolean inLoop;
     
     /**
      * Used to analysis a AST against the semantic rules of the language
@@ -23,9 +24,11 @@ public class SemAnalyzer {
      * @created by Emery
      */
     public SemAnalyzer(ProgramNode root) {
+        inLoop = false;
         scope = new Stack();
         init(root);
         error = false;
+        
     }
     
     /**
@@ -119,10 +122,8 @@ public class SemAnalyzer {
      */
     public void VarDeclarationNode(VarDeclarationNode var) { 
         Declaration current = searchCurrentScope(var.ID);
-        
         if(current == null) {      
             scope.peek().add(new listRecord(var, var.ID));
-
         } else {
             printError(var.alexeme + " has already been declared within the current scope");
         }
@@ -225,6 +226,7 @@ public class SemAnalyzer {
      * @Created Leon
      */
     public void LoopNode(LoopNode loop) {
+        inLoop = true;
         //new scope???
         //check statement
         /*
@@ -234,7 +236,7 @@ public class SemAnalyzer {
         statement(loop.stmt);
         if(loop.nextLoopNode != null)
             LoopNode(loop.nextLoopNode);        
-
+        inLoop = false;
         //check for exit?
     }
     
@@ -244,7 +246,11 @@ public class SemAnalyzer {
       * @Created Leon
      */
     public TokenType MarkerNode(MarkerNode marker) {
-        //probably not needed
+        //Should check if we are in the scope of a LOOP, if we aren't then we should report
+        //a semantic error
+        if((marker.specifier == TokenType.CONTINUE || marker.specifier == TokenType.EXIT) && !inLoop){
+            printError(marker.specifier + " is not contained in a loop statment");
+        }       
         return marker.specifier;
     }
     
@@ -294,7 +300,6 @@ public class SemAnalyzer {
         ParameterNode param = node.params;
         
         if(node == null){
-            //throw functionNotDeclaredError()
             printError("Function Not Declared: " + call.alexeme);
         } else {
             call.declaration = node;
@@ -304,17 +309,15 @@ public class SemAnalyzer {
             TokenType temp = expression(e);
             
             if(param == null) {
-                printError(node.alexeme + " number of parameters do not match");
-            } else {
-                if(!checkTypes(param.param,temp))
-                    printError(node.alexeme + " parameter mismatch " + param.param + " expected " + temp + " found");
+                printError(node.alexeme + " call number of parameters do not match");
+            } else if(!checkTypes(param.param,temp))
+                printError(node.alexeme + " call parameter mismatch " + param.param + " expected " + temp + " found");
                 
-                param = param.nextNode;
-            }
+            param = param.nextNode;
         }
         
-        if(param != null) {
-            printError(node.alexeme + " number of parameters do not match");
+        if(!(param == null || param.param == TokenType.VOID)) {
+            printError(node.alexeme + " call number of parameters do not match");
         }
         
         //check if return type is used and valid

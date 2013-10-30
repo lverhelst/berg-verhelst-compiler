@@ -356,7 +356,7 @@ public class Scanner {
             ID, //Identifier
             NUM, //Numeral
          */
-        addWordToken(new Token(TokenType.ENDFILE, "endfile"));
+        addWordToken(new Token(TokenType.ENDFILE, "\u001a"));
         addWordToken(new Token(TokenType.ERROR, "error"));
         addWordToken(new Token(TokenType.AND, "and"));
         addWordToken(new Token(TokenType.NOT, "not"));

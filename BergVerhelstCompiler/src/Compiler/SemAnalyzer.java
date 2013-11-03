@@ -316,8 +316,10 @@ public class SemAnalyzer {
                 printError(node.alexeme + " reference must be to a variable");
             } else if(!checkTypes(param.param,temp)) {
                 printError(node.alexeme + " call parameter mismatch " + param.param + " expected " + temp + " found");
-            }                
-            param = param.nextNode;
+            }
+
+			if(param != null)
+				param = param.nextNode;
         }
         
         if(!(param == null || param.param == TokenType.VOID)) {

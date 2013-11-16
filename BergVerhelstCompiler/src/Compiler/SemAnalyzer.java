@@ -89,8 +89,6 @@ public class SemAnalyzer {
             
             func = func.nextFuncDec;
         }
-        
-        System.out.println("Program Node");
     }
     
     /**

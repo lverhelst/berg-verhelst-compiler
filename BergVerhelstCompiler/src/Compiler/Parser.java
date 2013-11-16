@@ -151,7 +151,7 @@ public class Parser{
      * @created by Emery
      */
     public ASTNode program(TNSet synch) { 
-        System.out.println(Thread.currentThread().getStackTrace()[1].getMethodName());
+       // System.out.println(Thread.currentThread().getStackTrace()[1].getMethodName());
         ProgramNode root = rootNode.new ProgramNode(); 
         FuncDeclarationNode currentFunc =  null;
         VarDeclarationNode currentVarDec = null;

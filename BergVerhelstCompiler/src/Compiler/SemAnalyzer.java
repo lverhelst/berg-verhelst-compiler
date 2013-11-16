@@ -95,7 +95,7 @@ public class SemAnalyzer {
      * Class to view FuncDeclarationNode
      * @Class Emery
      */
-    public void FuncDeclarationNode(FuncDeclarationNode func) {      
+    private void FuncDeclarationNode(FuncDeclarationNode func) {      
         scope.push(new ArrayList<listRecord>());
         ParameterNode param = func.params;        
                
@@ -118,7 +118,7 @@ public class SemAnalyzer {
      * Class to view VarDeclarationNode
      * @Class Emery
      */
-    public void VarDeclarationNode(VarDeclarationNode var) { 
+    private void VarDeclarationNode(VarDeclarationNode var) { 
         Declaration current = searchCurrentScope(var.ID);
         if(current == null) {      
             scope.peek().add(new listRecord(var, var.ID));
@@ -137,7 +137,7 @@ public class SemAnalyzer {
      * Class to view ParameterNode
      * @Class Emery
      */
-    public void ParameterNode(ParameterNode param) {
+    private void ParameterNode(ParameterNode param) {
         //check for redeclaration errors
         if(searchScope(param.ID) == null) {
             scope.peek().add(new listRecord(param, param.ID, param.alexeme));
@@ -149,7 +149,7 @@ public class SemAnalyzer {
      * Statements has to happen at least once
      * @Class Emery
      */
-    public TokenType CompoundNode(CompoundNode compound) {
+    private TokenType CompoundNode(CompoundNode compound) {
         TokenType type = null;
         scope.push(new ArrayList<listRecord>());
         
@@ -178,7 +178,7 @@ public class SemAnalyzer {
      * Class to view AssignmentNode
      * @Class Emery
      */
-    public void AssignmentNode(AssignmentNode assignment) {
+    private void AssignmentNode(AssignmentNode assignment) {
         //check var to ensure it has been declared
         TokenType leftSide = VariableNode(assignment.leftVar);        
         //check expressions for what type it is
@@ -198,7 +198,7 @@ public class SemAnalyzer {
      * Class to view ifNode
      * @Class Leon
      */
-    public void IfNode(IfNode ifNode) {
+    private void IfNode(IfNode ifNode) {
         //new scope??
         //check expersion to ensure it returns correct type
         TokenType t = expression(ifNode.exp);
@@ -223,7 +223,7 @@ public class SemAnalyzer {
      * Class to view loop syntax
      * @Created Leon
      */
-    public boolean LoopNode(LoopNode loop) {
+    private boolean LoopNode(LoopNode loop) {
         inLoop = true;
         Boolean hasExit;
         //new scope???
@@ -247,7 +247,7 @@ public class SemAnalyzer {
       * Markers can be the following specifiers: CONTINUE | EXIT | ENDFILE
       * @Created Leon
      */
-    public TokenType MarkerNode(MarkerNode marker) {
+    private TokenType MarkerNode(MarkerNode marker) {
         //Should check if we are in the scope of a LOOP, if we aren't then we should report
         //a semantic error
         if((marker.specifier == TokenType.CONTINUE || marker.specifier == TokenType.EXIT) && !inLoop){
@@ -260,7 +260,7 @@ public class SemAnalyzer {
      * A Return Node has an optional expression
      * @Created Leon
      */
-    public TokenType ReturnNode(ReturnNode returnNode) {
+    private TokenType ReturnNode(ReturnNode returnNode) {
        //check result of expresions and maybe return it to parent??
        if(returnNode.exp == null)
            return TokenType.VOID;
@@ -271,7 +271,7 @@ public class SemAnalyzer {
      * Branch node for branch nodes
      * @Created Emery
      */
-    public void BranchNode(BranchNode branch) {
+    private void BranchNode(BranchNode branch) {
         //check result of expersion type and the case statements to ensure they match
         if(branch.exp != null)
             expression(branch.exp);
@@ -284,7 +284,7 @@ public class SemAnalyzer {
      * Case Node for case statements
      * @Created Leon
      */
-    public void CaseNode(CaseNode caseNode) {
+    private void CaseNode(CaseNode caseNode) {
         //new scope???
         //check statement
         statement((ASTNode) caseNode.stmt);
@@ -295,7 +295,7 @@ public class SemAnalyzer {
      * EX. INT FOO(BAR foobar);
      * @Created Leon
      */
-    public TokenType CallNode(CallNode call) {
+    private TokenType CallNode(CallNode call) {
         //ensure function has been declared
         FuncDeclarationNode node = (FuncDeclarationNode)this.searchScope(call.ID);
         ParameterNode param = node.params;
@@ -316,8 +316,10 @@ public class SemAnalyzer {
                 printError(node.alexeme + " reference must be to a variable");
             } else if(!checkTypes(param.param,temp)) {
                 printError(node.alexeme + " call parameter mismatch " + param.param + " expected " + temp + " found");
-            }                
-            param = param.nextNode;
+            }
+
+			if(param != null)
+				param = param.nextNode;
         }
         
         if(!(param == null || param.param == TokenType.VOID)) {
@@ -335,7 +337,7 @@ public class SemAnalyzer {
      * This stores a variable ex: INT x;
      * @Created Leon
      */
-    public TokenType VariableNode(VariableNode var) {
+    private TokenType VariableNode(VariableNode var) {
         //check if var has been declared add to scope if not
         Declaration node = this.searchScope(var.ID);
         if(node == null){
@@ -368,7 +370,7 @@ public class SemAnalyzer {
      * @Created Leon
      * @return Type of the literal (NUM, BLIT)
      */
-    public TokenType LiteralNode(LiteralNode lit) {
+    private TokenType LiteralNode(LiteralNode lit) {
         //return the type???
         return lit.specifier;
     }
@@ -377,7 +379,7 @@ public class SemAnalyzer {
      * Unary Operation Node
      * @Created Leon
      */
-    public TokenType UnopNode(UnopNode unop) {
+    private TokenType UnopNode(UnopNode unop) {
         //ensure the result matches the specifier?
         return expression(unop.Rside);
     }
@@ -386,7 +388,7 @@ public class SemAnalyzer {
      * Binary Operation Node
      * @Created Leon
      */
-    public TokenType BinopNode(BinopNode binop) {
+    private TokenType BinopNode(BinopNode binop) {
         //ensure both left and right sides result in the same type
         //eval left side first as spec the Semantics Doc
         TokenType l = expression(binop.Lside);
@@ -431,7 +433,7 @@ public class SemAnalyzer {
             IfNode((IfNode) stmt);
         else if (stmt.getClass() == LoopNode.class){
             if(!LoopNode((LoopNode) stmt))
-                print("WARNING: Loop without EXIT");
+                printError("Loop without EXIT");
         }
         else if (stmt.getClass() == MarkerNode.class)
             MarkerNode((MarkerNode) stmt);

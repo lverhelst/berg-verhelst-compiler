@@ -5,10 +5,11 @@ void writeBool(bool x){;}
 void writeNum(int x){;}
 */
 int x;
+int y[8];
 
 --always true
 bool readBool(void) {
-	int arr[1 * 2];
+	int arr[1];
 	arr[3] := 2;
 	x := arr[1 + 4 mod 2 / 120239821];
 	return true;

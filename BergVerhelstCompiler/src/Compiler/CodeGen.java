@@ -15,28 +15,36 @@ public class CodeGen {
     public boolean printFile;
     public boolean error;
     
+    private int numTempVars;
+    
+    
+    
     /**
      * Generate code based on the annotated AST
      * @param root as ProgramNode to use as the root of the program 
      * @created by Emery
      */
-    public CodeGen(ProgramNode root) {
+    public CodeGen() {
         code = new ArrayList<Quadruple>();
         error = false;
+        numTempVars = 0;
         
-        
-        ProgramNode(root);
+
     }    
+    
+    public void generateCode(ProgramNode rootNode){
+        this.ProgramNode(rootNode);
+    }
     
     /**
     * Class to view ProgramNode
     * @Class Emery
     */
     public void ProgramNode(ProgramNode program) {        
-        code.add(new Quadruple("start", "1", "-", "-"));
-        code.add(new Quadruple("rval", "-", "-", "t1"));
+        code.add(new Quadruple("start", this.getGlobalSize(program) + "", "-", "-"));
+        code.add(new Quadruple("rval", "-", "-", this.genTemp()));
         code.add(new Quadruple("call", "main", "-", "-"));
-        code.add(new Quadruple("hlt", "1", "-", "-"));        
+        code.add(new Quadruple("hlt", "-", "-", "-"));        
         
         FuncDeclarationNode func = program.funcdeclaration;
 //        VarDeclarationNode var = program.vardeclaration;
@@ -59,17 +67,15 @@ public class CodeGen {
      * @Class Emery
      */
     private void FuncDeclarationNode(FuncDeclarationNode func) {        
-        code.add(new Quadruple("fun", func.alexeme, "1", "-"));
-        
-        ParameterNode param = func.params;        
-               
-//        //search all params
-//        while(param != null) {
-//            ParameterNode(func.params);
-//            param = param.nextNode;
-//        }    
-        
-        code.add(new Quadruple("retv", "num args", "return value", "-"));
+        code.add(new Quadruple("fun", func.alexeme, this.getLocalSize(func) + "", "-"));
+        int num_params = 0;
+        ParameterNode param = func.params;             
+        //search all params
+        while(param != null) {
+             num_params++;
+             param = param.nextNode;
+        }    
+        code.add(new Quadruple("retv", num_params + "", "return value", "-"));
     }
     
 //    /**
@@ -294,7 +300,7 @@ public class CodeGen {
    public String getCurrentCode(){
        String code_text = "";
        for(Quadruple p : code)
-           code_text += p.toString() + "/r/n";
+           code_text += p.toString() + "\r\n";
        return code_text;
    }
    /**
@@ -302,6 +308,62 @@ public class CodeGen {
     */
    public void printCodeToSysOut(){
        System.out.println(this.getCurrentCode());
+   }
+   
+   private String genTemp(){
+       //This method is used to generate a temporary variable to be used 
+       //This method needs a counter to keep track of current variables
+       //This method's counter will decrement when a temporary variable is used
+       //The above statement allows the reuse of temporary variables in a single expression
+       
+       //Increment first to start temporary variables at t1 since we init to 0;
+       numTempVars++;
+      String varLexeme = "t" + numTempVars; 
+      System.out.println("Temporary Variable Generated: " + varLexeme);
+      
+      return varLexeme;
+      
+   }
+   /**
+    * Returns the size needed for the global variables
+    * @param program 
+    * @return 
+    */
+   private int getGlobalSize(ProgramNode program){
+       int localsize = 0;
+       VarDeclarationNode localVar = null;
+       if(program.vardeclaration != null){
+            localVar = program.vardeclaration;
+            //The semantic analyzer already confirmed that it is of form: NUM {[OP NUM]}
+            localsize += (localVar.offset == null? 1 : Integer.parseInt(((LiteralNode)localVar.offset).lexeme));
+            //Iterate through var declarations
+            while(localVar.nextVarDec != null){
+                localVar = localVar.nextVarDec;
+                localsize += (localVar.offset == null? 1 : Integer.parseInt(((LiteralNode)localVar.offset).lexeme));
+            }
+       }
+       return localsize;
+   }
+    /**
+    * Returns the local variable size of functions and compound statements
+    * @param program 
+    * @return 
+    */
+   private int getLocalSize(ASTNode node){
+       int localsize = 0;
+       if(node.getClass() == ASTNode.FuncDeclarationNode.class){
+           FuncDeclarationNode fnode = (FuncDeclarationNode) node;
+           return this.getLocalSize(fnode.compoundStmt);
+       }else if(node.getClass() == ASTNode.CompoundNode.class){
+           CompoundNode cnode = (CompoundNode) node;
+           for(VarDeclarationNode vdn : cnode.variableDeclarations){
+               localsize += (vdn.offset == null? 1 : Integer.parseInt(((LiteralNode)vdn.offset).lexeme));
+           }
+           return localsize;
+       }else{
+           printError("Attempting to retrieve local variable allocation for non-function/compuound statmenst");
+       }
+       return -999;
    }
         
     

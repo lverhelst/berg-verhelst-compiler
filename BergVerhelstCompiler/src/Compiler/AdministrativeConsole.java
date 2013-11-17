@@ -170,6 +170,11 @@ public class AdministrativeConsole {
 		   didPass &= !semAnalyzer.error;
 	   }
        //System.out.println("Semantic Analyzer: " + node.toString(0));
+           
+       CodeGen cg = new CodeGen();
+       cg.ProgramNode((ASTNode.ProgramNode)node);
+       cg.printCodeToSysOut();
+       
        return (didPass)? "PASS": "FAIL";
    }  
    /**

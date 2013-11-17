@@ -362,13 +362,19 @@ public class ASTNode{
     public class VariableNode extends ASTNode implements Expression{
         TokenType specifier;
         Expression offset;
-        int ID;
+        int ID, level, displacement;
         Declaration declaration;
+        
+        VariableNode(){
+            level = 0;
+            displacement = 0;
+        }
         
          @Override
         public String toString(int depth) {
             //if(declaration == null)
-                return formatChild("[Variable] " + specifier + " :" + ID + (offset == null? "" : "\r\n" + format((ASTNode)offset, depth) + "") + "\r\n", depth);
+                return formatChild("[Variable] " + specifier + " :" + ID + (offset == null? "" : "\r\n" + format((ASTNode)offset, depth) + "") + "\r\n Level: " + level +
+                             " Displacement: " + displacement + " \r\n", depth);
            // else
             //     return formatChild("[Reference] " + declaration, depth);
         }

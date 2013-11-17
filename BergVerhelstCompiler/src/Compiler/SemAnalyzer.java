@@ -18,12 +18,15 @@ public class SemAnalyzer {
     public boolean error;
     private boolean inLoop;
     
+    int cur_lvl;
+    
     /**
      * Used to analysis a AST against the semantic rules of the language
      * @param root as ProgramNode to use as the root of the program 
      * @created by Emery
      */
     public SemAnalyzer(ProgramNode root) {
+        cur_lvl = 0;
         inLoop = false;
         scope = new Stack();
         init(root);

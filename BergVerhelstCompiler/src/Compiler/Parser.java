@@ -740,9 +740,9 @@ public class Parser{
         
         while(ADDOP.firstSet().contains(lookahead.getName())){
             BinopNode subNode = rootNode.new BinopNode();
-            subNode.Rside = node;
+            subNode.Lside = node;
             subNode.specifier = (TokenType)visit("addop",  synch.union(TERM.firstSet().union(ADDOP.firstSet())));
-            subNode.Lside = (Expression)visit("term", synch.union(TERM.firstSet()));
+            subNode.Rside = (Expression)visit("term", synch.union(TERM.firstSet()));
             node = subNode;
         }
         return node;

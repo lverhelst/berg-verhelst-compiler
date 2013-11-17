@@ -16,9 +16,6 @@ public class CodeGen {
     public boolean error;
     
     private int numTempVars;
-    
-    
-    
     /**
      * Generate code based on the annotated AST
      * @param root as ProgramNode to use as the root of the program 
@@ -103,11 +100,12 @@ public class CodeGen {
 //        for(VarDeclarationNode var: compound.variableDeclarations) {
 //            VarDeclarationNode(var);
 //        }
-        
+        code.add(new Quadruple("ecs", this.getLocalSize(compound)+ "","-","-"));
         //check child stmts and their returns
         for(ASTNode stmt: compound.statements) {
             statement(stmt);
         }
+        code.add(new Quadruple("lcs", "-", "-", "-"));
     }
     /**
      * Class to view AssignmentNode
@@ -335,11 +333,11 @@ public class CodeGen {
        if(program.vardeclaration != null){
             localVar = program.vardeclaration;
             //The semantic analyzer already confirmed that it is of form: NUM {[OP NUM]}
-            localsize += (localVar.offset == null? 1 : Integer.parseInt(((LiteralNode)localVar.offset).lexeme));
+            localsize += (localVar.offset == null? 1 : this.evalBinExpression(localVar.offset));
             //Iterate through var declarations
             while(localVar.nextVarDec != null){
                 localVar = localVar.nextVarDec;
-                localsize += (localVar.offset == null? 1 : Integer.parseInt(((LiteralNode)localVar.offset).lexeme));
+                localsize += (localVar.offset == null? 1 : this.evalBinExpression(localVar.offset));
             }
        }
        return localsize;
@@ -357,13 +355,46 @@ public class CodeGen {
        }else if(node.getClass() == ASTNode.CompoundNode.class){
            CompoundNode cnode = (CompoundNode) node;
            for(VarDeclarationNode vdn : cnode.variableDeclarations){
-               localsize += (vdn.offset == null? 1 : Integer.parseInt(((LiteralNode)vdn.offset).lexeme));
+               localsize += (vdn.offset == null? 1 : this.evalBinExpression(vdn.offset));
            }
            return localsize;
        }else{
            printError("Attempting to retrieve local variable allocation for non-function/compuound statmenst");
        }
        return -999;
+   }
+   /**
+    * Evaluates the result of a binary expression of numbers and operators
+    * @param exp Expression to evaluate
+    * @return Integer result of the evaluation
+    */
+   private int evalBinExpression(Expression exp){
+      if(exp.getClass() == ASTNode.LiteralNode.class){
+          return Integer.parseInt(((LiteralNode)exp).lexeme);
+      }
+      else if(exp.getClass() == ASTNode.BinopNode.class){
+          BinopNode bexp = (BinopNode)exp;
+          String operatorLexeme = bexp.specifier.toString();
+          if("DIV".equals(operatorLexeme)){
+              return evalBinExpression(bexp.Lside)/evalBinExpression(bexp.Rside);
+          }
+          if("MULT".equals(operatorLexeme)){  
+              return evalBinExpression(bexp.Lside)*evalBinExpression(bexp.Rside);
+          }
+          if("PLUS".equals(operatorLexeme)){    
+              return evalBinExpression(bexp.Lside)+evalBinExpression(bexp.Rside);
+          }
+          if("MINUS".equals(operatorLexeme)){
+              return evalBinExpression(bexp.Lside)-evalBinExpression(bexp.Rside);
+          }
+          if("MOD".equals(operatorLexeme)){
+              return evalBinExpression(bexp.Lside)%evalBinExpression(bexp.Rside);
+          }
+          return -1;
+      }else{
+          printError("Attempting to evaluate non Binop/Literal expression");
+          return 0;
+      }
    }
         
     

@@ -119,15 +119,25 @@ public class CodeGen {
     }
     
     /**
-     * Class to view ifNode
-     * @Class Leon
+     * Generates Quadruples from an If Node
+     * @Author Leon
      */
     private void IfNode(IfNode ifNode) {
+        //code to eval expression        
         expression(ifNode.exp);
+        String store_exp_result = this.genTemp();
+        
+        code.add(new Quadruple("asg", "SOME VAR", "-", store_exp_result));
+        //conditional jump if false
+        code.add(new Quadruple("iff", store_exp_result, "-", "LABEL TO ELSE STUFF"));        
         statement(ifNode.stmt);
-
-        if(ifNode.elseStmt != null)
+        
+        
+        if(ifNode.elseStmt != null){
+            //mandatory jump over if false part
+            code.add(new Quadruple("goto", "-","-", "LABEL AFTER ELSE STUFF"));
             statement(ifNode.elseStmt);
+        }
     }
     
     /**

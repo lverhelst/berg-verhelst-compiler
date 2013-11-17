@@ -3,6 +3,7 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
+<<<<<<< HEAD
             <file>file:/C:/Users/Orion/berg-verhelst-compiler/BergVerhelstCompiler/src/Compiler/SemAnalyzer.java</file>
             <file>file:/C:/Users/Orion/berg-verhelst-compiler/BergVerhelstCompiler/src/Compiler/FFSet.java</file>
             <file>file:/C:/Users/Orion/berg-verhelst-compiler/BergVerhelstCompiler/src/Compiler/Scanner.java</file>
@@ -12,6 +13,10 @@
             <file>file:/C:/Users/Orion/berg-verhelst-compiler/BergVerhelstCompiler/src/Compiler/Parser.java</file>
             <file>file:/C:/Users/Orion/berg-verhelst-compiler/BergVerhelstCompiler/src/Compiler/TNSet.java</file>
             <file>file:/C:/Users/Orion/berg-verhelst-compiler/BergVerhelstCompiler/src/Compiler/Token.java</file>
+=======
+            <file>file:/C:/Users/Emery/berg-verhelst-compiler/BergVerhelstCompiler/src/Compiler/CodeGen.java</file>
+            <file>file:/C:/Users/Emery/berg-verhelst-compiler/BergVerhelstCompiler/src/Compiler/SemAnalyzer.java</file>
+>>>>>>> 5c9e2a30069cf112c2e27eef13b4915ba73ac77c
         </group>
     </open-files>
 </project-private>

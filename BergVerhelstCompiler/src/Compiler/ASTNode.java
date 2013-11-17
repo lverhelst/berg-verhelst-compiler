@@ -45,7 +45,7 @@ public class ASTNode{
             readint.compoundStmt = nullstmt;
             
             writeint.ID = -3;
-            writeint.alexeme = "writeints";
+            writeint.alexeme = "writeint";
 //            writeint.specifier = TokenType.VOID;          
             writeint.nextFuncDec = readbool;
             writeint.compoundStmt = nullstmt;

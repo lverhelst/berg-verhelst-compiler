@@ -321,8 +321,8 @@ public class SemAnalyzer {
                 printError(node.alexeme + " call parameter mismatch " + param.param + " expected " + temp + " found");
             }
 
-			if(param != null)
-				param = param.nextNode;
+            if(param != null)
+                    param = param.nextNode;
         }
         
         if(!(param == null || param.param == TokenType.VOID)) {

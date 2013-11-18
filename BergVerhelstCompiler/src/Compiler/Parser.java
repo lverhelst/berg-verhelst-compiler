@@ -803,8 +803,10 @@ public class Parser{
         }else if(lookahead.getName() == TokenType.BLIT){
 
             LiteralNode node = rootNode.new LiteralNode();
+            node.lexeme = lookahead.getAttribute_Value();
             match(TokenType.BLIT, synch);
             node.specifier = TokenType.BLIT;
+            
             return node;
         }else{
             printError("nidFactor error: " + lookahead.getName());  

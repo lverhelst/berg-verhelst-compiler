@@ -16,6 +16,7 @@ public class CodeGen {
     public boolean error;
     
     private int numTempVars;
+    private int numLabels;
     /**
      * Generate code based on the annotated AST
      * @param root as ProgramNode to use as the root of the program 
@@ -128,20 +129,40 @@ public class CodeGen {
      */
     private void IfNode(IfNode ifNode) {
         //code to eval expression        
-        expression(ifNode.exp);
+       // expression(ifNode.exp);
         String store_exp_result = this.genTemp();
         
-        code.add(new Quadruple("asg", "SOME VAR", "-", store_exp_result));
+        code.add(new Quadruple("asg", expression(ifNode.exp), "-", store_exp_result));
         //conditional jump if false
-        code.add(new Quadruple("iff", store_exp_result, "-", "LABEL TO ELSE STUFF"));        
+        code.add(new Quadruple("iff", store_exp_result, "-", "LABEL TO ELSE STUFF"));  
+        int toElse = code.size() - 1;
+        //Generate Code for if true statments
         statement(ifNode.stmt);
-        
-        
+        int afterElse = code.size(); //Where the after else label will be
         if(ifNode.elseStmt != null){
             //mandatory jump over if false part
-            code.add(new Quadruple("goto", "-","-", "LABEL AFTER ELSE STUFF"));
+            code.add(new Quadruple("goto","-","-", "LABEL AFTER ELSE STUFF"));
+            //IF False Label
+            String label = this.genLabel();
+            code.add(new Quadruple("lab", "-","-", label)); //TOELSE LABEL
+            Quadruple q1 = code.get(toElse);
+            q1.result = label;
+            //Generate Code for if false Statments
             statement(ifNode.elseStmt);
+            
+            
+            
+           
         }
+        String elseLabel = this.genLabel();
+        code.add(new Quadruple("lab","-","-",elseLabel));
+        Quadruple q = null;
+        if(ifNode.elseStmt == null)
+            q = code.get(toElse);
+        else
+            q = code.get(afterElse);
+        q.result = elseLabel;
+        
     }
     
     /**
@@ -227,7 +248,7 @@ public class CodeGen {
      */
     private String UnopNode(UnopNode unop) {
         String t = this.genTemp();
-        code.add(new Quadruple(unop.specifier.name(),expression(unop.Rside),"",t));
+        code.add(new Quadruple(unop.specifier.name(),expression(unop.Rside),"-",t));
         return t;
     }
     
@@ -349,6 +370,18 @@ public class CodeGen {
       return varLexeme;
       
    }
+   
+   private String genLabel(){
+
+       //Increment first to start temporary variables at t1 since we init to 0;
+      numLabels++;
+      String varLexeme = "L" + numLabels; 
+      System.out.println("Label Generated: " + varLexeme);
+      
+      return varLexeme;
+      
+   }
+   
    /**
     * Returns the size needed for the global variables
     * @param program 

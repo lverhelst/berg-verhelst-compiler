@@ -14,8 +14,12 @@ int main(void) {
 	bool x;
 	int y;
 	x := true;
-	y := -5 * 1/2;
+	y := -5 * 1/2 + 2;
 	y := 5 mod 6;
+	if(y > y - y)
+		x := false;
+	else x := true;
+	return 0;
 
 }
 

@@ -325,7 +325,7 @@ public class ASTNode{
      */
     public class CaseNode extends ASTNode{
         String num;
-        Statement stmt;
+        ASTNode stmt;
         
         @Override
         public String toString(int depth) {
@@ -394,8 +394,7 @@ public class ASTNode{
         
          @Override
         public String toString(int depth) {
-            return formatChild("[Literal] " + specifier + (lexeme != null? " lexeme: " + lexeme: "") + "\r\n", depth);
-                    
+            return formatChild("[Literal] " + specifier + (lexeme != null? " lexeme: " + lexeme: "") + "\r\n", depth);                    
         }
     }
     /**

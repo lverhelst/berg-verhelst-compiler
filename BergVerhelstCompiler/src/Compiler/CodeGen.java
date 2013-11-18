@@ -71,15 +71,16 @@ public class CodeGen {
         ParameterNode param = func.params;             
         //search all params
         while(param != null) {
-             num_params++;
+            if(param.param != TokenType.VOID)
+                num_params++;
              param = param.nextNode;
         }    
+        num_params_cur_func = num_params;
         //Generate Compound Node stuff
         //Don't call compound node because we don't want to increase the level
         for(ASTNode stmt: func.compoundStmt.statements) {
             statement(stmt);
         }
-        num_params_cur_func = num_params;
     }
     
     /**
@@ -265,11 +266,11 @@ public class CodeGen {
             return temp;
         }  else if(call.alexeme.equals("writeint")) {
             String temp = genTemp();
-            code.add(new Quadruple("wri",((ASTNode)call.arguments.get(0)).alexeme,"-",temp));  
+            code.add(new Quadruple("wri",expression(call.arguments.get(0)),"-",temp));  
             return temp;
-        }   else if(call.alexeme.equals("readint")) {
+        }   else if(call.alexeme.equals("writebool")) {
             String temp = genTemp();
-            code.add(new Quadruple("wrb",((ASTNode)call.arguments.get(0)).alexeme,"-",temp));  
+            code.add(new Quadruple("wrb",expression(call.arguments.get(0)),"-",temp));  
             return temp;
         }   
             

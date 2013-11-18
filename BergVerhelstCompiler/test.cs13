@@ -1,12 +1,14 @@
-int r(void){
-	return 4; --Chosen By Dice roll
-}
 
-void r2(void){
+int r(void){
 writeint(10);
 readint();
 writebool(true);
 readbool();
+return 0;
+}
+
+
+void r2(int a, int b, int c, int arr){
 	return;
 }
 
@@ -14,9 +16,9 @@ readbool();
 int main(void) {
 	int x;
 	branch (x)
-		case 0: writeint(10);
+		case 0: {return 0;}
 		case 1: x := 0;
-		default: x := r();
+		default: x := 0;
 	end;
 	return 0;
 }

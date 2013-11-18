@@ -290,7 +290,8 @@ public class SemAnalyzer {
     private void CaseNode(CaseNode caseNode) {
         
         //check statement
-        statement((ASTNode) caseNode.stmt);
+        
+        statement((ASTNode)caseNode.stmt);
     }
     
     /**

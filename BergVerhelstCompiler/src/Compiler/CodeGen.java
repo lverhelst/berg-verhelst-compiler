@@ -293,9 +293,9 @@ public class CodeGen {
      * @Created Leon
      */
     private String VariableNode(VariableNode var) {
-        if(var.offset != null) {
-            System.out.println("array");
-        }
+        if(var.offset != null) 
+            code.add(new Quadruple("fae", var.alexeme, expression(var.offset), VariableNode(var)));
+        
         return var.alexeme;
     }
     

@@ -156,9 +156,16 @@ public class Parser{
         VarDeclarationNode currentVarDec = null;
        
         Object declaration = visit("declaration", synch.union(DECLARATION.firstSet()));
+        
+        currentFunc = root.funcdeclaration;
+        
+        while(currentFunc.nextFuncDec != null) {
+            currentFunc = currentFunc.nextFuncDec;
+        } 
+        
         if(declaration instanceof FuncDeclarationNode){
-            root.funcdeclaration.nextFuncDec = (FuncDeclarationNode)declaration;
-            currentFunc = root.funcdeclaration.nextFuncDec;
+            currentFunc.nextFuncDec = (FuncDeclarationNode)declaration;
+            currentFunc = currentFunc.nextFuncDec;
         }
         else{       
             root.vardeclaration = (VarDeclarationNode)declaration;
@@ -169,13 +176,11 @@ public class Parser{
             declaration = visit("declaration", synch.union(DECLARATION.firstSet()));
             if(declaration instanceof FuncDeclarationNode){
                 if(currentFunc == null){
-                    root.funcdeclaration = (FuncDeclarationNode)declaration;
-                    currentFunc = root.funcdeclaration; 
+                    currentFunc = (FuncDeclarationNode)declaration;
                 }else{
                     currentFunc.nextFuncDec = (FuncDeclarationNode)declaration;
                     currentFunc = currentFunc.nextFuncDec;
-                }
-               
+                }               
             }else       {
                 if(currentVarDec == null){
                      root.vardeclaration = (VarDeclarationNode)declaration;

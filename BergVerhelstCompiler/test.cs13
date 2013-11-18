@@ -1,12 +1,10 @@
-/*
-bool readBool(void){;}
-int readNum(void){;}
-void writeBool(bool x){;}
-void writeNum(int x){;}
-*/
 int x;
 int y[8];
 
+int test(int x, int y) {
+	int i;
+	return i;
+}
 
 
 --main program to run
@@ -19,6 +17,7 @@ int main(void) {
 	if(y > y - y)
 		x := false;
 	else x := true;
+	test(y,y);
 	return 0;
 
 }

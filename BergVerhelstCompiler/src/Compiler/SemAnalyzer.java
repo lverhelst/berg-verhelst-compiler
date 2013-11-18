@@ -374,7 +374,6 @@ public class SemAnalyzer {
      * @return Type of the literal (NUM, BLIT)
      */
     private TokenType LiteralNode(LiteralNode lit) {
-        //return the type???
         return lit.specifier;
     }
     

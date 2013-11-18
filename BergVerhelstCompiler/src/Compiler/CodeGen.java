@@ -55,7 +55,7 @@ public class CodeGen {
         
         //process all function declarations
         while(func != null) {
-//            if(func.ID >= 0)
+            if(func.ID >= 0)
                 FuncDeclarationNode(func);  
             func = func.nextFuncDec;
         }
@@ -254,6 +254,25 @@ public class CodeGen {
      * @Created Leon
      */
     private String CallNode(CallNode call) {
+        //check for predefined functions
+        if(call.alexeme.equals("readint")) {
+            String temp = genTemp();
+            code.add(new Quadruple("rdi","-","-",temp));
+            return temp;
+        } else if(call.alexeme.equals("readbool")) {
+            String temp = genTemp();
+            code.add(new Quadruple("rdb","-","-",temp));  
+            return temp;
+        }  else if(call.alexeme.equals("writeint")) {
+            String temp = genTemp();
+            code.add(new Quadruple("wri",((ASTNode)call.arguments.get(0)).alexeme,"-",temp));  
+            return temp;
+        }   else if(call.alexeme.equals("readint")) {
+            String temp = genTemp();
+            code.add(new Quadruple("wrb",((ASTNode)call.arguments.get(0)).alexeme,"-",temp));  
+            return temp;
+        }   
+            
         code.add(new Quadruple("rval","-","-",this.genTemp()));  
         
         //check arguments against the functions parameters
@@ -319,27 +338,6 @@ public class CodeGen {
         else if (exp.getClass() == VariableNode.class)
             return VariableNode((VariableNode) exp);
         else if (exp.getClass() == CallNode.class) {
-            CallNode call = (CallNode) exp;
-            
-            //check for predefined functions
-            if(call.alexeme.equals("readint")) {
-                String temp = genTemp();
-                code.add(new Quadruple("rdi","-","-",temp));
-                return temp;
-            } else if(call.alexeme.equals("readbool")) {
-                String temp = genTemp();
-                code.add(new Quadruple("rdb","-","-",temp));  
-                return temp;
-            }  else if(call.alexeme.equals("writeint")) {
-                String temp = genTemp();
-                code.add(new Quadruple("wri",((ASTNode)call.arguments.get(0)).alexeme,"-",temp));  
-                return temp;
-            }   else if(call.alexeme.equals("readint")) {
-                String temp = genTemp();
-                code.add(new Quadruple("wrb",((ASTNode)call.arguments.get(0)).alexeme,"-",temp));  
-                return temp;
-            }   
-            
             return CallNode((CallNode) exp);
         }
         else{

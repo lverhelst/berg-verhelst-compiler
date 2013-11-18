@@ -20,6 +20,7 @@ public class CodeGen {
     
     private ArrayList<LoopStructure> loopStructs;
     int loopLvl;
+    int num_params_cur_func;
     
     /**
      * Generate code based on the annotated AST
@@ -32,7 +33,7 @@ public class CodeGen {
         error = false;
         numTempVars = 0;
         loopLvl = 0;
-        
+        num_params_cur_func = 0;
 
     }    
     
@@ -84,6 +85,7 @@ public class CodeGen {
         for(ASTNode stmt: func.compoundStmt.statements) {
             statement(stmt);
         }
+        num_params_cur_func = num_params;
     }
     
 //    /**
@@ -226,7 +228,11 @@ public class CodeGen {
      * @Created Leon
      */
     private void ReturnNode(ReturnNode returnNode) {        
-       code.add(new Quadruple("retv", "DEPTH HERE", expression(returnNode.exp), "-"));
+       if(returnNode.exp == null){
+            code.add(new Quadruple("ret",num_params_cur_func + "","-","-"));
+       }else{
+            code.add(new Quadruple("retv", num_params_cur_func + "", expression(returnNode.exp), "-"));
+       }
     }
     
     /**

@@ -2,10 +2,15 @@ int r(void){
 	return 4; --Chosen By Dice roll
 }
 
+void r2(void){
+	return;
+}
+
+
 int main(void) {
 	int x;
 	branch (x)
-		case 0: x := readint();
+		case 0: writeint();
 		case 1: x := 0;
 		default: x := r();
 	end;

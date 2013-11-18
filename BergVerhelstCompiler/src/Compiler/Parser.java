@@ -458,7 +458,18 @@ public class Parser{
                 return node;
             }else {
                 if(ID != null){
-                    ((ASTNode.CallNode)temp).ID = Integer.parseInt(ID);
+                    
+                    if(lex.equals("readint")){
+                        ((ASTNode.CallNode)temp).ID = -4;
+                    }else if(lex.equals("writeint")){
+                        ((ASTNode.CallNode)temp).ID = -3;
+                    }else if(lex.equals("readbool")){
+                        ((ASTNode.CallNode)temp).ID = -2;
+                    }else if(lex.equals("writebool")){
+                        ((ASTNode.CallNode)temp).ID = -1;
+                    }else{
+                        ((ASTNode.CallNode)temp).ID = Integer.parseInt(ID);
+                    }
                     ((ASTNode.CallNode)temp).alexeme = lex;
                 }
                 return (ASTNode.CallNode)temp;

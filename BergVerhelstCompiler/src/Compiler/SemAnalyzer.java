@@ -288,7 +288,7 @@ public class SemAnalyzer {
      * @Created Leon
      */
     private void CaseNode(CaseNode caseNode) {
-        //new scope???
+        
         //check statement
         statement((ASTNode) caseNode.stmt);
     }
@@ -301,14 +301,14 @@ public class SemAnalyzer {
     private TokenType CallNode(CallNode call) {
         //ensure function has been declared
         FuncDeclarationNode node = (FuncDeclarationNode)this.searchScope(call.ID);
-        ParameterNode param = node.params;
-        
         if(node == null){
             printError("Function Not Declared: " + call.alexeme);
+            return TokenType.UNI;
         } else {
             //Add reference to declaration to the AST
             call.declaration = node;
         }
+        ParameterNode param = node.params;
         //check arguments against the functions parameters
         for(Expression e: call.arguments){
             TokenType temp = expression(e);

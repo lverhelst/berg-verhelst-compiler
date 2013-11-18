@@ -17,6 +17,10 @@ public class CodeGen {
     
     private int numTempVars;
     private int numLabels;
+    
+    private ArrayList<LoopStructure> loopStructs;
+    int loopLvl;
+    
     /**
      * Generate code based on the annotated AST
      * @param root as ProgramNode to use as the root of the program 
@@ -24,8 +28,10 @@ public class CodeGen {
      */
     public CodeGen() {
         code = new ArrayList<Quadruple>();
+        loopStructs = new ArrayList<LoopStructure>();
         error = false;
         numTempVars = 0;
+        loopLvl = 0;
         
 
     }    
@@ -149,10 +155,6 @@ public class CodeGen {
             q1.result = label;
             //Generate Code for if false Statments
             statement(ifNode.elseStmt);
-            
-            
-            
-           
         }
         String elseLabel = this.genLabel();
         code.add(new Quadruple("lab","-","-",elseLabel));
@@ -169,11 +171,33 @@ public class CodeGen {
      * Class to view loop syntax
      * @Created Leon
      */
-    private void LoopNode(LoopNode loop) {        
-        statement(loop.stmt);      
-        if(loop.nextLoopNode != null){
-            LoopNode(loop.nextLoopNode);
+    private void LoopNode(LoopNode loop) {   
+        loopStructs.add(new LoopStructure(loopLvl++));
+        String loopBeginLbl = this.genLabel();
+        code.add(new Quadruple("lab","-","-",loopBeginLbl));
+        LoopNode current = loop;
+        statement(loop.stmt);
+        while(current.nextLoopNode != null){
+            current = current.nextLoopNode;
+            statement(current.stmt);
+        }   
+        LoopStructure cur = loopStructs.get(loopLvl - 1);
+        if(cur.hasCont){
+            String rightBeforeLoopEndLbl = this.genLabel();
+            code.add(new Quadruple("lab","-","-",rightBeforeLoopEndLbl));
+            //Set last continue loop
+            Quadruple q = code.get(cur.contLoc);
+            q.result = rightBeforeLoopEndLbl;
         }
+        code.add(new Quadruple("goto","-","-",loopBeginLbl));
+        if(cur.hasExit){
+            String loopEndLbl = this.genLabel();
+            code.add(new Quadruple("lab","-","-",loopEndLbl));
+            Quadruple q = code.get(cur.exitLoc);
+            q.result = loopEndLbl;
+        }
+        
+        loopStructs.remove(--loopLvl);
     }
     
      /**
@@ -182,7 +206,20 @@ public class CodeGen {
       * @Created Leon
      */
     private void MarkerNode(MarkerNode marker) {
-        
+            System.out.println(marker.specifier.name());
+            if("CONTINUE".equals(marker.specifier.name())){
+                code.add(new Quadruple("goto","-","-","RIGHTBEFORELOOPENDLBL"));
+                LoopStructure ls = loopStructs.get(loopStructs.size() - 1);
+                ls.hasCont = true;
+                ls.contLoc = code.size() - 1;
+                
+            }
+            else {
+                code.add(new Quadruple("goto","-","-","LOOPENDLBL"));
+                LoopStructure ls = loopStructs.get(loopStructs.size() - 1);
+                ls.hasExit = true;
+                ls.exitLoc = code.size() - 1;
+            }
     }
     
     /**
@@ -198,18 +235,39 @@ public class CodeGen {
      * @Created Emery
      */
     private void BranchNode(BranchNode branch) {
-        expression(branch.exp);
-        CaseNode(branch.thisCase);
-        if(branch.nextNode != null)
-            BranchNode(branch.nextNode);
+        BranchNode current = branch;
+        //grab integer
+        String eval_var = expression(current.exp);
+        String end_lbl = this.genLabel();
+        while(current != null){
+            
+            CaseNode(current.thisCase, eval_var, end_lbl);
+            current = current.nextNode;
+           
+        }
+        //End label
+        code.add(new Quadruple("lab","-","-",end_lbl));
     }
     
     /**
      * Case Node for case statements
      * @Created Leon
      */
-    private void CaseNode(CaseNode caseNode) {       
-        statement((ASTNode) caseNode.stmt);
+    private void CaseNode(CaseNode caseNode, String match_var, String end_lbl) {  
+        if(caseNode.num != null){
+            String var =  this.genTemp();
+            code.add(new Quadruple("eq", match_var, caseNode.num,var));  
+            code.add(new Quadruple("iff",var, "-", "CASE" + match_var + "ENDLBL"));
+            int endofcase = code.size() - 1;
+            statement((ASTNode)caseNode.stmt);
+             code.add(new Quadruple("goto","-","-",end_lbl));        
+            String lbl = this.genLabel();
+            code.add(new Quadruple("lab", "-","-",lbl));
+            Quadruple q = code.get(endofcase);
+            q.result = lbl;
+        }else{
+            statement((ASTNode)caseNode.stmt);
+        }
     }
     
     /**
@@ -305,6 +363,8 @@ public class CodeGen {
             BranchNode((BranchNode) stmt);
         else if (stmt.getClass() == CallNode.class)
             CallNode((CallNode) stmt);
+        else if(stmt.getClass() == CompoundNode.class)
+            CompoundNode((CompoundNode)stmt);
     }
     
     /**
@@ -491,6 +551,18 @@ public class CodeGen {
         @Override
         public String toString() {
             return "(" + op + "," + arg + "," + arg2 + "," + result + ");";
+        }
+    }
+    
+    protected class LoopStructure{
+        public boolean hasCont;
+        public boolean hasExit;
+        public final int level;
+        public int contLoc;
+        public int exitLoc;
+        
+        LoopStructure(int l){
+            this.level = l;
         }
     }
 }

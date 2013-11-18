@@ -689,6 +689,7 @@ public class Parser{
         CaseNode node = rootNode.new CaseNode();
         if(lookahead.getName() == TokenType.CASE){
             match(TokenType.CASE, synch.union(STATEMENT.firstSet()).union(TokenType.NUM).union(TokenType.COLON));
+            node.num = lookahead.getAttribute_Value();
             match(TokenType.NUM, synch.union(STATEMENT.firstSet()).union(TokenType.COLON));
             match(TokenType.COLON, synch.union(STATEMENT.firstSet()));
             node.stmt = (Statement)visit("statement", synch);

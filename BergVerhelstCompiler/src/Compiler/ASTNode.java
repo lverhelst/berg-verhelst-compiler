@@ -320,11 +320,12 @@ public class ASTNode{
      * @Created Leon
      */
     public class CaseNode extends ASTNode{
+        String num;
         Statement stmt;
         
         @Override
         public String toString(int depth) {
-             String temp = "[Case]\r\n";
+             String temp = "[Case] " + ((num== null)? "default": num)+ " \r\n";
             
             temp += format((ASTNode)stmt, depth); 
             
@@ -373,10 +374,10 @@ public class ASTNode{
          @Override
         public String toString(int depth) {
             //if(declaration == null)
-                return formatChild("[Variable] " + specifier + " :" + ID + (offset == null? "" : "\r\n" + format((ASTNode)offset, depth) + "") + "\r\n Level: " + level +
-                             " Displacement: " + displacement + " \r\n", depth);
+                return formatChild("[Variable] " + specifier + " :" + ID + (offset == null? "" : "\r\n" + format((ASTNode)offset, depth) + "")  + " \r\n", depth);
            // else
-            //     return formatChild("[Reference] " + declaration, depth);
+            //     return formatChild("[Reference] " + declaration, depth); + "\r\n Level: " + level +" Displacement: " + displacement
+                             
         }
     }
     /**

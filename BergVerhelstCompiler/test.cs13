@@ -7,30 +7,7 @@ void writeNum(int x){;}
 int x;
 int y[8];
 
---always true
-bool readBool(void) {
-	int arr[1 * 2];
-	arr[3] := 2;
-	x := arr[1 + 4 mod 2 / 120239821];
-	return true;
-}
 
---outputs a random preset number so its not really random at all
-int readNum(int abc, ref int x) {
-	return 42;
-}
-
---used to test the case statement
-void testcase(void) {
-	int x;
-	int a;
-	branch (x)
-		case 0: testcase();
-		case 1: readNum(1, x) ;
-		default: ;
-	end;
-	return;
-}
 
 --main program to run
 int main(void) {
@@ -40,19 +17,5 @@ int main(void) {
 	y := -5 * 1/2;
 	y := 5 mod 6;
 
-
-	--test the loop function
-	loop
-		--test the if function
-		--if((x < y) && (readNum() > 0) || (y > 0)) {
-		if(true){
-			y := y - 1;
-		} else {
-			--test exit
-			exit;
-		}
-	continue;
-	end;
-	return 0;
 }
 

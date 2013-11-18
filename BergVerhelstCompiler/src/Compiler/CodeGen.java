@@ -72,6 +72,11 @@ public class CodeGen {
              num_params++;
              param = param.nextNode;
         }    
+        //Generate Compound Node stuff
+        //Don't call compound node because we don't want to increase the level
+        for(ASTNode stmt: func.compoundStmt.statements) {
+            statement(stmt);
+        }
         code.add(new Quadruple("retv", num_params + "", "return value", "-"));
     }
     
@@ -112,9 +117,8 @@ public class CodeGen {
      * @Class Emery
      */
     private void AssignmentNode(AssignmentNode assignment) {              
-        code.add(new Quadruple("asg", "expression result", "-", VariableNode(assignment.leftVar)));
-        
-        expression(assignment.expersion);
+        code.add(new Quadruple("asg", expression(assignment.expersion), "-", VariableNode(assignment.leftVar)));
+       // expression(assignment.expersion);
         
     }
     
@@ -192,11 +196,12 @@ public class CodeGen {
      * EX. INT FOO(BAR foobar);
      * @Created Leon
      */
-    private void CallNode(CallNode call) {        
+    private String CallNode(CallNode call) {        
         //check arguments against the functions parameters
         for(Expression e: call.arguments){
             expression(e);
         }
+        return call.alexeme;
     }
     
     /**
@@ -212,40 +217,52 @@ public class CodeGen {
      * @Created Leon
      * @return Type of the literal (NUM, BLIT)
      */
-    private void LiteralNode(LiteralNode lit) {
+    private String LiteralNode(LiteralNode lit) {
+        return lit.lexeme;
     }
     
     /**
      * Unary Operation Node
      * @Created Leon
      */
-    private void UnopNode(UnopNode unop) {
+    private String UnopNode(UnopNode unop) {
+        String t = this.genTemp();
+        code.add(new Quadruple(unop.specifier.name(),expression(unop.Rside),"",t));
+        return t;
     }
     
     /**
      * Binary Operation Node
+     * This needs to be iterative or recursive
      * @Created Leon
      */
-    private void BinopNode(BinopNode binop) {
-        expression(binop.Lside);
-        expression(binop.Rside);        
+    private String BinopNode(BinopNode binop) {
+        String tempVar = this.genTemp();
+        code.add(new Quadruple(binop.specifier.name(),expression(binop.Lside),expression(binop.Rside),tempVar));
+        //expression(binop.Lside);    
+        //expression(binop.Rside);        
+        return tempVar;
     }
     
     /**
      * Routing Method for Expressions
      * @param exp 
      */
-    private void expression(Expression exp){
+    private String expression(Expression exp){
         if(exp.getClass() == BinopNode.class)
-           BinopNode((BinopNode)exp);  
+           return BinopNode((BinopNode)exp);  
         else if (exp.getClass() == UnopNode.class)
-           UnopNode((UnopNode) exp);
+           return UnopNode((UnopNode) exp);
         else if (exp.getClass() == LiteralNode.class)
-            LiteralNode((LiteralNode) exp);
+            return LiteralNode((LiteralNode) exp);
         else if (exp.getClass() == VariableNode.class)
-            VariableNode((VariableNode) exp);
+            return VariableNode((VariableNode) exp);
         else if (exp.getClass() == CallNode.class)
-            CallNode((CallNode) exp);
+            return CallNode((CallNode) exp);
+        else{
+            printError("Attempting Code Generation for Invalid Expression");
+            return "ERROR_ERROR_ERROR";
+        }
     }
 
     /**

@@ -52,17 +52,11 @@ public class CodeGen {
         code.add(new Quadruple("hlt", "-", "-", "-"));        
         
         FuncDeclarationNode func = program.funcdeclaration;
-//        VarDeclarationNode var = program.vardeclaration;
-        
-        //process all global variable declarations
-//        while(var != null) {
-//            VarDeclarationNode(var);                        
-//            var = var.nextVarDec;
-//        } 
         
         //process all function declarations
         while(func != null) {
-            FuncDeclarationNode(func);  
+            if(func.ID >= 0)
+                FuncDeclarationNode(func);  
             func = func.nextFuncDec;
         }
     }
@@ -89,31 +83,12 @@ public class CodeGen {
         }
     }
     
-//    /**
-//     * Class to view VarDeclarationNode
-//     * @Class Emery
-//     */
-//    private void VarDeclarationNode(VarDeclarationNode var) { 
-//        
-//    }
-//    
-//    /**
-//     * Class to view ParameterNode
-//     * @Class Emery
-//     */
-//    private void ParameterNode(ParameterNode param) {
-//        
-//    }
-    
     /**
      * Class to view CompoundNode
      * Statements has to happen at least once
      * @Class Emery
      */
     private void CompoundNode(CompoundNode compound) {
-//        for(VarDeclarationNode var: compound.variableDeclarations) {
-//            VarDeclarationNode(var);
-//        }
         code.add(new Quadruple("ecs", this.getLocalSize(compound)+ "","-","-"));
         //check child stmts and their returns
         for(ASTNode stmt: compound.statements) {
@@ -127,8 +102,6 @@ public class CodeGen {
      */
     private void AssignmentNode(AssignmentNode assignment) {
         code.add(new Quadruple("asg", expression(assignment.expersion), "-", VariableNode(assignment.leftVar)));
-       // expression(assignment.expersion);
-        
     }
     
     /**

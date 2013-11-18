@@ -46,6 +46,8 @@ public class ASTNode{
             
             writeint.ID = -3;
             writeint.alexeme = "writeint";
+            writeint.params = new ParameterNode();
+            writeint.params.param = TokenType.INT;
 //            writeint.specifier = TokenType.VOID;          
             writeint.nextFuncDec = readbool;
             writeint.compoundStmt = nullstmt;
@@ -59,6 +61,8 @@ public class ASTNode{
             writebool.ID = -1;
             writebool.alexeme = "writebool";
 //            writebool.specifier = TokenType.VOID;
+            writebool.params = new ParameterNode();
+            writebool.params.param = TokenType.BOOL;
             writebool.compoundStmt = nullstmt;
             
             funcdeclaration = readint;

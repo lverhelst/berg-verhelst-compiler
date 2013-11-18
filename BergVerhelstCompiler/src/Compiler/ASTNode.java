@@ -321,7 +321,7 @@ public class ASTNode{
      */
     public class CaseNode extends ASTNode{
         String num;
-        Statement stmt;
+        ASTNode stmt;
         
         @Override
         public String toString(int depth) {

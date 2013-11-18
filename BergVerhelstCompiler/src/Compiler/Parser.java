@@ -708,11 +708,11 @@ public class Parser{
             node.num = lookahead.getAttribute_Value();
             match(TokenType.NUM, synch.union(STATEMENT.firstSet()).union(TokenType.COLON));
             match(TokenType.COLON, synch.union(STATEMENT.firstSet()));
-            node.stmt = (Statement)visit("statement", synch);
+            node.stmt = (ASTNode)visit("statement", synch);
         }else if(lookahead.getName() == TokenType.DEFAULT){
             match(TokenType.DEFAULT, synch.union(STATEMENT.firstSet()).union(TokenType.COLON));
             match(TokenType.COLON, synch.union(STATEMENT.firstSet()));
-            node.stmt = (Statement)visit("statement", synch);
+            node.stmt = (ASTNode)visit("statement", synch);
         }//else
          //   printError("CaseStmt Error: " + lookahead.getName());
         return node;

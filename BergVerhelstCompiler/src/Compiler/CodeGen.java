@@ -77,15 +77,16 @@ public class CodeGen {
         ParameterNode param = func.params;             
         //search all params
         while(param != null) {
-             num_params++;
+            if(param.param != TokenType.VOID)
+                num_params++;
              param = param.nextNode;
         }    
+        num_params_cur_func = num_params;
         //Generate Compound Node stuff
         //Don't call compound node because we don't want to increase the level
         for(ASTNode stmt: func.compoundStmt.statements) {
             statement(stmt);
         }
-        num_params_cur_func = num_params;
     }
     
 //    /**

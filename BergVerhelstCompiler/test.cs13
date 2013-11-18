@@ -1,8 +1,4 @@
-int r(void){
-	return 4; --Chosen By Dice roll
-}
-
-void r2(void){
+void r2(int a, int b, int c, int arr){
 	return;
 }
 
@@ -10,9 +6,9 @@ void r2(void){
 int main(void) {
 	int x;
 	branch (x)
-		case 0: writeint();
+		case 0: {return 0;}
 		case 1: x := 0;
-		default: x := r();
+		default: x := 0;
 	end;
 	return 0;
 }

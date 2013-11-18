@@ -101,7 +101,10 @@ public class CodeGen {
      * @Class Emery
      */
     private void AssignmentNode(AssignmentNode assignment) {
-        code.add(new Quadruple("asg", expression(assignment.expersion), "-", VariableNode(assignment.leftVar)));
+        if(assignment.index != null)
+            code.add(new Quadruple("tae", expression(assignment.expersion), expression(assignment.index), VariableNode(assignment.leftVar)));
+        else
+            code.add(new Quadruple("asg", expression(assignment.expersion), "-", VariableNode(assignment.leftVar)));
     }
     
     /**
@@ -290,6 +293,9 @@ public class CodeGen {
      * @Created Leon
      */
     private String VariableNode(VariableNode var) {
+        if(var.offset != null) {
+            System.out.println("array");
+        }
         return var.alexeme;
     }
     

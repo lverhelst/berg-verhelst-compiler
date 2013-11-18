@@ -381,9 +381,9 @@ public class Parser{
             TokenType t = (TokenType)visit("nonvoidSpec", synch);
             ID = lookahead.getAttribute_Value();
             lexeme = lookahead.getLexeme();
-            match(TokenType.ID, synch);
+            match(TokenType.ID, synch.union(IDTAIL.firstSet()));
             if(lookahead.getName() == TokenType.LSQR){
-                match(TokenType.LSQR, synch);
+                match(TokenType.LSQR, synch.union(IDTAIL.followSet()));
                 match(TokenType.RSQR, synch);
             }
             return new Token(t, lexeme, ID);
@@ -502,7 +502,6 @@ public class Parser{
         if(lookahead.getName() == TokenType.LSQR){
             match(TokenType.LSQR, synch.union(ADDEXP.firstSet().union(EXPRESSION.firstSet())).union(TokenType.RSQR).union(TokenType.ASSIGN));
             current.index = (Expression)visit("addExp", synch.union(ADDEXP.firstSet().union(EXPRESSION.firstSet())).union(TokenType.RSQR).union(TokenType.ASSIGN));
-            //visit("addExp", synch.union(ADDEXP.firstSet().union(EXPRESSION.firstSet())).union(TokenType.RSQR));
             match(TokenType.RSQR, synch.union((EXPRESSION.firstSet())).union(TokenType.ASSIGN));
         }
         match(TokenType.ASSIGN, synch.union((EXPRESSION.firstSet())));

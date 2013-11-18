@@ -1,20 +1,27 @@
 
 int r(void){
-writeint(10);
-readint();
-writebool(true);
-readbool();
-return 0;
+	writeint(10);
+	readint();
+	writebool(true);
+	readbool();
+	return 0;
 }
 
 
-void r2(int a, int b, int c, int arr){
+void r2(int arr[]){
 	return;
 }
 
 
 int main(void) {
+	int arr[10];
+	arr[1] := 2;
+	
 	int x;
+	x := arr[1];
+	
+	r2(arr);
+
 	branch (x)
 		case 0: {return 0;}
 		case 1: x := 0;

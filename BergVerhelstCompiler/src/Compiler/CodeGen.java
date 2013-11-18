@@ -70,7 +70,7 @@ public class CodeGen {
      * Class to view FuncDeclarationNode
      * @Class Emery
      */
-    private void FuncDeclarationNode(FuncDeclarationNode func) {        
+    private void FuncDeclarationNode(FuncDeclarationNode func) {
         code.add(new Quadruple("fun", func.alexeme, this.getLocalSize(func) + "", "-"));
         int num_params = 0;
         ParameterNode param = func.params;             
@@ -84,7 +84,6 @@ public class CodeGen {
         for(ASTNode stmt: func.compoundStmt.statements) {
             statement(stmt);
         }
-        code.add(new Quadruple("retv", num_params + "", "return value", "-"));
     }
     
 //    /**
@@ -123,7 +122,7 @@ public class CodeGen {
      * Class to view AssignmentNode
      * @Class Emery
      */
-    private void AssignmentNode(AssignmentNode assignment) {              
+    private void AssignmentNode(AssignmentNode assignment) {
         code.add(new Quadruple("asg", expression(assignment.expersion), "-", VariableNode(assignment.leftVar)));
        // expression(assignment.expersion);
         
@@ -226,8 +225,8 @@ public class CodeGen {
      * A Return Node has an optional expression
      * @Created Leon
      */
-    private void ReturnNode(ReturnNode returnNode) {
-       expression(returnNode.exp);
+    private void ReturnNode(ReturnNode returnNode) {        
+       code.add(new Quadruple("retv", "DEPTH HERE", expression(returnNode.exp), "-"));
     }
     
     /**
@@ -275,11 +274,15 @@ public class CodeGen {
      * EX. INT FOO(BAR foobar);
      * @Created Leon
      */
-    private String CallNode(CallNode call) {        
+    private String CallNode(CallNode call) {
+        code.add(new Quadruple("rval","-","-",this.genTemp()));  
+        
         //check arguments against the functions parameters
-        for(Expression e: call.arguments){
-            expression(e);
+        for(Expression e: call.arguments){           
+            code.add(new Quadruple("arg",expression(e),"-", "-"));
         }
+        
+        code.add(new Quadruple("call",call.alexeme,"-","-"));
         return call.alexeme;
     }
     
@@ -336,8 +339,21 @@ public class CodeGen {
             return LiteralNode((LiteralNode) exp);
         else if (exp.getClass() == VariableNode.class)
             return VariableNode((VariableNode) exp);
-        else if (exp.getClass() == CallNode.class)
+        else if (exp.getClass() == CallNode.class) {
+            CallNode call = (CallNode) exp;
+            
+            //check for predefined functions
+            if(call.alexeme.equals("readint")) {
+                String temp = genTemp();
+                code.add(new Quadruple("rdi","-","-",temp));
+                return temp;
+            } else if(call.alexeme.equals("readbool")) {
+                String temp = genTemp();
+                code.add(new Quadruple("rdb","-","-",temp));  
+                return temp;
+            }            
             return CallNode((CallNode) exp);
+        }
         else{
             printError("Attempting Code Generation for Invalid Expression");
             return "ERROR_ERROR_ERROR";

@@ -10,7 +10,7 @@ void r2(void){
 int main(void) {
 	int x;
 	branch (x)
-		case 0: writeint();
+		case 0: writeint(10);
 		case 1: x := 0;
 		default: x := r();
 	end;

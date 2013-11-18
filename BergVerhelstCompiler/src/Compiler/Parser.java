@@ -844,10 +844,19 @@ public class Parser{
             //IS Call
             CallNode cnode = (CallNode)e;
             cnode.specifier = TokenType.ID;
+            System.out.println(ID);
             if(ID != null)
                 cnode.ID = Integer.parseInt(ID);
+            if(lex.equals("readint")){
+                cnode.ID = -4;
+            }else if(lex.equals("writeint")){
+                cnode.ID = -3;
+            }else if(lex.equals("readbool")){
+                cnode.ID = -2;
+            }else if(lex.equals("writebool")){
+                cnode.ID = -1;
+            }
             cnode.alexeme = lex;
-            
             return cnode;
         }
     }

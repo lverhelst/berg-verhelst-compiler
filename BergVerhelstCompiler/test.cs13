@@ -1,9 +1,13 @@
+int r(void){
+	return 4; --Chosen By Dice roll
+}
+
 int main(void) {
-	bool x;
+	int x;
 	branch (x)
-		case 0: x := true;
-		case 1: x := false;
-		default: x := false;
+		case 0: x := readint();
+		case 1: x := 0;
+		default: x := r();
 	end;
 	return 0;
 }

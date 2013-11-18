@@ -110,7 +110,7 @@ public class SemAnalyzer {
         
         TokenType type = CompoundNode(func.compoundStmt);
         
-        if(!checkTypes(type,func.specifier)) {
+        if(!checkTypes(type,func.specifier) && func.ID >= -0) {
             printError(func.alexeme + ": return type of " + type + " does not match the expected " + func.specifier);
         }
         
@@ -192,7 +192,7 @@ public class SemAnalyzer {
         }
         //check expression result against id type
         TokenType rightSide = expression(assignment.expersion);
-        if(!checkTypes(leftSide, rightSide)){
+        if(!checkTypes(leftSide, rightSide) && !checkSpecialFunctionCall((ASTNode)assignment.expersion)){           
             printError("Type mismatch, assigning:" + rightSide + " to: " + leftSide);
         }
     }
@@ -300,6 +300,7 @@ public class SemAnalyzer {
      */
     private TokenType CallNode(CallNode call) {
         //ensure function has been declared
+        System.out.println(call.alexeme + " " + call.ID);
         FuncDeclarationNode node = (FuncDeclarationNode)this.searchScope(call.ID);
         if(node == null){
             printError("Function Not Declared: " + call.alexeme);
@@ -531,6 +532,14 @@ public class SemAnalyzer {
         return false;
     }
     
+    private boolean checkSpecialFunctionCall(ASTNode node){
+        if(node.getClass() == CallNode.class){
+            CallNode cn = (CallNode)node;
+            return cn.ID < 0;
+        }
+        return false;
+    }
+    
     private TokenType getOpType(TokenType t){
         if(t == TokenType.AND || t == TokenType.ANDTHEN ||t == TokenType.OR ||t == TokenType.ORELSE || t == TokenType.EQ || t == TokenType.NOT || t == TokenType.NEQ ||
               t == TokenType.GT  ||  t == TokenType.GTEQ  ||t == TokenType.LT || t == TokenType.LTEQ )
@@ -539,7 +548,7 @@ public class SemAnalyzer {
              return TokenType.NUM;
         return TokenType.UNI;
     }
-    
+
     protected class listRecord {
         public int id_num;
         //Is either a varDecNode or a FuncDecNode

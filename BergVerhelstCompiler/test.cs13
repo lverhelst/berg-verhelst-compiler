@@ -3,6 +3,10 @@ int r(void){
 }
 
 void r2(void){
+writeint(10);
+readint();
+writebool(true);
+readbool();
 	return;
 }
 

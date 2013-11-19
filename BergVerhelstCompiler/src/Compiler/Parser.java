@@ -454,6 +454,7 @@ public class Parser{
             Object temp = visit("idstmtTail", synch);
             if(temp instanceof ASTNode.AssignmentNode){
                 ASTNode.AssignmentNode node = (ASTNode.AssignmentNode)temp;
+               // varNode.offset = node.index;
                 node.leftVar = varNode;
                 return node;
             }else {

@@ -1,13 +1,3 @@
-
-int r(void){
-	writeint(10);
-	readint();
-	writebool(true);
-	readbool();
-	return 0;
-}
-
-
 void r2(int arr[]){
 	return;
 }
@@ -15,17 +5,9 @@ void r2(int arr[]){
 
 int main(void) {
 	int arr[10];
-	arr[1] := 2;
-	
 	int x;
+	arr[1] := arr[2];	
 	x := arr[1];
-	
 	r2(arr);
-
-	branch (x)
-		case 0: {return 0;}
-		case 1: x := 0;
-		default: x := 0;
-	end;
 	return 0;
 }

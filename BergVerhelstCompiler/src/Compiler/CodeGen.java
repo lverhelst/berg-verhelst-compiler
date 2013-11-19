@@ -293,9 +293,11 @@ public class CodeGen {
      * @Created Leon
      */
     private String VariableNode(VariableNode var) {
-        if(var.offset != null) 
-            code.add(new Quadruple("fae", var.alexeme, expression(var.offset), VariableNode(var)));
-        
+        if(var.offset != null) {
+            String tvar = this.genTemp();
+            code.add(new Quadruple("fae", var.alexeme, expression(var.offset), tvar));
+            return tvar;
+        }
         return var.alexeme;
     }
     

@@ -4,10 +4,16 @@ void r2(int arr[]){
 
 
 int main(void) {
+	bool test;
 	int arr[10];
 	int x;
+	
+	test := true;
 	arr[1] := arr[2];	
 	x := arr[1];
+
+	test := 1 >= 0;
+
 	r2(arr);
 	return 0;
 }

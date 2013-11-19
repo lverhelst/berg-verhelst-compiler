@@ -327,7 +327,28 @@ public class CodeGen {
      */
     private String BinopNode(BinopNode binop) {
         String tempVar = this.genTemp();
-        code.add(new Quadruple(binop.specifier.name(),expression(binop.Lside),expression(binop.Rside),tempVar));
+        String op = binop.specifier.name().toLowerCase();
+        
+        //convert names which do not match
+        switch(binop.specifier) {
+            case LTEQ:
+                op = "lte";
+                break;
+            case GTEQ:
+                op = "gte";
+                break;
+            case PLUS:
+                op = "add";
+                break;
+            case MINUS:
+                op = "sub";
+                break;
+            case MULT:
+                op = "mul";
+                break;                
+        }
+        
+        code.add(new Quadruple(op,expression(binop.Lside),expression(binop.Rside),tempVar));
         //expression(binop.Lside);    
         //expression(binop.Rside);        
         return tempVar;
@@ -376,39 +397,6 @@ public class CodeGen {
             CallNode((CallNode) stmt);
         else if(stmt.getClass() == CompoundNode.class)
             CompoundNode((CompoundNode)stmt);
-    }
-    
-    /**
-     * Used to set the output device
-     * @param printWriter the output device 
-     * @created by Emery
-     */
-    public void setTrace(PrintWriter printWriter) {
-        this.printWriter = printWriter;
-        
-    }
-    
-    /**
-     * Used to print messages to the console or file if set to
-     * @param line the string to print
-     */
-    public void print(String line) {
-        if(verbose) {  
-            System.out.println(line);
-            if(printFile)
-              printWriter.print(line + "\r\n");
-        }
-    }
-    
-    /**
-     * Used to print error messages to the console or file if set to
-     * @param line the line to print
-     */
-    public void printError(String line) {
-        error = true;
-        System.out.println("\u001B[31m" + line + "\u001B[0m");
-        if(printFile)
-          printWriter.print(line + "\r\n");
     }
     /**
      * Retrieve current quadruple code in the code Arraylist
@@ -527,8 +515,39 @@ public class CodeGen {
           return 0;
       }
    }
-        
     
+    /**
+     * Used to set the output device
+     * @param printWriter the output device 
+     * @created by Emery
+     */
+    public void setTrace(PrintWriter printWriter) {
+        this.printWriter = printWriter;
+        
+    }
+    
+    /**
+     * Used to print messages to the console or file if set to
+     * @param line the string to print
+     */
+    public void print(String line) {
+        if(verbose) {  
+            System.out.println(line);
+            if(printFile)
+              printWriter.print(line + "\r\n");
+        }
+    }
+    
+    /**
+     * Used to print error messages to the console or file if set to
+     * @param line the line to print
+     */
+    public void printError(String line) {
+        error = true;
+        System.out.println("\u001B[31m" + line + "\u001B[0m");
+        if(printFile)
+          printWriter.print(line + "\r\n");
+    }   
     
     /**
      * Used to create quadruples for code

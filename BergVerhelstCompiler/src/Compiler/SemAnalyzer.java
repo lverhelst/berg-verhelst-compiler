@@ -359,10 +359,11 @@ public class SemAnalyzer {
             var.declaration = node;
         }
         if(var.offset != null){
-         if(!expressionIsInt(var.offset)){
-                printError("Invalid Array Index: Array Indices -> NUM {[ op NUM ]} ");
-          }
+            if(!expressionIsInt(var.offset)){
+                   printError("Invalid Array Index: Array Indices -> NUM {[ op NUM ]} ");
+            }
         }
+        
         //return the type???
         if(node != null)
             return node.getSpecifier();
@@ -404,7 +405,7 @@ public class SemAnalyzer {
           return getOpType(binop.specifier);
        }else{
            printError("Incompatible Types: " + l + ", " + r);
-           return null;
+           return TokenType.UNI;
        }
     }
     
@@ -419,9 +420,10 @@ public class SemAnalyzer {
            return UnopNode((UnopNode) exp);
         else if (exp.getClass() == LiteralNode.class)
             return LiteralNode((LiteralNode) exp);
-        else if (exp.getClass() == VariableNode.class)
-            return VariableNode((VariableNode) exp);
-        else if (exp.getClass() == CallNode.class)
+        else if (exp.getClass() == VariableNode.class) {
+            VariableNode node = (VariableNode) exp;
+            return VariableNode(node);
+        } else if (exp.getClass() == CallNode.class)
             return CallNode((CallNode) exp);
         return null;
     }

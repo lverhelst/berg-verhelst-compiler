@@ -1,7 +1,15 @@
+int main(void) {
+	int val;
+	int x;
+	--x := 10 + val;
+	return val;
+}
+
+/*
 void r2(int arr[]){
 	return;
 }
-#$%^&*
+
 int main(void) {
 	bool test;
 	int arr[10];
@@ -15,4 +23,4 @@ int main(void) {
 
 	r2(arr);
 	return 0;
-}
+}*/

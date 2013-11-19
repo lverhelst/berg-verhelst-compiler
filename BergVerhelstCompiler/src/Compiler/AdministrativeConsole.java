@@ -191,42 +191,6 @@ public class AdministrativeConsole {
                 didPass &= !cg.error;
             }
         }
-       
-       
-       
-       /*
-       scn.verbose = cmd.hasOption("v");
-       //Parse
-       //Create new Parser
-       Parser prs = new Parser(scn);
-       if(cmd.hasOption("dev")) {
-	           prs.development = true;
-        }
-       if(cmd.hasOption("scan")){
-           prs.verbose = false;
-       }else{
-           prs.verbose = cmd.hasOption("v");
-       }
-       prs.setTrace(pWriter);
-       if(cmd.hasOption("o")){
-               prs.printFile = true;
-       }       
-
-       ASTNode node = prs.parse(cmd.hasOption("v"));
-       
-       didPass &= prs.didPass();
-	   if(!cmd.hasOption("parse") && !cmd.hasOption("scan")) {
-		   SemAnalyzer semAnalyzer = new SemAnalyzer((ASTNode.ProgramNode)node);
-		   semAnalyzer.verbose = cmd.hasOption("v");
-		   semAnalyzer.ProgramNode((ASTNode.ProgramNode)node);
-		   didPass &= !semAnalyzer.error;
-	   }
-       //System.out.println("Semantic Analyzer: " + node.toString(0));
-           
-       CodeGen cg = new CodeGen();
-       cg.ProgramNode((ASTNode.ProgramNode)node);
-       cg.printCodeToSysOut();
-       */
        return (didPass)? "PASS": "FAIL";
    }  
    /**

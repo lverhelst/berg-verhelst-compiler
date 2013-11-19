@@ -22,14 +22,12 @@ public class SemAnalyzer {
     
     /**
      * Used to analysis a AST against the semantic rules of the language
-     * @param root as ProgramNode to use as the root of the program 
      * @created by Emery
      */
-    public SemAnalyzer(ProgramNode root) {
+    public SemAnalyzer() {
         cur_lvl = 0;
         inLoop = false;
         scope = new Stack();
-        init(root);
         error = false;
         
     }
@@ -40,7 +38,7 @@ public class SemAnalyzer {
      * @param program the program node
      * @created by Emery
      */
-    private void init(ProgramNode program) {        
+    public void analyse(ProgramNode program) {        
         scope.add(new ArrayList<listRecord>());        
         FuncDeclarationNode func = program.funcdeclaration;
         VarDeclarationNode var = program.vardeclaration;
@@ -57,6 +55,8 @@ public class SemAnalyzer {
             
             func = func.nextFuncDec;
         }
+        
+        ProgramNode(program);
     }
     
     /**

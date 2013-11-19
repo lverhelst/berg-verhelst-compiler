@@ -59,6 +59,10 @@ public class CodeGen {
                 FuncDeclarationNode(func);  
             func = func.nextFuncDec;
         }
+        
+        for(Quadruple quad: code) {
+            print(quad.toString());
+        }
     }
     
     /**
@@ -184,7 +188,7 @@ public class CodeGen {
       * @Created Leon
      */
     private void MarkerNode(MarkerNode marker) {
-            System.out.println(marker.specifier.name());
+//            System.out.println(marker.specifier.name());
             if("CONTINUE".equals(marker.specifier.name())){
                 code.add(new Quadruple("goto","-","-","RIGHTBEFORELOOPENDLBL"));
                 LoopStructure ls = loopStructs.get(loopStructs.size() - 1);
@@ -269,11 +273,11 @@ public class CodeGen {
             return temp;
         }  else if(call.alexeme.equals("writeint")) {
             String temp = genTemp();
-            code.add(new Quadruple("wri",expression(call.arguments.get(0)),"-",temp));  
+            code.add(new Quadruple("wri",expression(call.arguments.get(0)),"-","-"));  
             return temp;
         }   else if(call.alexeme.equals("writebool")) {
             String temp = genTemp();
-            code.add(new Quadruple("wrb",expression(call.arguments.get(0)),"-",temp));  
+            code.add(new Quadruple("wrb",expression(call.arguments.get(0)),"-","-"));  
             return temp;
         }   
             
@@ -316,7 +320,7 @@ public class CodeGen {
      */
     private String UnopNode(UnopNode unop) {
         String t = this.genTemp();
-        code.add(new Quadruple(unop.specifier.name(),expression(unop.Rside),"-",t));
+        code.add(new Quadruple("uminus",expression(unop.Rside),"-",t));
         return t;
     }
     
@@ -398,22 +402,6 @@ public class CodeGen {
         else if(stmt.getClass() == CompoundNode.class)
             CompoundNode((CompoundNode)stmt);
     }
-    /**
-     * Retrieve current quadruple code in the code Arraylist
-     * @return String of Quadruples
-     */
-   public String getCurrentCode(){
-       String code_text = "";
-       for(Quadruple p : code)
-           code_text += p.toString() + "\r\n";
-       return code_text;
-   }
-   /**
-    * Prints current code in quad_code to sys.out
-    */
-   public void printCodeToSysOut(){
-       System.out.println(this.getCurrentCode());
-   }
    
    private String genTemp(){
        //This method is used to generate a temporary variable to be used 
@@ -424,7 +412,7 @@ public class CodeGen {
        //Increment first to start temporary variables at t1 since we init to 0;
        numTempVars++;
       String varLexeme = "t" + numTempVars; 
-      System.out.println("Temporary Variable Generated: " + varLexeme);
+      //System.out.println("Temporary Variable Generated: " + varLexeme);
       
       return varLexeme;
       
@@ -435,7 +423,7 @@ public class CodeGen {
        //Increment first to start temporary variables at t1 since we init to 0;
       numLabels++;
       String varLexeme = "L" + numLabels; 
-      System.out.println("Label Generated: " + varLexeme);
+      //System.out.println("Label Generated: " + varLexeme);
       
       return varLexeme;
       

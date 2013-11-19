@@ -68,7 +68,10 @@ public class Scanner {
      */
     public Token getToken(){ 
         Token toRet = getNextToken();
-        print("    " + linenumber + ":  " + toRet.toString());
+        if(toRet.getName() == TokenType.ERROR) 
+            printError("    " + linenumber + ":  " + toRet.toString());
+        else 
+            print("    " + linenumber + ":  " + toRet.toString());
         return toRet;
     } 
     

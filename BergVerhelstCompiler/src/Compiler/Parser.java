@@ -36,11 +36,10 @@ public class Parser{
 
     /**
      * Method stub for next phase, currently retrieves all tokens
-     * @param showTrace 
      * @return boolean value representing pass(true) or fail (false)
      * @created by Leon, Modified by Emery
      */
-    public ASTNode parse(Boolean showTrace){
+    public ASTNode parse(){
        error = false; //ensure error value is reset for all runs
        Token currentToken;
        currentToken = scn.getToken();

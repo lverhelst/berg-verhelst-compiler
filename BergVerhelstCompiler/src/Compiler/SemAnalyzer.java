@@ -37,7 +37,7 @@ public class SemAnalyzer {
      * @param program the program node
      * @created by Emery
      */
-    private void init(ProgramNode program) {        
+    private ProgramNode init(ProgramNode program) {        
         scope.add(new ArrayList<listRecord>());        
         FuncDeclarationNode func = program.funcdeclaration;
         VarDeclarationNode var = program.vardeclaration;
@@ -54,6 +54,7 @@ public class SemAnalyzer {
             
             func = func.nextFuncDec;
         }
+        return program;
     }
     
     /**

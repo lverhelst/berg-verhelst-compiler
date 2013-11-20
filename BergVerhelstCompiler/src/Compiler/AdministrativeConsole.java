@@ -105,7 +105,7 @@ public class AdministrativeConsole {
        for(int j = 0; j < i; j++){
            System.out.println("Result:" + results[j][1] + " File: " + results[j][0]);
            if(cmd.hasOption("o")){
-                pWriter.print("Result:" + results[j][1] + " File: " + results[j][0]);
+                pWriter.print(";Result:" + results[j][1] + " File: " + results[j][0]);
            }
        }
        pWriter.close();

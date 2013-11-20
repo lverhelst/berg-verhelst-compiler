@@ -113,6 +113,7 @@ public class ASTNode{
         TokenType specifier;
         Expression offset;
         VarDeclarationNode nextVarDec;
+        boolean assigned;
         
         @Override
         public TokenType getSpecifier(){
@@ -196,7 +197,7 @@ public class ASTNode{
     public class AssignmentNode extends ASTNode implements Statement{
         VariableNode leftVar;
         Expression index;
-        Expression expersion;   
+        Expression expersion; 
         
         @Override
         public String toString(int depth) {

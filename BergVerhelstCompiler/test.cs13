@@ -1,8 +1,9 @@
 int main(void) {
 	int val;
 	int x;
-	--x := 10 + val;
-	return val;
+	x := 10;
+	x := 10 + val2;
+	return val2;
 }
 
 /*
@@ -14,7 +15,9 @@ int main(void) {
 	bool test;
 	int arr[10];
 	int x;
-	
+	arr[1] := x + 5;
+	arr[1] := x + 5;	
+
 	test := not true;
 	arr[1] := arr[2];	
 	x := arr[1];

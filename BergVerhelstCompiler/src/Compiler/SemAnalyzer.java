@@ -181,9 +181,13 @@ public class SemAnalyzer {
      * Class to view AssignmentNode
      * @Class Emery
      */
-    private void AssignmentNode(AssignmentNode assignment) {
+    private void AssignmentNode(AssignmentNode assignment) {        
+        Declaration node = this.searchScope(assignment.leftVar.ID);
+        if(node != null) {
+            ((VarDeclarationNode)node).assigned = true;
+        }
         //check var to ensure it has been declared
-        TokenType leftSide = VariableNode(assignment.leftVar);        
+        TokenType leftSide = VariableNode(assignment.leftVar); 
         //check expressions for what type it is
         if(assignment.index != null){
             if(!expressionIsInt(assignment.index)){
@@ -344,14 +348,14 @@ public class SemAnalyzer {
      */
     private TokenType VariableNode(VariableNode var) {
         //check if var has been declared add to scope if not
-        Declaration node = this.searchScope(var.ID);
+        VarDeclarationNode node = (VarDeclarationNode)this.searchScope(var.ID);
         if(node == null){
-            VarDeclarationNode temp = var.new VarDeclarationNode();
-            temp.ID = var.ID;
-            temp.specifier = TokenType.UNI;
+            node = var.new VarDeclarationNode();
+            node.ID = var.ID;
+            node.specifier = TokenType.UNI;
             //Adjust the AST to reflect the attempt change
             var.specifier = TokenType.UNI;
-            scope.peek().add(new listRecord(temp, temp.ID));
+            scope.peek().add(new listRecord(node, node.ID));
             
             printError("Undeclared Identifier: " + ((var.alexeme == null)?"":var.alexeme));
         } else {
@@ -364,11 +368,13 @@ public class SemAnalyzer {
             }
         }
         
+        if(!node.assigned) {
+            printError("Uninitialized Variable: " + var.alexeme);
+            node.assigned = true;
+        }
+        
         //return the type???
-        if(node != null)
-            return node.getSpecifier();
-        else
-            return var.specifier;
+        return node.specifier;
     }
     
     /**
@@ -420,10 +426,9 @@ public class SemAnalyzer {
            return UnopNode((UnopNode) exp);
         else if (exp.getClass() == LiteralNode.class)
             return LiteralNode((LiteralNode) exp);
-        else if (exp.getClass() == VariableNode.class) {
-            VariableNode node = (VariableNode) exp;
-            return VariableNode(node);
-        } else if (exp.getClass() == CallNode.class)
+        else if (exp.getClass() == VariableNode.class) 
+            return VariableNode((VariableNode)exp);
+        else if (exp.getClass() == CallNode.class)
             return CallNode((CallNode) exp);
         return null;
     }

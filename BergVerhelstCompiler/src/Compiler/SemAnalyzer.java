@@ -18,15 +18,16 @@ public class SemAnalyzer {
     public boolean error;
     private boolean inLoop;
     
+    int cur_lvl;
+    
     /**
      * Used to analysis a AST against the semantic rules of the language
-     * @param root as ProgramNode to use as the root of the program 
      * @created by Emery
      */
-    public SemAnalyzer(ProgramNode root) {
+    public SemAnalyzer() {
+        cur_lvl = 0;
         inLoop = false;
         scope = new Stack();
-        init(root);
         error = false;
         
     }
@@ -37,7 +38,7 @@ public class SemAnalyzer {
      * @param program the program node
      * @created by Emery
      */
-    private ProgramNode init(ProgramNode program) {        
+    public void analyse(ProgramNode program) {        
         scope.add(new ArrayList<listRecord>());        
         FuncDeclarationNode func = program.funcdeclaration;
         VarDeclarationNode var = program.vardeclaration;
@@ -54,7 +55,7 @@ public class SemAnalyzer {
             
             func = func.nextFuncDec;
         }
-        return program;
+        ProgramNode(program);
     }
     
     /**
@@ -108,7 +109,7 @@ public class SemAnalyzer {
         
         TokenType type = CompoundNode(func.compoundStmt);
         
-        if(!checkTypes(type,func.specifier)) {
+        if(!checkTypes(type,func.specifier) && func.ID >= -0) {
             printError(func.alexeme + ": return type of " + type + " does not match the expected " + func.specifier);
         }
         
@@ -179,9 +180,13 @@ public class SemAnalyzer {
      * Class to view AssignmentNode
      * @Class Emery
      */
-    private void AssignmentNode(AssignmentNode assignment) {
+    private void AssignmentNode(AssignmentNode assignment) {        
+        Declaration node = this.searchScope(assignment.leftVar.ID);
+        if(node != null) {
+            ((VarDeclarationNode)node).assigned = true;
+        }
         //check var to ensure it has been declared
-        TokenType leftSide = VariableNode(assignment.leftVar);        
+        TokenType leftSide = VariableNode(assignment.leftVar); 
         //check expressions for what type it is
         if(assignment.index != null){
             if(!expressionIsInt(assignment.index)){
@@ -190,7 +195,7 @@ public class SemAnalyzer {
         }
         //check expression result against id type
         TokenType rightSide = expression(assignment.expersion);
-        if(!checkTypes(leftSide, rightSide)){
+        if(!checkTypes(leftSide, rightSide) && !checkSpecialFunctionCall((ASTNode)assignment.expersion)){           
             printError("Type mismatch, assigning:" + rightSide + " to: " + leftSide);
         }
     }
@@ -286,9 +291,10 @@ public class SemAnalyzer {
      * @Created Leon
      */
     private void CaseNode(CaseNode caseNode) {
-        //new scope???
+        
         //check statement
-        statement((ASTNode) caseNode.stmt);
+        
+        statement((ASTNode)caseNode.stmt);
     }
     
     /**
@@ -298,15 +304,16 @@ public class SemAnalyzer {
      */
     private TokenType CallNode(CallNode call) {
         //ensure function has been declared
+        System.out.println(call.alexeme + " " + call.ID);
         FuncDeclarationNode node = (FuncDeclarationNode)this.searchScope(call.ID);
-        ParameterNode param = node.params;
-        
         if(node == null){
             printError("Function Not Declared: " + call.alexeme);
+            return TokenType.UNI;
         } else {
             //Add reference to declaration to the AST
             call.declaration = node;
         }
+        ParameterNode param = node.params;
         //check arguments against the functions parameters
         for(Expression e: call.arguments){
             TokenType temp = expression(e);
@@ -317,8 +324,10 @@ public class SemAnalyzer {
                 printError(node.alexeme + " reference must be to a variable");
             } else if(!checkTypes(param.param,temp)) {
                 printError(node.alexeme + " call parameter mismatch " + param.param + " expected " + temp + " found");
-            }                
-            param = param.nextNode;
+            }
+
+            if(param != null)
+                    param = param.nextNode;
         }
         
         if(!(param == null || param.param == TokenType.VOID)) {
@@ -338,14 +347,14 @@ public class SemAnalyzer {
      */
     private TokenType VariableNode(VariableNode var) {
         //check if var has been declared add to scope if not
-        Declaration node = this.searchScope(var.ID);
+        VarDeclarationNode node = (VarDeclarationNode)this.searchScope(var.ID);
         if(node == null){
-            VarDeclarationNode temp = var.new VarDeclarationNode();
-            temp.ID = var.ID;
-            temp.specifier = TokenType.UNI;
+            node = var.new VarDeclarationNode();
+            node.ID = var.ID;
+            node.specifier = TokenType.UNI;
             //Adjust the AST to reflect the attempt change
             var.specifier = TokenType.UNI;
-            scope.peek().add(new listRecord(temp, temp.ID));
+            scope.peek().add(new listRecord(node, node.ID));
             
             printError("Undeclared Identifier: " + ((var.alexeme == null)?"":var.alexeme));
         } else {
@@ -353,15 +362,18 @@ public class SemAnalyzer {
             var.declaration = node;
         }
         if(var.offset != null){
-         if(!expressionIsInt(var.offset)){
-                printError("Invalid Array Index: Array Indices -> NUM {[ op NUM ]} ");
-          }
+            if(!expressionIsInt(var.offset)){
+                   printError("Invalid Array Index: Array Indices -> NUM {[ op NUM ]} ");
+            }
         }
+        
+        if(!node.assigned) {
+            printError("Uninitialized Variable: " + var.alexeme);
+            node.assigned = true;
+        }
+        
         //return the type???
-        if(node != null)
-            return node.getSpecifier();
-        else
-            return var.specifier;
+        return node.specifier;
     }
     
     /**
@@ -370,7 +382,6 @@ public class SemAnalyzer {
      * @return Type of the literal (NUM, BLIT)
      */
     private TokenType LiteralNode(LiteralNode lit) {
-        //return the type???
         return lit.specifier;
     }
     
@@ -399,7 +410,7 @@ public class SemAnalyzer {
           return getOpType(binop.specifier);
        }else{
            printError("Incompatible Types: " + l + ", " + r);
-           return null;
+           return TokenType.UNI;
        }
     }
     
@@ -414,8 +425,8 @@ public class SemAnalyzer {
            return UnopNode((UnopNode) exp);
         else if (exp.getClass() == LiteralNode.class)
             return LiteralNode((LiteralNode) exp);
-        else if (exp.getClass() == VariableNode.class)
-            return VariableNode((VariableNode) exp);
+        else if (exp.getClass() == VariableNode.class) 
+            return VariableNode((VariableNode)exp);
         else if (exp.getClass() == CallNode.class)
             return CallNode((CallNode) exp);
         return null;
@@ -528,6 +539,14 @@ public class SemAnalyzer {
         return false;
     }
     
+    private boolean checkSpecialFunctionCall(ASTNode node){
+        if(node.getClass() == CallNode.class){
+            CallNode cn = (CallNode)node;
+            return cn.ID < 0;
+        }
+        return false;
+    }
+    
     private TokenType getOpType(TokenType t){
         if(t == TokenType.AND || t == TokenType.ANDTHEN ||t == TokenType.OR ||t == TokenType.ORELSE || t == TokenType.EQ || t == TokenType.NOT || t == TokenType.NEQ ||
               t == TokenType.GT  ||  t == TokenType.GTEQ  ||t == TokenType.LT || t == TokenType.LTEQ )
@@ -536,7 +555,7 @@ public class SemAnalyzer {
              return TokenType.NUM;
         return TokenType.UNI;
     }
-    
+
     protected class listRecord {
         public int id_num;
         //Is either a varDecNode or a FuncDecNode

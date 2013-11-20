@@ -45,7 +45,9 @@ public class ASTNode{
             readint.compoundStmt = nullstmt;
             
             writeint.ID = -3;
-            writeint.alexeme = "writeints";
+            writeint.alexeme = "writeint";
+            writeint.params = new ParameterNode();
+            writeint.params.param = TokenType.INT;
 //            writeint.specifier = TokenType.VOID;          
             writeint.nextFuncDec = readbool;
             writeint.compoundStmt = nullstmt;
@@ -59,6 +61,8 @@ public class ASTNode{
             writebool.ID = -1;
             writebool.alexeme = "writebool";
 //            writebool.specifier = TokenType.VOID;
+            writebool.params = new ParameterNode();
+            writebool.params.param = TokenType.BOOL;
             writebool.compoundStmt = nullstmt;
             
             funcdeclaration = readint;
@@ -109,6 +113,7 @@ public class ASTNode{
         TokenType specifier;
         Expression offset;
         VarDeclarationNode nextVarDec;
+        boolean assigned;
         
         @Override
         public TokenType getSpecifier(){
@@ -192,7 +197,7 @@ public class ASTNode{
     public class AssignmentNode extends ASTNode implements Statement{
         VariableNode leftVar;
         Expression index;
-        Expression expersion;   
+        Expression expersion; 
         
         @Override
         public String toString(int depth) {
@@ -320,11 +325,12 @@ public class ASTNode{
      * @Created Leon
      */
     public class CaseNode extends ASTNode{
-        Statement stmt;
+        String num;
+        ASTNode stmt;
         
         @Override
         public String toString(int depth) {
-             String temp = "[Case]\r\n";
+             String temp = "[Case] " + ((num== null)? "default": num)+ " \r\n";
             
             temp += format((ASTNode)stmt, depth); 
             
@@ -362,15 +368,21 @@ public class ASTNode{
     public class VariableNode extends ASTNode implements Expression{
         TokenType specifier;
         Expression offset;
-        int ID;
+        int ID, level, displacement;
         Declaration declaration;
+        
+        VariableNode(){
+            level = 0;
+            displacement = 0;
+        }
         
          @Override
         public String toString(int depth) {
             //if(declaration == null)
-                return formatChild("[Variable] " + specifier + " :" + ID + (offset == null? "" : "\r\n" + format((ASTNode)offset, depth) + "") + "\r\n", depth);
+                return formatChild("[Variable] " + specifier + " :" + ID + (offset == null? "" : "\r\n" + format((ASTNode)offset, depth) + "")  + " \r\n", depth);
            // else
-            //     return formatChild("[Reference] " + declaration, depth);
+            //     return formatChild("[Reference] " + declaration, depth); + "\r\n Level: " + level +" Displacement: " + displacement
+                             
         }
     }
     /**
@@ -383,8 +395,7 @@ public class ASTNode{
         
          @Override
         public String toString(int depth) {
-            return formatChild("[Literal] " + specifier + (lexeme != null? " lexeme: " + lexeme: "") + "\r\n", depth);
-                    
+            return formatChild("[Literal] " + specifier + (lexeme != null? " lexeme: " + lexeme: "") + "\r\n", depth);                    
         }
     }
     /**

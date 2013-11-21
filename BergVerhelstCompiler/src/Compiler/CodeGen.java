@@ -42,10 +42,10 @@ public class CodeGen {
     }
     
     /**
-    * Class to view ProgramNode
+    * Generate program node quadruples
     * @Class Emery
     */
-    public void ProgramNode(ProgramNode program) {        
+    private void ProgramNode(ProgramNode program) {        
         code.add(new Quadruple("start", this.getGlobalSize(program) + "", "-", "-"));
         code.add(new Quadruple("rval", "-", "-", this.genTemp()));
         code.add(new Quadruple("call", "main", "-", "-"));
@@ -66,7 +66,7 @@ public class CodeGen {
     }
     
     /**
-     * Class to view FuncDeclarationNode
+     * Generate code for funcdeclarationnode
      * @Class Emery
      */
     private void FuncDeclarationNode(FuncDeclarationNode func) {
@@ -88,7 +88,7 @@ public class CodeGen {
     }
     
     /**
-     * Class to view CompoundNode
+     * Generates code for CompoundNode
      * Statements has to happen at least once
      * @Class Emery
      */
@@ -101,7 +101,7 @@ public class CodeGen {
         code.add(new Quadruple("lcs", "-", "-", "-"));
     }
     /**
-     * Class to view AssignmentNode
+     * Quadruple generation for AssignmentNode
      * @Class Emery
      */
     private void AssignmentNode(AssignmentNode assignment) {
@@ -150,7 +150,7 @@ public class CodeGen {
     }
     
     /**
-     * Class to view loop syntax
+     * Generated Loop Code
      * @Created Leon
      */
     private void LoopNode(LoopNode loop) {   
@@ -183,7 +183,7 @@ public class CodeGen {
     }
     
      /**
-      * The Marker Node class
+      * The Marker Node Code Generator
       * Markers can be the following specifiers: CONTINUE | EXIT | ENDFILE
       * @Created Leon
      */
@@ -359,6 +359,7 @@ public class CodeGen {
     }
     
     /**
+     * @Created Leon
      * Routing Method for Expressions
      * @param exp 
      */
@@ -381,6 +382,7 @@ public class CodeGen {
     }
 
     /**
+     * @Created Leon
      * Routing Method for Statements
      * @param stmt 
      */
@@ -403,6 +405,10 @@ public class CodeGen {
             CompoundNode((CompoundNode)stmt);
     }
    
+   /**
+    * @Created Leon
+    * @return Generated the next temporary variable
+    */
    private String genTemp(){
        //This method is used to generate a temporary variable to be used 
        //This method needs a counter to keep track of current variables
@@ -417,7 +423,10 @@ public class CodeGen {
       return varLexeme;
       
    }
-   
+   /**
+    * @Created Leon
+    * @return Creates the next Label
+    */
    private String genLabel(){
 
        //Increment first to start temporary variables at t1 since we init to 0;
@@ -430,6 +439,7 @@ public class CodeGen {
    }
    
    /**
+    * @Created Leon
     * Returns the size needed for the global variables
     * @param program 
     * @return 
@@ -450,6 +460,7 @@ public class CodeGen {
        return localsize;
    }
     /**
+     * @Created Leon
     * Returns the local variable size of functions and compound statements
     * @param program 
     * @return 
@@ -471,6 +482,7 @@ public class CodeGen {
        return -999;
    }
    /**
+    * @Created Leon
     * Evaluates the result of a binary expression of numbers and operators
     * @param exp Expression to evaluate
     * @return Integer result of the evaluation
@@ -515,6 +527,7 @@ public class CodeGen {
     }
     
     /**
+     * @Created emery
      * Used to print messages to the console or file if set to
      * @param line the string to print
      */
@@ -527,6 +540,7 @@ public class CodeGen {
     }
     
     /**
+     * @Created Emery
      * Used to print error messages to the console or file if set to
      * @param line the line to print
      */
@@ -572,6 +586,9 @@ public class CodeGen {
         }
     }
     
+    /**
+     * @Created Leon Verhelst
+     */
     protected class LoopStructure{
         public boolean hasCont;
         public boolean hasExit;

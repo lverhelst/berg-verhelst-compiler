@@ -34,12 +34,13 @@ public class AdministrativeConsole {
     */
    private void initializeCliParser(String [] args){
        opts = new Options();
-       Option helpOption = new Option("help", false, "Displays Help Menu");
+       Option helpOption = new Option("h", false, "Displays Help Menu");
        Option lexOption = new Option("scan", false, "Process up to Lexical Phase");
        Option parseOption = new Option("parse", false, "Process up to the Parser Phase");
-       //Option semOption = new Option("sem", false, "Process up to the Semantic Phase");
-       //Option tupOption = new Option("tup", false, "Process up to the Tuple Phase");
-       Option compOption = new Option ("compile", false, "Process all phases and compile (Default)");
+       Option semOption = new Option("sem", false, "Process up to the Semantic Phase");
+       Option codeOption = new Option("code", false, "Process up to the code Phase");
+       Option compOption = new Option ("compile", false, "Process all phases and compile (Not Implemented)");
+       Option astOption = new Option("ast", false, "Prints the astnode");
        Option quietOption = new Option ("q", false, "Only display error messages (Default)");
        Option verboseOption = new Option("v", false, "Display all Trace Messages");       
        Option devOption = new Option("dev", false, "Displays development messages");
@@ -49,7 +50,10 @@ public class AdministrativeConsole {
        opts.addOption(helpOption);
        opts.addOption(lexOption);
        opts.addOption(parseOption);
+       opts.addOption(semOption);
+       opts.addOption(codeOption);
        opts.addOption(compOption);
+       opts.addOption(astOption);
        opts.addOption(quietOption);
        opts.addOption(verboseOption);
        opts.addOption(devOption);
@@ -103,7 +107,7 @@ public class AdministrativeConsole {
        for(int j = 0; j < i; j++){
            System.out.println("Result:" + results[j][1] + " File: " + results[j][0]);
            if(cmd.hasOption("o")){
-                pWriter.print("Result:" + results[j][1] + " File: " + results[j][0]);
+                pWriter.print(";Result:" + results[j][1] + " File: " + results[j][0]);
            }
        }
        pWriter.close();
@@ -143,31 +147,54 @@ public class AdministrativeConsole {
        }else{
            scn.setTrace(pWriter);
        }
-       scn.verbose = cmd.hasOption("v");
-       //Parse
-       //Create new Parser
-       Parser prs = new Parser(scn);
-       if(cmd.hasOption("dev")) {
-	           prs.development = true;
-        }
-       if(cmd.hasOption("scan")){
-           prs.verbose = false;
-       }else{
-           prs.verbose = cmd.hasOption("v");
-       }
-       prs.setTrace(pWriter);
-       if(cmd.hasOption("o")){
-               prs.printFile = true;
-       }
-
-       ASTNode node = prs.parse(cmd.hasOption("v"));
        
-       didPass &= prs.didPass();
-       SemAnalyzer semAnalyzer = new SemAnalyzer((ASTNode.ProgramNode)node);
-       semAnalyzer.verbose = cmd.hasOption("v");
-       semAnalyzer.ProgramNode((ASTNode.ProgramNode)node);
-       didPass &= !semAnalyzer.error;
-       //System.out.println("Semantic Analyzer: " + node.toString(0));
+       //scan and parse
+       Parser prs = new Parser(scn);
+       scn.setTrace(pWriter);
+       prs.setTrace(pWriter);
+       
+       if(cmd.hasOption("scan")) {
+            scn.verbose = cmd.hasOption("v");
+            scn.printFile = cmd.hasOption("o");
+       } else if (cmd.hasOption("parse")) { 
+            prs.development = cmd.hasOption("dev");           
+            prs.verbose = cmd.hasOption("v");
+            prs.printFile = cmd.hasOption("o");
+       } 
+       
+       prs.ast = cmd.hasOption("ast");
+       
+        ASTNode.ProgramNode node = (ASTNode.ProgramNode)prs.parse();
+        didPass &= !scn.error;
+        didPass &= !prs.error;
+        
+        //only continue if previous run passed
+        if(didPass) {
+            SemAnalyzer semAnalyzer = new SemAnalyzer();
+            CodeGen cg = new CodeGen();
+            semAnalyzer.setTrace(pWriter);
+            cg.setTrace(pWriter);
+            
+            //check for other options
+            if (cmd.hasOption("sem")) {
+                 semAnalyzer.verbose = cmd.hasOption("v");
+                 semAnalyzer.printFile = cmd.hasOption("o");
+            } else if (cmd.hasOption("code")) {
+                 cg.verbose = cmd.hasOption("v");
+                 cg.printFile = cmd.hasOption("o");           
+            } else if (cmd.hasOption("compile")) {
+                System.out.println("Sorry not implemented yet");
+            } 
+
+            semAnalyzer.analyse(node);
+            didPass &= !semAnalyzer.error;            
+            
+            //only continue if previous run passed
+            if(didPass) {
+                cg.ProgramNode(node);
+                didPass &= !cg.error;
+            }
+        }
        return (didPass)? "PASS": "FAIL";
    }  
    /**

@@ -1,36 +1,52 @@
-int main(void) {
-	int val2;
-	int x;
-	x := 10;
-	val2 := 10;
-	x := 10 + val2;
-	return val2;
+int x;
+
+--always true
+bool readBool(void) {
+	int arr[1 * 2];
+	arr[2] := 2;
+	x := arr[1 + 4 mod 2 / 120239821];
+	writeint(arr[1]);
+	return true;
 }
 
-/*
-void r2(int arr[]){
+--outputs a random preset number so its not really random at all
+int readNum(int abc, ref int x) {
+	return 42;
+}
+
+--used to test the case statement
+void testcase(void) {
+	int x;
+	int a;
+	branch (x)
+		case 0: testcase();
+		case 1: readNum(1, x) ;
+		default: ;
+	end;
 	return;
 }
 
+--main program to run
 int main(void) {
-	bool test;
-	int arr[10];
-	int x;
-	arr[1] := x + 5;
-	arr[1] := x + 5;	
+	bool x;
+	int y;
+	x := true;
+	y := -5 * 1/2;
+	y := 5 mod 6;
 
-	test := not true;
-	arr[1] := arr[2];	
-	x := arr[1];
 
-	test := -1 >= 0;
-	loop 
-		{
+	--test the loop function
+	loop
+		--test the if function
+		--if((x < y) && (readNum() > 0) || (y > 0)) {
+		if(true){
+			y := y - 1;
+		} else {
+			--test exit
 			exit;
-
 		}
+	continue;
 	end;
-
-	r2(arr);
 	return 0;
-}*/
+}
+

@@ -29,7 +29,6 @@ public class SemAnalyzer {
         inLoop = false;
         scope = new Stack();
         error = false;
-        
     }
     
     /**
@@ -304,7 +303,6 @@ public class SemAnalyzer {
      */
     private TokenType CallNode(CallNode call) {
         //ensure function has been declared
-        System.out.println(call.alexeme + " " + call.ID);
         FuncDeclarationNode node = (FuncDeclarationNode)this.searchScope(call.ID);
         if(node == null){
             printError("Function Not Declared: " + call.alexeme);
@@ -367,10 +365,11 @@ public class SemAnalyzer {
             }
         }
         
-        if(!node.assigned) {
-            printError("Uninitialized Variable: " + var.alexeme);
-            node.assigned = true;
-        }
+//        Attempt to fix unintialized variables but is not dynamic
+//        if(!node.assigned) {
+//            printError("Uninitialized Variable: " + var.alexeme);
+//            node.assigned = true;
+//        }
         
         //return the type???
         return node.specifier;

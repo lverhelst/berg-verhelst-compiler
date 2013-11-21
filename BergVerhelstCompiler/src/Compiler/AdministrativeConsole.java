@@ -34,12 +34,13 @@ public class AdministrativeConsole {
     */
    private void initializeCliParser(String [] args){
        opts = new Options();
-       Option helpOption = new Option("help", false, "Displays Help Menu");
+       Option helpOption = new Option("h", false, "Displays Help Menu");
        Option lexOption = new Option("scan", false, "Process up to Lexical Phase");
        Option parseOption = new Option("parse", false, "Process up to the Parser Phase");
        Option semOption = new Option("sem", false, "Process up to the Semantic Phase");
        Option codeOption = new Option("code", false, "Process up to the code Phase");
-       Option compOption = new Option ("compile", false, "Process all phases and compile (Default)");
+       Option compOption = new Option ("compile", false, "Process all phases and compile (Not Implemented)");
+       Option astOption = new Option("ast", false, "Prints the astnode");
        Option quietOption = new Option ("q", false, "Only display error messages (Default)");
        Option verboseOption = new Option("v", false, "Display all Trace Messages");       
        Option devOption = new Option("dev", false, "Displays development messages");
@@ -52,6 +53,7 @@ public class AdministrativeConsole {
        opts.addOption(semOption);
        opts.addOption(codeOption);
        opts.addOption(compOption);
+       opts.addOption(astOption);
        opts.addOption(quietOption);
        opts.addOption(verboseOption);
        opts.addOption(devOption);
@@ -160,6 +162,8 @@ public class AdministrativeConsole {
             prs.printFile = cmd.hasOption("o");
        } 
        
+       prs.ast = cmd.hasOption("ast");
+       
         ASTNode.ProgramNode node = (ASTNode.ProgramNode)prs.parse();
         didPass &= !scn.error;
         didPass &= !prs.error;
@@ -170,7 +174,7 @@ public class AdministrativeConsole {
             CodeGen cg = new CodeGen();
             semAnalyzer.setTrace(pWriter);
             cg.setTrace(pWriter);
-
+            
             //check for other options
             if (cmd.hasOption("sem")) {
                  semAnalyzer.verbose = cmd.hasOption("v");
@@ -179,11 +183,11 @@ public class AdministrativeConsole {
                  cg.verbose = cmd.hasOption("v");
                  cg.printFile = cmd.hasOption("o");           
             } else if (cmd.hasOption("compile")) {
-                System.out.println("Sorry not implemented yet");
+                System.out.println("Sorry compile option not implemented yet");
             } 
 
             semAnalyzer.analyse(node);
-            didPass &= !semAnalyzer.error;
+            didPass &= !semAnalyzer.error;            
             
             //only continue if previous run passed
             if(didPass) {

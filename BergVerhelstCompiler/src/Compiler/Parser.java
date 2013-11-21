@@ -20,6 +20,7 @@ public class Parser{
     
     private PrintWriter printWriter;
     private boolean quite;
+    public boolean ast;
     public boolean verbose;
     public boolean printFile;
     public boolean error;
@@ -48,8 +49,7 @@ public class Parser{
        TNSet synch = PROGRAM.followSet();
        rootNode = (ASTNode)visit("program", synch);
        //Print AST
-       if(!error)
-            print(((ProgramNode)rootNode).toString());
+       printAST((ProgramNode)rootNode);
        
        error |= scn.error;
        
@@ -1027,6 +1027,18 @@ public class Parser{
             System.out.println(line);
             if(printFile)
               printWriter.print(line + "\r\n");
+        }
+    }
+    
+    /**
+     * Used to print messages to the console or file if set to
+     * @param program the root node to print
+     */
+    public void printAST(ProgramNode program) {
+        if(ast) {  
+            System.out.println(program);
+            if(printFile)
+              printWriter.print(program + "\r\n");
         }
     }
     

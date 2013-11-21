@@ -5,7 +5,6 @@ import static Compiler.FFSet.*;
 import java.io.PrintWriter;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.io.FileReader;
 
 /**
  * @author Leon Verhelst and Emery Berg
@@ -21,6 +20,7 @@ public class Parser{
     
     private PrintWriter printWriter;
     private boolean quite;
+    public boolean ast;
     public boolean verbose;
     public boolean printFile;
     public boolean error;
@@ -37,11 +37,10 @@ public class Parser{
 
     /**
      * Method stub for next phase, currently retrieves all tokens
-     * @param showTrace 
      * @return boolean value representing pass(true) or fail (false)
      * @created by Leon, Modified by Emery
      */
-    public ASTNode parse(Boolean showTrace){
+    public ASTNode parse(){
        error = false; //ensure error value is reset for all runs
        Token currentToken;
        currentToken = scn.getToken();
@@ -50,8 +49,7 @@ public class Parser{
        TNSet synch = PROGRAM.followSet();
        rootNode = (ASTNode)visit("program", synch);
        //Print AST
-       if(!error)
-            print(((ProgramNode)rootNode).toString());
+       printAST((ProgramNode)rootNode);
        
        error |= scn.error;
        
@@ -151,15 +149,22 @@ public class Parser{
      * @created by Emery
      */
     public ASTNode program(TNSet synch) { 
-        System.out.println(Thread.currentThread().getStackTrace()[1].getMethodName());
+       // System.out.println(Thread.currentThread().getStackTrace()[1].getMethodName());
         ProgramNode root = rootNode.new ProgramNode(); 
         FuncDeclarationNode currentFunc =  null;
         VarDeclarationNode currentVarDec = null;
        
         Object declaration = visit("declaration", synch.union(DECLARATION.firstSet()));
+        
+        currentFunc = root.funcdeclaration;
+        
+        while(currentFunc.nextFuncDec != null) {
+            currentFunc = currentFunc.nextFuncDec;
+        } 
+        
         if(declaration instanceof FuncDeclarationNode){
-            root.funcdeclaration.nextFuncDec = (FuncDeclarationNode)declaration;
-            currentFunc = root.funcdeclaration.nextFuncDec;
+            currentFunc.nextFuncDec = (FuncDeclarationNode)declaration;
+            currentFunc = currentFunc.nextFuncDec;
         }
         else{       
             root.vardeclaration = (VarDeclarationNode)declaration;
@@ -170,13 +175,11 @@ public class Parser{
             declaration = visit("declaration", synch.union(DECLARATION.firstSet()));
             if(declaration instanceof FuncDeclarationNode){
                 if(currentFunc == null){
-                    root.funcdeclaration = (FuncDeclarationNode)declaration;
-                    currentFunc = root.funcdeclaration; 
+                    currentFunc = (FuncDeclarationNode)declaration;
                 }else{
                     currentFunc.nextFuncDec = (FuncDeclarationNode)declaration;
                     currentFunc = currentFunc.nextFuncDec;
-                }
-               
+                }               
             }else       {
                 if(currentVarDec == null){
                      root.vardeclaration = (VarDeclarationNode)declaration;
@@ -341,11 +344,15 @@ public class Parser{
         ParameterNode node = rootNode.new ParameterNode();
         ParameterNode current = node;
         if(PARAM.firstSet().contains(lookahead.getName())){
+            if(lookahead.getName() == TokenType.REF)
+                    current.ref = true;
             node.setParam((Token)visit("param", synch.union(PARAM.firstSet()).union(PARAMS.followSet()).union(TokenType.COMMA)));
             while(this.lookahead.getName() == TokenType.COMMA){
                 current.nextNode = rootNode.new ParameterNode();
                 current = current.nextNode;
                 match(TokenType.COMMA, synch.union(PARAM.firstSet()).union(PARAMS.followSet()));
+                if(lookahead.getName() == TokenType.REF)
+                    current.ref = true;
                 current.setParam((Token)visit("param", synch.union(PARAM.firstSet()).union(PARAMS.followSet()).union(TokenType.COMMA)));
             }   
         }else{
@@ -362,7 +369,7 @@ public class Parser{
     public Token param(TNSet synch) {
         String ID;
         String lexeme;
-        if(lookahead.getName() == TokenType.REF){ 
+        if(lookahead.getName() == TokenType.REF){
             match(TokenType.REF, synch.union(NONVOIDSPEC.firstSet()));
             TokenType t = (TokenType)visit("nonvoidSpec", synch);
             ID = lookahead.getAttribute_Value();
@@ -373,9 +380,9 @@ public class Parser{
             TokenType t = (TokenType)visit("nonvoidSpec", synch);
             ID = lookahead.getAttribute_Value();
             lexeme = lookahead.getLexeme();
-            match(TokenType.ID, synch);
+            match(TokenType.ID, synch.union(IDTAIL.firstSet()));
             if(lookahead.getName() == TokenType.LSQR){
-                match(TokenType.LSQR, synch);
+                match(TokenType.LSQR, synch.union(IDTAIL.followSet()));
                 match(TokenType.RSQR, synch);
             }
             return new Token(t, lexeme, ID);
@@ -446,11 +453,23 @@ public class Parser{
             Object temp = visit("idstmtTail", synch);
             if(temp instanceof ASTNode.AssignmentNode){
                 ASTNode.AssignmentNode node = (ASTNode.AssignmentNode)temp;
+               // varNode.offset = node.index;
                 node.leftVar = varNode;
                 return node;
             }else {
                 if(ID != null){
-                    ((ASTNode.CallNode)temp).ID = Integer.parseInt(ID);
+                    
+                    if(lex.equals("readint")){
+                        ((ASTNode.CallNode)temp).ID = -4;
+                    }else if(lex.equals("writeint")){
+                        ((ASTNode.CallNode)temp).ID = -3;
+                    }else if(lex.equals("readbool")){
+                        ((ASTNode.CallNode)temp).ID = -2;
+                    }else if(lex.equals("writebool")){
+                        ((ASTNode.CallNode)temp).ID = -1;
+                    }else{
+                        ((ASTNode.CallNode)temp).ID = Integer.parseInt(ID);
+                    }
                     ((ASTNode.CallNode)temp).alexeme = lex;
                 }
                 return (ASTNode.CallNode)temp;
@@ -483,7 +502,6 @@ public class Parser{
         if(lookahead.getName() == TokenType.LSQR){
             match(TokenType.LSQR, synch.union(ADDEXP.firstSet().union(EXPRESSION.firstSet())).union(TokenType.RSQR).union(TokenType.ASSIGN));
             current.index = (Expression)visit("addExp", synch.union(ADDEXP.firstSet().union(EXPRESSION.firstSet())).union(TokenType.RSQR).union(TokenType.ASSIGN));
-            //visit("addExp", synch.union(ADDEXP.firstSet().union(EXPRESSION.firstSet())).union(TokenType.RSQR));
             match(TokenType.RSQR, synch.union((EXPRESSION.firstSet())).union(TokenType.ASSIGN));
         }
         match(TokenType.ASSIGN, synch.union((EXPRESSION.firstSet())));
@@ -686,13 +704,14 @@ public class Parser{
         CaseNode node = rootNode.new CaseNode();
         if(lookahead.getName() == TokenType.CASE){
             match(TokenType.CASE, synch.union(STATEMENT.firstSet()).union(TokenType.NUM).union(TokenType.COLON));
+            node.num = lookahead.getAttribute_Value();
             match(TokenType.NUM, synch.union(STATEMENT.firstSet()).union(TokenType.COLON));
             match(TokenType.COLON, synch.union(STATEMENT.firstSet()));
-            node.stmt = (Statement)visit("statement", synch);
+            node.stmt = (ASTNode)visit("statement", synch);
         }else if(lookahead.getName() == TokenType.DEFAULT){
             match(TokenType.DEFAULT, synch.union(STATEMENT.firstSet()).union(TokenType.COLON));
             match(TokenType.COLON, synch.union(STATEMENT.firstSet()));
-            node.stmt = (Statement)visit("statement", synch);
+            node.stmt = (ASTNode)visit("statement", synch);
         }//else
          //   printError("CaseStmt Error: " + lookahead.getName());
         return node;
@@ -737,9 +756,9 @@ public class Parser{
         
         while(ADDOP.firstSet().contains(lookahead.getName())){
             BinopNode subNode = rootNode.new BinopNode();
-            subNode.Rside = node;
+            subNode.Lside = node;
             subNode.specifier = (TokenType)visit("addop",  synch.union(TERM.firstSet().union(ADDOP.firstSet())));
-            subNode.Lside = (Expression)visit("term", synch.union(TERM.firstSet()));
+            subNode.Rside = (Expression)visit("term", synch.union(TERM.firstSet()));
             node = subNode;
         }
         return node;
@@ -800,8 +819,10 @@ public class Parser{
         }else if(lookahead.getName() == TokenType.BLIT){
 
             LiteralNode node = rootNode.new LiteralNode();
+            node.lexeme = lookahead.getAttribute_Value();
             match(TokenType.BLIT, synch);
             node.specifier = TokenType.BLIT;
+            
             return node;
         }else{
             printError("nidFactor error: " + lookahead.getName());  
@@ -833,10 +854,19 @@ public class Parser{
             //IS Call
             CallNode cnode = (CallNode)e;
             cnode.specifier = TokenType.ID;
+            System.out.println(ID);
             if(ID != null)
                 cnode.ID = Integer.parseInt(ID);
+            if(lex.equals("readint")){
+                cnode.ID = -4;
+            }else if(lex.equals("writeint")){
+                cnode.ID = -3;
+            }else if(lex.equals("readbool")){
+                cnode.ID = -2;
+            }else if(lex.equals("writebool")){
+                cnode.ID = -1;
+            }
             cnode.alexeme = lex;
-            
             return cnode;
         }
     }
@@ -997,6 +1027,18 @@ public class Parser{
             System.out.println(line);
             if(printFile)
               printWriter.print(line + "\r\n");
+        }
+    }
+    
+    /**
+     * Used to print messages to the console or file if set to
+     * @param program the root node to print
+     */
+    public void printAST(ProgramNode program) {
+        if(ast) {  
+            System.out.println(program);
+            if(printFile)
+              printWriter.print(program + "\r\n");
         }
     }
     

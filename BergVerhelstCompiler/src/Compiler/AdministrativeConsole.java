@@ -191,7 +191,7 @@ public class AdministrativeConsole {
             
             //only continue if previous run passed
             if(didPass) {
-                cg.ProgramNode(node);
+                cg.generateCode(node);
                 didPass &= !cg.error;
             }
         }

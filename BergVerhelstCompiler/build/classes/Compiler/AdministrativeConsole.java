@@ -183,7 +183,7 @@ public class AdministrativeConsole {
                  cg.verbose = cmd.hasOption("v");
                  cg.printFile = cmd.hasOption("o");           
             } else if (cmd.hasOption("compile")) {
-                System.out.println("Sorry not implemented yet");
+                System.out.println("Sorry compile option not implemented yet");
             } 
 
             semAnalyzer.analyse(node);
@@ -191,7 +191,7 @@ public class AdministrativeConsole {
             
             //only continue if previous run passed
             if(didPass) {
-                cg.ProgramNode(node);
+                cg.generateCode(node);
                 didPass &= !cg.error;
             }
         }

@@ -802,7 +802,9 @@ public class Parser{
 
         if(lookahead.getName() == TokenType.NOT){
             match(TokenType.NOT, synch.union(FACTOR.firstSet()));
-            return (ASTNode)visit("factor", synch);
+            Expression temp = (Expression)visit("factor", synch);
+            temp.negate();
+            return (ASTNode)temp;
         }else if(lookahead.getName() == TokenType.LPAREN){
             ASTNode node;
             match(TokenType.LPAREN, synch.union(EXPRESSION.firstSet()).union(new TNSet(TokenType.RPAREN)));

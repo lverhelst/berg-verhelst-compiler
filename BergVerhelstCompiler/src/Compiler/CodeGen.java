@@ -29,6 +29,8 @@ public class CodeGen {
     int displacement;
     int level;
     
+    String active_address;
+    
     /**
      * Generate code based on the annotated AST
      * @param root as ProgramNode to use as the root of the program 
@@ -47,6 +49,8 @@ public class CodeGen {
         offset = 0;
         displacement = 0;
         level = 0;
+        
+        active_address = "";
     }    
     
     public void generateCode(ProgramNode rootNode){
@@ -148,9 +152,9 @@ public class CodeGen {
        // expression(ifNode.exp);
         String store_exp_result = this.genTemp();
         
-        code.add(new Quadruple("asg", expression(ifNode.exp), "-", store_exp_result));
+//        code.add(new Quadruple("asg", , "-", store_exp_result));
         //conditional jump if false
-        code.add(new Quadruple("iff", store_exp_result, "-", "LABEL TO ELSE STUFF"));  
+        code.add(new Quadruple("iff", expression(ifNode.exp), "-", "LABEL TO ELSE STUFF"));  
         int toElse = code.size() - 1;
         //Generate Code for if true statments
         statement(ifNode.stmt);
@@ -337,6 +341,12 @@ public class CodeGen {
         if(lvl_displacement) {
             address = "(" + var.declaration.getLevel() + "," + 
                 var.declaration.getDisplacement() + ")";
+        }        
+        
+        if(var.negate) {
+            String temp = this.genTemp(); //replace with active address
+            code.add(new Quadruple("not", address, "-", temp));
+            address = temp;
         }
         
         if(var.offset != null) {
@@ -356,7 +366,7 @@ public class CodeGen {
         String temp = lit.lexeme;
         
         if(lit.negate) {
-            temp = this.genTemp();
+            temp = this.genTemp(); //replace with active address
             code.add(new Quadruple("not", lit.lexeme, "-", temp));
         }
         

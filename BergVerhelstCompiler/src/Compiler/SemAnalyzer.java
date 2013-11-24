@@ -69,9 +69,12 @@ public class SemAnalyzer {
             printError("Program must have one or more declarations");
         }
         
+        int variables = 0;
+        
         //process all global variable declarations
         while(var != null) {
-            VarDeclarationNode(var);                        
+            VarDeclarationNode(var);
+            var.displacement = variables++;
             var = var.nextVarDec;
         } 
         
@@ -98,11 +101,18 @@ public class SemAnalyzer {
      */
     private void FuncDeclarationNode(FuncDeclarationNode func) {      
         scope.push(new ArrayList<listRecord>());
-        ParameterNode param = func.params;        
-               
+        ParameterNode param = func.params;
+        
+        func.compoundStmt.displacement = 2;
+        int displacement = -1;
+        
         //search all params
         while(param != null) {
-            ParameterNode(func.params);
+            func.num_params++;
+            if(param.param != TokenType.VOID)
+                ParameterNode(param);
+            
+            param.displacement = displacement--;
             param = param.nextNode;
         }
         
@@ -121,8 +131,10 @@ public class SemAnalyzer {
      */
     private void VarDeclarationNode(VarDeclarationNode var) { 
         Declaration current = searchCurrentScope(var.ID);
+        
         if(current == null) {      
             scope.peek().add(new listRecord(var, var.ID));
+            var.level = cur_lvl;
         } else {
             printError(var.alexeme + " has already been declared within the current scope");
         }
@@ -139,10 +151,7 @@ public class SemAnalyzer {
      * @Class Emery
      */
     private void ParameterNode(ParameterNode param) {
-        //check for redeclaration errors
-        if(searchScope(param.ID) == null) {
-            scope.peek().add(new listRecord(param, param.ID, param.alexeme));
-        }
+        scope.peek().add(new listRecord(param, param.ID, param.alexeme));
     }
     
     /**
@@ -154,9 +163,12 @@ public class SemAnalyzer {
         TokenType type = null;
         scope.push(new ArrayList<listRecord>());
         
-        for(VarDeclarationNode var: compound.variableDeclarations) {
+        compound.level = cur_lvl++;
+                
+        for(VarDeclarationNode var: compound.variableDeclarations) {            
+            var.displacement = compound.displacement++;
             VarDeclarationNode(var);
-        }
+        }        
         
         //check child stmts and their returns
         for(ASTNode stmt: compound.statements) {
@@ -172,7 +184,9 @@ public class SemAnalyzer {
                 statement(stmt);
             }
         }
-        scope.pop();
+        scope.pop();        
+        cur_lvl--;
+        
         return type;
     }
     /**
@@ -181,11 +195,16 @@ public class SemAnalyzer {
      */
     private void AssignmentNode(AssignmentNode assignment) {        
         Declaration node = this.searchScope(assignment.leftVar.ID);
-        if(node != null) {
+        if(node != null && node instanceof VarDeclarationNode) {
             ((VarDeclarationNode)node).assigned = true;
         }
         //check var to ensure it has been declared
-        TokenType leftSide = VariableNode(assignment.leftVar); 
+        TokenType leftSide = VariableNode(assignment.leftVar);
+        
+        if(node instanceof ParameterNode) {
+            leftSide = node.getSpecifier();
+        }
+        
         //check expressions for what type it is
         if(assignment.index != null){
             if(!expressionIsInt(assignment.index)){
@@ -302,6 +321,9 @@ public class SemAnalyzer {
      * @Created Leon
      */
     private TokenType CallNode(CallNode call) {
+        int store_lvl = cur_lvl;
+        cur_lvl = 1;
+        
         //ensure function has been declared
         FuncDeclarationNode node = (FuncDeclarationNode)this.searchScope(call.ID);
         if(node == null){
@@ -312,9 +334,11 @@ public class SemAnalyzer {
             call.declaration = node;
         }
         ParameterNode param = node.params;
+        int num_params = node.num_params * -1;
         //check arguments against the functions parameters
         for(Expression e: call.arguments){
-            TokenType temp = expression(e);
+            param.displacement = num_params++;
+            TokenType temp = expression(e);            
             
             if(param == null) {
                 printError(node.alexeme + " call number of parameters do not match");
@@ -325,18 +349,15 @@ public class SemAnalyzer {
             }
 
             if(param != null)
-                    param = param.nextNode;
+                param = param.nextNode;
         }
         
         if(!(param == null || param.param == TokenType.VOID)) {
             printError(node.alexeme + " call number of parameters do not match");
         }
         
-        //check if return type is used and valid
-        if(node != null)
-            return node.getSpecifier();
-        else 
-            return call.specifier;
+        cur_lvl = store_lvl;
+        return node.getSpecifier();
     }
     
     /**
@@ -345,14 +366,14 @@ public class SemAnalyzer {
      */
     private TokenType VariableNode(VariableNode var) {
         //check if var has been declared add to scope if not
-        VarDeclarationNode node = (VarDeclarationNode)this.searchScope(var.ID);
+        Declaration node = this.searchScope(var.ID);
         if(node == null){
             node = var.new VarDeclarationNode();
-            node.ID = var.ID;
-            node.specifier = TokenType.UNI;
+            ((VarDeclarationNode)node).ID = var.ID;
+            ((VarDeclarationNode)node).specifier = TokenType.UNI;
             //Adjust the AST to reflect the attempt change
             var.specifier = TokenType.UNI;
-            scope.peek().add(new listRecord(node, node.ID));
+            scope.peek().add(new listRecord(node, ((VarDeclarationNode)node).ID));
             
             printError("Undeclared Identifier: " + ((var.alexeme == null)?"":var.alexeme));
         } else {
@@ -371,8 +392,7 @@ public class SemAnalyzer {
 //            node.assigned = true;
 //        }
         
-        //return the type???
-        return node.specifier;
+        return node.getSpecifier();
     }
     
     /**
@@ -452,6 +472,8 @@ public class SemAnalyzer {
             BranchNode((BranchNode) stmt);
         else if (stmt.getClass() == CallNode.class)
             CallNode((CallNode) stmt);
+        else if (stmt.getClass() == CompoundNode.class)
+            CompoundNode((CompoundNode) stmt);
         return null;
     }
     /**

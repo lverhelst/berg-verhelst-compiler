@@ -11,9 +11,12 @@ public class ASTNode{
     }    
     public interface Expression{
         public String toString(int depth);
+        public void negate();
     }
     public interface Declaration{
         public TokenType getSpecifier();
+        public int getLevel();
+        public int getDisplacement();
         public String toString(int depth);
     }
     
@@ -87,7 +90,8 @@ public class ASTNode{
         ParameterNode params; 
         CompoundNode compoundStmt;  
         FuncDeclarationNode nextFuncDec;
-       
+        int num_params;
+        
         @Override
         public TokenType getSpecifier(){
              return specifier;
@@ -102,6 +106,16 @@ public class ASTNode{
                 temp += format(compoundStmt, depth);  
             return formatChild(temp, depth) + ((nextFuncDec == null) ? "" :  format(nextFuncDec, depth - 1));
         }
+
+        @Override
+        public int getLevel() {
+            return 0;
+        }
+
+        @Override
+        public int getDisplacement() {
+            return 0;
+        }
     }
     
     /**
@@ -114,6 +128,14 @@ public class ASTNode{
         Expression offset;
         VarDeclarationNode nextVarDec;
         boolean assigned;
+        
+        int level;   //stores the depth and offset position
+        int displacement;
+        
+        public VarDeclarationNode() {
+            level = 0;
+            displacement = 0;
+        }
         
         @Override
         public TokenType getSpecifier(){
@@ -128,6 +150,16 @@ public class ASTNode{
             
             return formatChild(temp, depth) + ((nextVarDec == null) ? "" : format(nextVarDec, depth - 1));
         }
+
+        @Override
+        public int getLevel() {
+           return level;
+        }
+
+        @Override
+        public int getDisplacement() {
+            return displacement;
+        }
     }
     
     /**
@@ -139,6 +171,12 @@ public class ASTNode{
         TokenType param;
         ParameterNode nextNode; 
         boolean ref;
+        
+        int displacement;
+        
+        public ParameterNode() {
+            displacement = 0;
+        }
         
         /**
          * Used to convert an ID into a param object
@@ -160,6 +198,16 @@ public class ASTNode{
             
             return formatChild(temp, depth) + ((nextNode == null)?"":format(nextNode, depth - 1));
         }
+
+        @Override
+        public int getLevel() {
+           return 1;
+        }
+
+        @Override
+        public int getDisplacement() {
+            return displacement;
+        }
     }
     
     /**
@@ -171,9 +219,14 @@ public class ASTNode{
         ArrayList<VarDeclarationNode> variableDeclarations;
         ArrayList<ASTNode> statements;   
         
+        int level;
+        int displacement;
+        
         public CompoundNode(){
             variableDeclarations = new ArrayList<VarDeclarationNode>();
             statements = new ArrayList<ASTNode>();
+            level = 0;
+            displacement = 0;
         }
         
         @Override
@@ -360,6 +413,9 @@ public class ASTNode{
             }
             return formatChild(temp, depth);
         }
+
+        @Override
+        public void negate() {}
     }
     /**
      * This stores a variable ex: INT x;
@@ -368,14 +424,10 @@ public class ASTNode{
     public class VariableNode extends ASTNode implements Expression{
         TokenType specifier;
         Expression offset;
-        int ID, level, displacement;
+        int ID;
         Declaration declaration;
-        
-        VariableNode(){
-            level = 0;
-            displacement = 0;
-        }
-        
+        boolean negate;
+                
          @Override
         public String toString(int depth) {
             //if(declaration == null)
@@ -383,6 +435,11 @@ public class ASTNode{
            // else
             //     return formatChild("[Reference] " + declaration, depth); + "\r\n Level: " + level +" Displacement: " + displacement
                              
+        }
+
+        @Override
+        public void negate() {
+            negate = true;
         }
     }
     /**
@@ -392,10 +449,16 @@ public class ASTNode{
     public class LiteralNode extends ASTNode implements Expression{
         TokenType specifier;
         String lexeme;
+        boolean negate;
         
          @Override
         public String toString(int depth) {
             return formatChild("[Literal] " + specifier + (lexeme != null? " lexeme: " + lexeme: "") + "\r\n", depth);                    
+        }
+
+        @Override
+        public void negate() {
+            negate = true;
         }
     }
     /**
@@ -413,6 +476,9 @@ public class ASTNode{
             
             return formatChild(temp, depth);
         }
+
+        @Override
+        public void negate() {}
     }
     /**
      * Binary Operation Node
@@ -432,6 +498,9 @@ public class ASTNode{
             temp += format((ASTNode)Rside, depth);
             return formatChild(temp, depth);
         }
+
+        @Override
+        public void negate() {}
     }
     
     /**

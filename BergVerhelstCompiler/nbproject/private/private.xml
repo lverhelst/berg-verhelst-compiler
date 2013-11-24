@@ -4,9 +4,8 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/C:/Users/Emery/berg-verhelst-compiler/BergVerhelstCompiler/src/Compiler/SemAnalyzer.java</file>
-            <file>file:/C:/Users/Emery/berg-verhelst-compiler/BergVerhelstCompiler/src/Compiler/ASTNode.java</file>
-            <file>file:/C:/Users/Emery/berg-verhelst-compiler/BergVerhelstCompiler/src/Compiler/Parser.java</file>
+            <file>file:/home/emery/berg-verhelst-compiler/BergVerhelstCompiler/src/Compiler/AdministrativeConsole.java</file>
+            <file>file:/home/emery/berg-verhelst-compiler/BergVerhelstCompiler/src/Compiler/SemAnalyzer.java</file>
         </group>
     </open-files>
 </project-private>

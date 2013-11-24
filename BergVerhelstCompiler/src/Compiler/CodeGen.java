@@ -3,6 +3,7 @@ package Compiler;
 import Compiler.ASTNode.*;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  *
@@ -10,17 +11,23 @@ import java.util.ArrayList;
  */
 public class CodeGen {      
     private ArrayList<Quadruple> code;
+    private HashMap<String, Integer> functions;
     private PrintWriter printWriter;
     public boolean verbose;
     public boolean printFile;
     public boolean error;
+    public boolean lvl_displacement;
     
     private int numTempVars;
     private int numLabels;
-    
+        
     private ArrayList<LoopStructure> loopStructs;
     int loopLvl;
     int num_params_cur_func;
+    
+    int offset;
+    int displacement;
+    int level;
     
     /**
      * Generate code based on the annotated AST
@@ -30,15 +37,28 @@ public class CodeGen {
     public CodeGen() {
         code = new ArrayList<Quadruple>();
         loopStructs = new ArrayList<LoopStructure>();
+        functions = new HashMap<String, Integer>();
         error = false;
         numTempVars = 0;
         loopLvl = 0;
         num_params_cur_func = 0;
-
+        lvl_displacement = true;
+        
+        offset = 0;
+        displacement = 0;
+        level = 0;
     }    
     
     public void generateCode(ProgramNode rootNode){
         this.ProgramNode(rootNode);
+        
+        for(Quadruple quad: code) {
+            if(lvl_displacement && quad.op.equals("call")) {
+                quad.arg = functions.get(quad.arg) + "";
+            }
+            
+            print(quad.toString());
+        }   
     }
     
     /**
@@ -59,10 +79,6 @@ public class CodeGen {
                 FuncDeclarationNode(func);  
             func = func.nextFuncDec;
         }
-        
-        for(Quadruple quad: code) {
-            print(quad.toString());
-        }
     }
     
     /**
@@ -70,7 +86,8 @@ public class CodeGen {
      * @Class Emery
      */
     private void FuncDeclarationNode(FuncDeclarationNode func) {
-        code.add(new Quadruple("fun", func.alexeme, this.getLocalSize(func) + "", "-"));
+        code.add(new Quadruple("fun", func.alexeme, getLocalSize(func) + "", "-"));
+        functions.put(func.alexeme, code.size() - 1);
         int num_params = 0;
         ParameterNode param = func.params;             
         //search all params
@@ -93,11 +110,22 @@ public class CodeGen {
      * @Class Emery
      */
     private void CompoundNode(CompoundNode compound) {
-        code.add(new Quadruple("ecs", this.getLocalSize(compound)+ "","-","-"));
+        int store_displacement = displacement;
+        int store_offset = offset;
+        
+        displacement = this.getLocalSize(compound);
+        offset = 0;
+        level = compound.level;
+        
+        code.add(new Quadruple("ecs", getLocalSize(compound) + "","-","-"));
         //check child stmts and their returns
         for(ASTNode stmt: compound.statements) {
             statement(stmt);
         }
+        
+        displacement = store_displacement;
+        offset = store_offset;
+        
         code.add(new Quadruple("lcs", "-", "-", "-"));
     }
     /**
@@ -106,9 +134,9 @@ public class CodeGen {
      */
     private void AssignmentNode(AssignmentNode assignment) {
         if(assignment.index != null)
-            code.add(new Quadruple("tae", expression(assignment.expersion), expression(assignment.index), VariableNode(assignment.leftVar)));
+            code.add(new Quadruple("tae", expression(assignment.expersion), expression(assignment.index), expression(assignment.leftVar)));
         else
-            code.add(new Quadruple("asg", expression(assignment.expersion), "-", VariableNode(assignment.leftVar)));
+            code.add(new Quadruple("asg", expression(assignment.expersion), "-", expression(assignment.leftVar)));
     }
     
     /**
@@ -210,7 +238,7 @@ public class CodeGen {
      */
     private void ReturnNode(ReturnNode returnNode) {        
        if(returnNode.exp == null){
-            code.add(new Quadruple("ret",num_params_cur_func + "","-","-"));
+            code.add(new Quadruple("ret", num_params_cur_func + "","-","-"));
        }else{
             code.add(new Quadruple("retv", num_params_cur_func + "", expression(returnNode.exp), "-"));
        }
@@ -280,16 +308,23 @@ public class CodeGen {
             code.add(new Quadruple("wrb",expression(call.arguments.get(0)),"-","-"));  
             return temp;
         }   
-            
-        code.add(new Quadruple("rval","-","-",this.genTemp()));  
+        
+        String temp = genTemp();
+        code.add(new Quadruple("rval","-","-",temp));  
         
         //check arguments against the functions parameters
-        for(Expression e: call.arguments){           
+        for(Expression e: call.arguments){ 
+            if(e instanceof VariableNode) {
+                Declaration declare = ((VariableNode)e).declaration;
+                if(declare instanceof VarDeclarationNode) {
+                    ((VarDeclarationNode)declare).level = level;
+                } 
+            }
             code.add(new Quadruple("arg",expression(e),"-", "-"));
         }
         
         code.add(new Quadruple("call",call.alexeme,"-","-"));
-        return call.alexeme;
+        return temp;
     }
     
     /**
@@ -297,12 +332,19 @@ public class CodeGen {
      * @Created Leon
      */
     private String VariableNode(VariableNode var) {
+        String address = var.alexeme;                
+        
+        if(lvl_displacement) {
+            address = "(" + var.declaration.getLevel() + "," + 
+                var.declaration.getDisplacement() + ")";
+        }
+        
         if(var.offset != null) {
             String tvar = this.genTemp();
-            code.add(new Quadruple("fae", var.alexeme, expression(var.offset), tvar));
+            code.add(new Quadruple("fae", address, expression(var.offset), tvar));
             return tvar;
         }
-        return var.alexeme;
+        return address;
     }
     
     /**
@@ -311,7 +353,14 @@ public class CodeGen {
      * @return Type of the literal (NUM, BLIT)
      */
     private String LiteralNode(LiteralNode lit) {
-        return lit.lexeme;
+        String temp = lit.lexeme;
+        
+        if(lit.negate) {
+            temp = this.genTemp();
+            code.add(new Quadruple("not", lit.lexeme, "-", temp));
+        }
+        
+        return temp;
     }
     
     /**
@@ -410,17 +459,22 @@ public class CodeGen {
     * @return Generated the next temporary variable
     */
    private String genTemp(){
-       //This method is used to generate a temporary variable to be used 
-       //This method needs a counter to keep track of current variables
-       //This method's counter will decrement when a temporary variable is used
-       //The above statement allows the reuse of temporary variables in a single expression
-       
-       //Increment first to start temporary variables at t1 since we init to 0;
-       numTempVars++;
-      String varLexeme = "t" + numTempVars; 
-      //System.out.println("Temporary Variable Generated: " + varLexeme);
-      
-      return varLexeme;
+        //This method is used to generate a temporary variable to be used 
+        //This method needs a counter to keep track of current variables
+        //This method's counter will decrement when a temporary variable is used
+        //The above statement allows the reuse of temporary variables in a single expression
+
+        //Increment first to start temporary variables at t1 since we init to 0;
+        numTempVars++;
+        offset++;
+        String varLexeme = "t" + numTempVars;
+        
+        if(lvl_displacement) {
+            varLexeme = "(" + level + "," + (displacement + offset) + ")";
+        } 
+        //S   ystem.out.println("Temporary Variable Generated: " + varLexeme);
+
+        return varLexeme;
       
    }
    /**

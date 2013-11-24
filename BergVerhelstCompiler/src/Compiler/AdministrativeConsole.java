@@ -5,8 +5,6 @@ import java.io.PrintWriter;
 import java.util.List;
 import org.apache.commons.cli.*;
 
-
-
 //Command Line Parsing Libary: commons-cli-1.2
 
 /**

@@ -4,7 +4,9 @@ int x;
 bool readBool(void) {
 	int arr[1 * 2];
 	arr[2] := 2;
+	{ {
 	x := arr[1 + 4 mod 2 / 120239821];
+	} }
 	writeint(arr[1]);
 	return true;
 }

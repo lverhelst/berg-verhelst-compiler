@@ -568,13 +568,13 @@ public class Parser{
             node = (VarDeclarationNode)visit("vardecTail", tempSynch);
             node.specifier = t;
             node.alexeme = lex;
-            node.ID = Integer.parseInt(ID);
+            node.ID = Integer.parseInt(ID);            
+            current.variableDeclarations.add(node);
             VarDeclarationNode temp = node;
             while(temp.nextVarDec != null){
                 temp = temp.nextVarDec;
                 temp.specifier = t;
             }
-            current.variableDeclarations.add(node);
         }
         while(STATEMENT.firstSet().contains(lookahead.getName())){
              current.statements.add((ASTNode)visit("statement", synch.union(STATEMENT.firstSet()).union(TokenType.RCRLY)));

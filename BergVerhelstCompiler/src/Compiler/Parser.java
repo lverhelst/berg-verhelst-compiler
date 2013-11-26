@@ -309,7 +309,7 @@ public class Parser{
         VarDeclarationNode current = rootNode.new VarDeclarationNode();
         if(lookahead.getAttribute_Value() != null){
             current.ID = Integer.parseInt(lookahead.getAttribute_Value());
-            System.out.println(lookahead.getAttribute_Value() + " " + lookahead.getLexeme());
+//            System.out.println(lookahead.getAttribute_Value() + " " + lookahead.getLexeme());
             current.alexeme = lookahead.getLexeme();
         }else{
             current.alexeme = "What what";
@@ -856,7 +856,7 @@ public class Parser{
             //IS Call
             CallNode cnode = (CallNode)e;
             cnode.specifier = TokenType.ID;
-            System.out.println(ID);
+//            System.out.println(ID);
             if(ID != null)
                 cnode.ID = Integer.parseInt(ID);
             if(lex.equals("readint")){

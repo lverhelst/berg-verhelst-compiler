@@ -121,7 +121,7 @@ public class SemAnalyzer {
         if(!checkTypes(type,func.specifier) && func.ID >= -0) {
             printError(func.alexeme + ": return type of " + type + " does not match the expected " + func.specifier);
         }
-        
+                
         scope.pop();
     }
     
@@ -163,7 +163,7 @@ public class SemAnalyzer {
         TokenType type = null;
         scope.push(new ArrayList<listRecord>());
         
-        compound.level = cur_lvl++;
+        compound.level = ++cur_lvl;
                 
         for(VarDeclarationNode var: compound.variableDeclarations) {            
             var.displacement = compound.displacement++;
@@ -185,7 +185,7 @@ public class SemAnalyzer {
             }
         }
         scope.pop();        
-        cur_lvl--;
+        --cur_lvl;
         
         return type;
     }

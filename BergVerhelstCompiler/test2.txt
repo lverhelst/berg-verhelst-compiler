@@ -3,6 +3,8 @@ int a;
 int f(int x, bool b) {
 	int y;
 
+	y := readint();
+
 	if (b) {
 		int u;
 		u := 2 * x;
@@ -17,9 +19,9 @@ int f(int x, bool b) {
 }
 
 int main(void) {
-	int m;
-	a := 1;
-	m := f(a, false);
-	writeint(m);
+--	int m;
+--	a := 1;
+--	m := f(a, false);
+--	writeint(m);
 	return 1;
 }

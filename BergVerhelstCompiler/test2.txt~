@@ -3,13 +3,15 @@ int a;
 int f(int x, bool b) {
 	int y;
 
-	if (b) {
+	y := readint();
+
+	if (b && true) {
 		int u;
 		u := 2 * x;
 		return u;
 	}
 	else {
-		y := f(x, b);
+		y := f(x, not b);
 		return y;
 	}
 
@@ -17,9 +19,9 @@ int f(int x, bool b) {
 }
 
 int main(void) {
-	int m;
-	a := 1;
-	m := f(a, false);
-	writeint(m);
+--	int m;
+--	a := 1;
+--	m := f(a, false);
+--	writeint(m);
 	return 1;
 }

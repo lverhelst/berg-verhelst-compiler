@@ -120,12 +120,15 @@ public class CodeGen {
         displacement = this.getLocalSize(compound);
         offset = 0;
         level = compound.level;
-        
-        code.add(new Quadruple("ecs", getLocalSize(compound) + "","-","-"));
+        Quadruple cs = new Quadruple("ecs", getLocalSize(compound) + "","-","-"); 
+        code.add(cs);
         //check child stmts and their returns
         for(ASTNode stmt: compound.statements) {
             statement(stmt);
         }
+        
+        //sets the number of variables
+        cs.arg = (displacement + offset) + "";
         
         displacement = store_displacement;
         offset = store_offset;

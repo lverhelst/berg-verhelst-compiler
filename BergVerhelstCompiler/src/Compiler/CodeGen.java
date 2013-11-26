@@ -390,7 +390,7 @@ public class CodeGen {
         }        
         
         if(var.negate) {
-            String temp = this.genTemp(); //replace with active address
+            String temp = this.genTemp(); 
             code.add(new Quadruple("not", address, "-", temp));
             address = temp;
         }
@@ -458,6 +458,11 @@ public class CodeGen {
         }
         
         code.add(new Quadruple(op,expression(binop.Lside),expression(binop.Rside),tempVar));
+        
+        if(binop.negate) {
+            code.add(new Quadruple("not", tempVar, "-", tempVar));
+        }
+        
         //expression(binop.Lside);    
         //expression(binop.Rside);        
         return tempVar;

@@ -427,7 +427,7 @@ public class SemAnalyzer {
         binop.RsideType = r;
        if(checkTypes(l,r)){
           return getOpType(binop.specifier);
-       }else{
+       } else{
            printError("Incompatible Types: " + l + ", " + r);
            return TokenType.UNI;
        }

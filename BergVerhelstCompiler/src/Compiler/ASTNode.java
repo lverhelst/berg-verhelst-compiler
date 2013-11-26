@@ -489,7 +489,8 @@ public class ASTNode{
         Expression Lside;
         TokenType LsideType;
         Expression Rside;
-        TokenType RsideType;
+        TokenType RsideType;        
+        boolean negate;
         
          @Override
         public String toString(int depth) {
@@ -500,7 +501,9 @@ public class ASTNode{
         }
 
         @Override
-        public void negate() {}
+        public void negate() {
+            negate = true;
+        }
     }
     
     /**

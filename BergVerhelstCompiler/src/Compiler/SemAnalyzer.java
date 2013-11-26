@@ -386,6 +386,11 @@ public class SemAnalyzer {
             }
         }
         
+        if(var.negate && !checkTypes(node.getSpecifier(), TokenType.BOOL)) {
+           printError("Imcompatible Negation Type: " + node.getSpecifier());
+           return TokenType.UNI;
+        }
+        
 //        Attempt to fix unintialized variables but is not dynamic
 //        if(!node.assigned) {
 //            printError("Uninitialized Variable: " + var.alexeme);
@@ -401,6 +406,10 @@ public class SemAnalyzer {
      * @return Type of the literal (NUM, BLIT)
      */
     private TokenType LiteralNode(LiteralNode lit) {
+        if(lit.negate && !checkTypes(lit.specifier, TokenType.BOOL)) {
+           printError("Imcompatible Negation Type: " + lit.specifier);
+           return TokenType.UNI;
+        }
         return lit.specifier;
     }
     
@@ -426,8 +435,12 @@ public class SemAnalyzer {
         binop.LsideType = l;
         binop.RsideType = r;
        if(checkTypes(l,r)){
-          return getOpType(binop.specifier);
-       } else{
+           if(binop.negate && !checkTypes(l, TokenType.BOOL)) {
+               printError("Imcompatible Negation Type: " + l);
+               return TokenType.UNI;
+           }
+           return getOpType(binop.specifier);
+       } else {
            printError("Incompatible Types: " + l + ", " + r);
            return TokenType.UNI;
        }

@@ -147,7 +147,7 @@ public class CodeGen {
     }
     /**
      * Quadruple generation for AssignmentNode
-     * @Class Emery
+     * @Class Emerygen
      */
     private void AssignmentNode(AssignmentNode assignment) {
         if(assignment.index != null)
@@ -350,12 +350,12 @@ public class CodeGen {
             code.add(new Quadruple("rdb","-","-",temp));  
             return temp;
         }  else if(call.alexeme.equals("writeint")) {
-            String temp = genTemp();
-            code.add(new Quadruple("wri",expression(call.arguments.get(0)),"-","-"));  
+            String temp = expression(call.arguments.get(0));
+            code.add(new Quadruple("wri",temp,"-","-"));  
             return temp;
         }   else if(call.alexeme.equals("writebool")) {
-            String temp = genTemp();
-            code.add(new Quadruple("wrb",expression(call.arguments.get(0)),"-","-"));  
+            String temp = expression(call.arguments.get(0));
+            code.add(new Quadruple("wrb",temp,"-","-"));  
             return temp;
         }   
         
@@ -364,12 +364,6 @@ public class CodeGen {
         
         //check arguments against the functions parameters
         for(Expression e: call.arguments){ 
-            if(e instanceof VariableNode) {
-                Declaration declare = ((VariableNode)e).declaration;
-                if(declare instanceof VarDeclarationNode) {
-                    ((VarDeclarationNode)declare).level = level;
-                } 
-            }
             code.add(new Quadruple("arg",expression(e),"-", "-"));
         }
         

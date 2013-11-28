@@ -1,27 +1,37 @@
 int a;
-
+/*
 int f(int x, bool b) {
 	int y;
 
-	y := readint();
+	y := 1;
 
-	if (b) {
+	if (x = 10) {
 		int u;
 		u := 2 * x;
 		return u;
 	}
 	else {
-		y := f(u, not b);
+		--y := f(x, true);
 		return y;
 	}
 
 	return y;
+}*/
+
+int f(int x, bool b) {
+int y;
+
+	writeint(x);
+	writebool(b);
+	return x + 10;
 }
 
 int main(void) {
 	int m;
-	a := 1;
-	m := f(a, false);
-	writeint(m);
+	a := readint();
+	
+	a := f(a, true);
+	--m := f(a, false);
+	writeint(a);
 	return 1;
 }

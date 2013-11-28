@@ -690,7 +690,7 @@ public class CodeGen {
          */
         @Override
         public String toString() {
-            return "(" + op + "," + arg + "," + arg2 + "," + result + ");";
+            return "(" + op + "," + arg + "," + arg2 + "," + result + ")";
         }
     }
     

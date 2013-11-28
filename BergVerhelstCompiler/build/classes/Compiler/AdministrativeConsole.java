@@ -192,6 +192,8 @@ public class AdministrativeConsole {
                 cg.generateCode(node);
                 didPass &= !cg.error;
             }
+            
+            pWriter.close();
         }
        return (didPass)? "PASS": "FAIL";
    }  

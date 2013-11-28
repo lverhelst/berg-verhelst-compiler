@@ -333,23 +333,25 @@ public class SemAnalyzer {
             //Add reference to declaration to the AST
             call.declaration = node;
         }
+        
         ParameterNode param = node.params;
         int num_params = node.num_params * -1;
         //check arguments against the functions parameters
-        for(Expression e: call.arguments){
-            param.displacement = num_params++;
-            TokenType temp = expression(e);            
-            
-            if(param == null) {
-                printError(node.alexeme + " call number of parameters do not match");
-            } else if(param.ref && !(e.getClass() == VariableNode.class)) {
-                printError(node.alexeme + " reference must be to a variable");
-            } else if(!checkTypes(param.param,temp)) {
-                printError(node.alexeme + " call parameter mismatch " + param.param + " expected " + temp + " found");
-            }
+        if(call.arguments != null) {
+            for(Expression e: call.arguments){
+                TokenType temp = expression(e);            
 
-            if(param != null)
-                param = param.nextNode;
+                if(param == null) {
+                    printError(node.alexeme + " call number of parameters do not match");
+                } else if(param.ref && !(e.getClass() == VariableNode.class)) {
+                    printError(node.alexeme + " reference must be to a variable");
+                } else if(!checkTypes(param.param,temp)) {
+                    printError(node.alexeme + " call parameter mismatch " + param.param + " expected " + temp + " found");
+                } else {
+                    param.displacement = num_params++;
+                    param = param.nextNode;
+                }                   
+            }
         }
         
         if(!(param == null || param.param == TokenType.VOID)) {

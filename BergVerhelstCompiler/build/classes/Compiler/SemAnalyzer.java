@@ -108,7 +108,10 @@ public class SemAnalyzer {
         
         //search all params
         while(param != null) {
-            ParameterNode(func.params);
+            func.num_params++;
+            if(param.param != TokenType.VOID)
+                ParameterNode(param);
+            
             param.displacement = displacement--;
             param = param.nextNode;
         }
@@ -118,7 +121,7 @@ public class SemAnalyzer {
         if(!checkTypes(type,func.specifier) && func.ID >= -0) {
             printError(func.alexeme + ": return type of " + type + " does not match the expected " + func.specifier);
         }
-        
+                
         scope.pop();
     }
     
@@ -148,10 +151,7 @@ public class SemAnalyzer {
      * @Class Emery
      */
     private void ParameterNode(ParameterNode param) {
-        //check for redeclaration errors
-//        if(searchScope(param.ID) == null) {
-            scope.peek().add(new listRecord(param, param.ID, param.alexeme));
-//        }
+        scope.peek().add(new listRecord(param, param.ID, param.alexeme));
     }
     
     /**
@@ -163,7 +163,7 @@ public class SemAnalyzer {
         TokenType type = null;
         scope.push(new ArrayList<listRecord>());
         
-        compound.level = cur_lvl++;
+        compound.level = ++cur_lvl;
                 
         for(VarDeclarationNode var: compound.variableDeclarations) {            
             var.displacement = compound.displacement++;
@@ -172,10 +172,6 @@ public class SemAnalyzer {
         
         //check child stmts and their returns
         for(ASTNode stmt: compound.statements) {
-            if(stmt instanceof CompoundNode) {
-                CompoundNode((CompoundNode)stmt);                
-            }
-            
             if(stmt instanceof ReturnNode) { //check return types of the compound statment
                 TokenType temp = statement(stmt);
                 
@@ -189,7 +185,7 @@ public class SemAnalyzer {
             }
         }
         scope.pop();        
-        cur_lvl--;
+        --cur_lvl;
         
         return type;
     }
@@ -203,7 +199,12 @@ public class SemAnalyzer {
             ((VarDeclarationNode)node).assigned = true;
         }
         //check var to ensure it has been declared
-        TokenType leftSide = VariableNode(assignment.leftVar); 
+        TokenType leftSide = VariableNode(assignment.leftVar);
+        
+        if(node instanceof ParameterNode) {
+            leftSide = node.getSpecifier();
+        }
+        
         //check expressions for what type it is
         if(assignment.index != null){
             if(!expressionIsInt(assignment.index)){
@@ -332,21 +333,25 @@ public class SemAnalyzer {
             //Add reference to declaration to the AST
             call.declaration = node;
         }
+        
         ParameterNode param = node.params;
+        int num_params = node.num_params * -1;
         //check arguments against the functions parameters
-        for(Expression e: call.arguments){
-            TokenType temp = expression(e);
-            
-            if(param == null) {
-                printError(node.alexeme + " call number of parameters do not match");
-            } else if(param.ref && !(e.getClass() == VariableNode.class)) {
-                printError(node.alexeme + " reference must be to a variable");
-            } else if(!checkTypes(param.param,temp)) {
-                printError(node.alexeme + " call parameter mismatch " + param.param + " expected " + temp + " found");
-            }
+        if(call.arguments != null) {
+            for(Expression e: call.arguments){
+                TokenType temp = expression(e);            
 
-            if(param != null)
+                if(param == null) {
+                    printError(node.alexeme + " call number of parameters do not match");
+                } else if(param.ref && !(e.getClass() == VariableNode.class)) {
+                    printError(node.alexeme + " reference must be to a variable");
+                } else if(!checkTypes(param.param,temp)) {
+                    printError(node.alexeme + " call parameter mismatch " + param.param + " expected " + temp + " found");
+                } else {
+                    param.displacement = num_params++;
                     param = param.nextNode;
+                }                   
+            }
         }
         
         if(!(param == null || param.param == TokenType.VOID)) {
@@ -383,6 +388,11 @@ public class SemAnalyzer {
             }
         }
         
+        if(var.negate && !checkTypes(node.getSpecifier(), TokenType.BOOL)) {
+           printError("Imcompatible Negation Type: " + node.getSpecifier());
+           return TokenType.UNI;
+        }
+        
 //        Attempt to fix unintialized variables but is not dynamic
 //        if(!node.assigned) {
 //            printError("Uninitialized Variable: " + var.alexeme);
@@ -398,6 +408,10 @@ public class SemAnalyzer {
      * @return Type of the literal (NUM, BLIT)
      */
     private TokenType LiteralNode(LiteralNode lit) {
+        if(lit.negate && !checkTypes(lit.specifier, TokenType.BOOL)) {
+           printError("Imcompatible Negation Type: " + lit.specifier);
+           return TokenType.UNI;
+        }
         return lit.specifier;
     }
     
@@ -423,8 +437,12 @@ public class SemAnalyzer {
         binop.LsideType = l;
         binop.RsideType = r;
        if(checkTypes(l,r)){
-          return getOpType(binop.specifier);
-       }else{
+           if(binop.negate && !checkTypes(l, TokenType.BOOL)) {
+               printError("Imcompatible Negation Type: " + l);
+               return TokenType.UNI;
+           }
+           return getOpType(binop.specifier);
+       } else {
            printError("Incompatible Types: " + l + ", " + r);
            return TokenType.UNI;
        }
@@ -469,6 +487,8 @@ public class SemAnalyzer {
             BranchNode((BranchNode) stmt);
         else if (stmt.getClass() == CallNode.class)
             CallNode((CallNode) stmt);
+        else if (stmt.getClass() == CompoundNode.class)
+            CompoundNode((CompoundNode) stmt);
         return null;
     }
     /**
